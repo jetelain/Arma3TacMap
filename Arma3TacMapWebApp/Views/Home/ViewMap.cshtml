@@ -1,0 +1,5 @@
+﻿@model EditMapViewModel
+
+<h1 class="h3 text-center">@Model.Access.TacMap.Label</h1>
+
+@await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = true })

@@ -1,0 +1,63 @@
+﻿@model IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-6">
+            <h2>Créer une carte tactique</h2>
+
+            <p>Choisir le fond de carte :</p>
+
+            <form asp-action="CreateMap" class="row justify-content-center">
+                @foreach (var map in Model.Maps)
+                {
+                    <button class="btn btn-outline-secondary m-2" asp-action="CreateMap" asp-route-id="@map.Key">
+                        <div class="card">
+                            <img class="card-img" src="@("https://jetelain.github.io/Arma3Map" + map.Value.tilePattern.Replace("{x}", "0").Replace("{y}", "0").Replace("{z}", "0"))" width="128" height="128" />
+                            <div class="card-img-overlay d-flex">
+                                <p class="text-dark align-self-center mx-auto btn-image-text">@map.Key</p>
+                            </div>
+                        </div>
+                    </button>
+                }
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h2>Cartes tactiques existantes</h2>
+            @if (Model.TacMaps.Count == 0)
+            {
+                <p>Vous n'avez pas de carte tactique existante.</p>
+            }
+            else
+            {
+                foreach (var map in Model.TacMaps)
+                {
+                    var action = map.CanWrite ? "EditMap" : "ViewMap";
+                    <div class="card mb-3">
+                        <div class="row no-gutters">
+                            <div class="col-2">
+                                <a asp-action="@action" asp-route-id="@map.TacMapID">
+                                    <img class="card-img" src="@("https://jetelain.github.io/Arma3Map" + Model.Maps[map.TacMap.WorldName].tilePattern.Replace("{x}", "0").Replace("{y}", "0").Replace("{z}", "0")) " />
+                                </a>
+                            </div>
+                            <div class="col-10">
+                                <div class="card-body pt-2 pb-2">
+                                    <h5 class="card-title"><a asp-action="@action" asp-route-id="@map.TacMapID">@map.TacMap.Label</a> <span class="small">@map.TacMap.WorldName</span></h5>
+                                    <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">Afficher</a>
+                                    @if (map.TacMap.OwnerUserID == map.UserID)
+                                    {
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Modifier libellé</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <p><a class="btn btn-sm btn-outline-secondary" href="">Voir la liste complète</a></p>
+            }
+        </div>
+    </div>
+
+</div>

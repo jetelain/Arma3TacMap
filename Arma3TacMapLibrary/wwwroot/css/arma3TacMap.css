@@ -1,0 +1,99 @@
+﻿
+.arma3-ColorBlack {
+    background-color: #000000 !important;
+    color: white;
+}
+
+.arma3-ColorGrey {
+    background-color: #7F7F7F !important;
+}
+
+.arma3-ColorRed {
+    background-color: #E50000 !important;
+}
+
+.arma3-ColorBrown {
+    background-color: #7F3F00 !important;
+}
+
+.arma3-ColorOrange {
+    background-color: #D86600 !important;
+}
+
+.arma3-ColorYellow {
+    background-color: #D8D800 !important;
+}
+
+.arma3-ColorKhaki {
+    background-color: #7F9966 !important;
+}
+
+.arma3-ColorGreen {
+    background-color: #00CC00 !important;
+}
+
+.arma3-ColorBlue {
+    background-color: #0000FF !important;
+}
+
+.arma3-ColorPink {
+    background-color: #FF4C66 !important;
+}
+
+.arma3-ColorWhite {
+    background-color: #FFFFFF !important;
+}
+
+.arma3-ColorUNKNOWN {
+    background-color: #B29900 !important;
+}
+
+.arma3-colorBLUFOR {
+    background-color: #004C99 !important;
+}
+
+.arma3-colorOPFOR {
+    background-color: #7F0000 !important;
+}
+
+.arma3-colorIndependent {
+    background-color: #007F00 !important;
+}
+
+.arma3-colorCivilian {
+    background-color: #66007F !important;
+}
+
+.leaflet-left {
+    margin-left: 10px;
+}
+
+.leaflet-right {
+    margin-right: 10px;
+}
+
+.leaflet-top {
+    margin-top: 5px;
+}
+
+.leaflet-container .leaflet-grid-mouseposition {
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 5px #bbb;
+    padding: 5px;
+    margin: 0px;
+    color: #000;
+    font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    width: 80px;
+    text-align: center;
+}
+.text-marker-content {
+    height: 32px;
+    width: max-content;
+    font-size: 14px;
+    font-weight: bold;
+    vertical-align: middle;
+    /*text-shadow: 1px 1px 2px white;*/
+}
+.btn-outline-secondary {
+    background-color: rgba(255, 255, 255, 0.25);
+}

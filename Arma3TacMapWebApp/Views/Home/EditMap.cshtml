@@ -1,0 +1,45 @@
+﻿@model EditMapViewModel
+
+<div class="modal" tabindex="-1" role="dialog" id="share">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Partage et export
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <p>Lien pour l'accès en lecture seule</p>
+
+                <div class="input-group mb-3">
+                    <input id="link-ro" class="form-control" type="text" readonly="readonly" value="@Url.Action("ViewMap", "Home", new { id = Model.Access.TacMap.TacMapID, t = Model.Access.TacMap.ReadOnlyToken }, Context.Request.Scheme)" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-ro">Copier</button>
+                    </div>
+                </div>
+
+                <p>Lien pour l'accès en lecture et écriture</p>
+
+                <div class="input-group mb-3">
+                    <input id="link-rw" class="form-control" type="text" readonly="readonly" value="@Url.Action("EditMap","Home", new { id = Model.Access.TacMap.TacMapID, t = Model.Access.TacMap.ReadWriteToken }, Context.Request.Scheme)" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-rw">Copier</button>
+                    </div>
+                </div>
+
+                <p>Exporter vers Arma3 (avec <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1508091616" target="_blank">Metis Marker</a>)</p>
+
+                <p><a href="" class="btn btn-secondary">Export SQF</a> <a href="" class="btn btn-secondary">Export Données</a></p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1 class="h3 text-center">@Model.Access.TacMap.Label <a href="#" class="btn btn-sm btn-outline-secondary">Modifier</a></h1>
+
+@await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = false })

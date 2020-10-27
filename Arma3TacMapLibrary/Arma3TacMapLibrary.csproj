@@ -1,0 +1,169 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\css\arma3TacMap.css" />
+    <Content Remove="wwwroot\img\home-solid.svg" />
+    <Content Remove="wwwroot\img\markers\flag_aaf.png" />
+    <Content Remove="wwwroot\img\markers\flag_altis.png" />
+    <Content Remove="wwwroot\img\markers\flag_altiscolonial.png" />
+    <Content Remove="wwwroot\img\markers\flag_belgium.png" />
+    <Content Remove="wwwroot\img\markers\flag_canada.png" />
+    <Content Remove="wwwroot\img\markers\flag_catalonia.png" />
+    <Content Remove="wwwroot\img\markers\flag_croatia.png" />
+    <Content Remove="wwwroot\img\markers\flag_csat.png" />
+    <Content Remove="wwwroot\img\markers\flag_ctrg.png" />
+    <Content Remove="wwwroot\img\markers\flag_czechrepublic.png" />
+    <Content Remove="wwwroot\img\markers\flag_denmark.png" />
+    <Content Remove="wwwroot\img\markers\flag_eu.png" />
+    <Content Remove="wwwroot\img\markers\flag_fia.png" />
+    <Content Remove="wwwroot\img\markers\flag_france.png" />
+    <Content Remove="wwwroot\img\markers\flag_georgia.png" />
+    <Content Remove="wwwroot\img\markers\flag_germany.png" />
+    <Content Remove="wwwroot\img\markers\flag_greece.png" />
+    <Content Remove="wwwroot\img\markers\flag_hungary.png" />
+    <Content Remove="wwwroot\img\markers\flag_iceland.png" />
+    <Content Remove="wwwroot\img\markers\flag_italy.png" />
+    <Content Remove="wwwroot\img\markers\flag_luxembourg.png" />
+    <Content Remove="wwwroot\img\markers\flag_nato.png" />
+    <Content Remove="wwwroot\img\markers\flag_netherlands.png" />
+    <Content Remove="wwwroot\img\markers\flag_norway.png" />
+    <Content Remove="wwwroot\img\markers\flag_poland.png" />
+    <Content Remove="wwwroot\img\markers\flag_portugal.png" />
+    <Content Remove="wwwroot\img\markers\flag_russia.png" />
+    <Content Remove="wwwroot\img\markers\flag_slovakia.png" />
+    <Content Remove="wwwroot\img\markers\flag_slovenia.png" />
+    <Content Remove="wwwroot\img\markers\flag_spain.png" />
+    <Content Remove="wwwroot\img\markers\flag_syndicat.png" />
+    <Content Remove="wwwroot\img\markers\flag_tanoa.png" />
+    <Content Remove="wwwroot\img\markers\flag_tanoagendarmerie.png" />
+    <Content Remove="wwwroot\img\markers\flag_uk.png" />
+    <Content Remove="wwwroot\img\markers\flag_un.png" />
+    <Content Remove="wwwroot\img\markers\flag_usa.png" />
+    <Content Remove="wwwroot\img\markers\flag_viper.png" />
+    <Content Remove="wwwroot\img\markers\hd_ambush.png" />
+    <Content Remove="wwwroot\img\markers\hd_arrow.png" />
+    <Content Remove="wwwroot\img\markers\hd_destroy.png" />
+    <Content Remove="wwwroot\img\markers\hd_dot.png" />
+    <Content Remove="wwwroot\img\markers\hd_end.png" />
+    <Content Remove="wwwroot\img\markers\hd_flag.png" />
+    <Content Remove="wwwroot\img\markers\hd_join.png" />
+    <Content Remove="wwwroot\img\markers\hd_objective.png" />
+    <Content Remove="wwwroot\img\markers\hd_pickup.png" />
+    <Content Remove="wwwroot\img\markers\hd_start.png" />
+    <Content Remove="wwwroot\img\markers\hd_unknown.png" />
+    <Content Remove="wwwroot\img\markers\hd_warning.png" />
+    <Content Remove="wwwroot\img\markers\mil_ambush.png" />
+    <Content Remove="wwwroot\img\markers\mil_arrow.png" />
+    <Content Remove="wwwroot\img\markers\mil_arrow2.png" />
+    <Content Remove="wwwroot\img\markers\mil_box.png" />
+    <Content Remove="wwwroot\img\markers\mil_circle.png" />
+    <Content Remove="wwwroot\img\markers\mil_destroy.png" />
+    <Content Remove="wwwroot\img\markers\mil_dot.png" />
+    <Content Remove="wwwroot\img\markers\mil_end.png" />
+    <Content Remove="wwwroot\img\markers\mil_flag.png" />
+    <Content Remove="wwwroot\img\markers\mil_join.png" />
+    <Content Remove="wwwroot\img\markers\mil_marker.png" />
+    <Content Remove="wwwroot\img\markers\mil_objective.png" />
+    <Content Remove="wwwroot\img\markers\mil_pickup.png" />
+    <Content Remove="wwwroot\img\markers\mil_start.png" />
+    <Content Remove="wwwroot\img\markers\mil_triangle.png" />
+    <Content Remove="wwwroot\img\markers\mil_unknown.png" />
+    <Content Remove="wwwroot\img\markers\mil_warning.png" />
+    <Content Remove="wwwroot\js\arma3TacMap.js" />
+    <Content Remove="wwwroot\js\milstdExtra.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\css\arma3TacMap.css" />
+    <EmbeddedResource Include="wwwroot\img\home-solid.svg" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_aaf.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_altis.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_altiscolonial.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_belgium.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_canada.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_catalonia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_croatia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_csat.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_ctrg.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_czechrepublic.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_denmark.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_eu.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_fia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_france.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_georgia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_germany.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_greece.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_hungary.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_iceland.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_italy.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_luxembourg.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_nato.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_netherlands.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_norway.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_poland.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_portugal.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_russia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_slovakia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_slovenia.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_spain.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_syndicat.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_tanoa.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_tanoagendarmerie.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_uk.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_un.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_usa.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\flag_viper.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_ambush.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_arrow.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_destroy.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_dot.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_end.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_flag.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_join.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_objective.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_pickup.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_start.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_unknown.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\hd_warning.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_ambush.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_arrow.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_arrow2.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_box.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_circle.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_destroy.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_dot.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_end.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_flag.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_join.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_marker.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_objective.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_pickup.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_start.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_triangle.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_unknown.png" />
+    <EmbeddedResource Include="wwwroot\img\markers\mil_warning.png" />
+    <EmbeddedResource Include="wwwroot\js\arma3TacMap.js" />
+    <EmbeddedResource Include="wwwroot\js\milstdExtra.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.9" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\NewFolder\" />
+  </ItemGroup>
+
+
+</Project>
