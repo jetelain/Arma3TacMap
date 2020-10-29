@@ -9,7 +9,7 @@ namespace Arma3TacMapWebApp.Models
 {
     public class IndexViewModel
     {
-        public Dictionary<string,MapInfos> Maps { get; set; }
+        public List<MapInfos> Maps { get; set; }
         public List<TacMapAccess> TacMaps { get; internal set; }
     }
 }

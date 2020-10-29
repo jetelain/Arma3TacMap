@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 namespace Arma3TacMapWebApp
 {
@@ -62,6 +64,13 @@ namespace Arma3TacMapWebApp
                 options.AddPolicy("Admin", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",admins.ToArray()));
                 options.AddPolicy("LoggedUser", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
             });
+
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetValue<string>("UnixKeysDirectory")))
+                    .SetApplicationName("Arma3Event");
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

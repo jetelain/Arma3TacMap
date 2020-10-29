@@ -45,7 +45,7 @@ namespace Arma3TacMapWebApp.Maps
 
         internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label)
         {
-            var dbUser = await GetOrCreateUser(user, GetSteamId(user));
+            var dbUser = await GetOrCreateUser(user);
             var map = new TacMap()
             {
                 Created = DateTime.UtcNow,
@@ -69,7 +69,7 @@ namespace Arma3TacMapWebApp.Maps
 
         internal async Task<TacMapAccess> GrantReadAccess(ClaimsPrincipal user, int id, string t)
         {
-            var dbUser = await GetUser(user, GetSteamId(user));
+            var dbUser = await GetUser(user);
             if (dbUser != null)
             {
                 var access = await _db.TacMapAccesses.Include(a => a.TacMap).FirstOrDefaultAsync(a => a.UserID == dbUser.UserID && a.TacMapID == id);
@@ -99,7 +99,7 @@ namespace Arma3TacMapWebApp.Maps
 
         internal async Task<TacMapAccess> GrantWriteAccess(ClaimsPrincipal user, int id, string t)
         {
-            var dbUser = await GetOrCreateUser(user, GetSteamId(user));
+            var dbUser = await GetOrCreateUser(user);
             var access = await _db.TacMapAccesses.Include(a => a.TacMap).FirstOrDefaultAsync(a => a.UserID == dbUser.UserID && a.TacMapID == id);
             if (access != null)
             {
@@ -127,8 +127,9 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        private async Task<User> GetUser(ClaimsPrincipal user, string steamId)
+        public async Task<User> GetUser(ClaimsPrincipal user)
         {
+            var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
             {
                 return null;
@@ -136,8 +137,9 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.Users.FirstOrDefaultAsync(u => u.SteamId == steamId);
         }
 
-        private async Task<User> GetOrCreateUser(ClaimsPrincipal user, string steamId)
+        private async Task<User> GetOrCreateUser(ClaimsPrincipal user)
         {
+            var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
             { 
                 return null;
@@ -213,7 +215,7 @@ namespace Arma3TacMapWebApp.Maps
             return MapUserInitialData.Denied;
         }
 
-        private async Task<List<StoredMarker>> GetMarkers(int tacMapID, bool isReadOnly)
+        internal async Task<List<StoredMarker>> GetMarkers(int tacMapID, bool isReadOnly)
         {
             return (await _db.TacMapMarkers.Where(m => m.TacMapID == tacMapID).ToListAsync())
                 .Select(m => new StoredMarker()
@@ -280,10 +282,10 @@ namespace Arma3TacMapWebApp.Maps
 
         internal async Task<List<TacMapAccess>> GetUserMaps(ClaimsPrincipal user, int maxMaps = 1000)
         {
-            var dbUser = await GetOrCreateUser(user, GetSteamId(user));
+            var dbUser = await GetOrCreateUser(user);
             if (dbUser != null)
             {
-                return await _db.TacMapAccesses.Where(m => m.UserID == dbUser.UserID).Include(t => t.TacMap).OrderByDescending(m => m.TacMap.Created).Take(maxMaps).ToListAsync();
+                return await _db.TacMapAccesses.Where(m => m.UserID == dbUser.UserID).Include(t => t.TacMap).Include(t => t.TacMap.Owner).OrderByDescending(m => m.TacMap.Created).Take(maxMaps).ToListAsync();
             }
             return new List<TacMapAccess>();
         }

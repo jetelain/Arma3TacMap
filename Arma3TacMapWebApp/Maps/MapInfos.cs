@@ -4,6 +4,7 @@ namespace Arma3TacMapWebApp.Maps
 {
     public class MapInfos
 	{
+		public string worldName { get; set; }
 		public string tilePattern { get; set; }
 		public int maxZoom { get; set; }
 		public int minZoom { get; set; }
@@ -14,6 +15,7 @@ namespace Arma3TacMapWebApp.Maps
 		public int worldSize { get; set; }
 		public string preview { get; set; }
 		public string dlc { get; set; }
+		public string title { get; set; }
 		public string steamWorkshop { get; set; }
 		public List<CityInfos> cities { get; set; }
 	}

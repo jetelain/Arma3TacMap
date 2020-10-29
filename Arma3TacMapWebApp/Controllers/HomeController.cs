@@ -30,25 +30,31 @@ namespace Arma3TacMapWebApp.Controllers
             var vm = new IndexViewModel();
             vm.Maps = await _mapInfos.GetMapsInfos();
             vm.TacMaps = await _mapSvc.GetUserMaps(User, 6);
+            foreach(var map in vm.TacMaps)
+            {
+                map.TacMap.MapInfos = vm.Maps.FirstOrDefault(m => m.worldName == map.TacMap.WorldName);
+            }
             return View(vm);
         }
 
         [Authorize(Policy = "LoggedUser")]
         [HttpGet]
-        public async Task<IActionResult> CreateMap(string id)
+        public IActionResult CreateMap(string id)
         {
-            return View(); // TODO !
+            return RedirectToAction(nameof(TacMapsController.Create), "TacMaps", new { worldName = id });
         }
-
+        /*
         [Authorize(Policy = "LoggedUser")]
-        [HttpPost("CreateMap")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMap(string id, string label)
         {
             MapId mapId = await _mapSvc.CreateMap(User, id, label ?? "Carte tactique sans nom");
             return RedirectToAction(nameof(EditMap), new { id = mapId.TacMapID });
         }
+        */
 
+        [Route("EditMap/{id}")]
         [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> EditMap(int id, string t)
         {
@@ -69,6 +75,7 @@ namespace Arma3TacMapWebApp.Controllers
             });
         }
 
+        [Route("ViewMap/{id}")]
         public async Task<IActionResult> ViewMap(int id, string t)
         {
             var access = await _mapSvc.GrantReadAccess(User, id, t);

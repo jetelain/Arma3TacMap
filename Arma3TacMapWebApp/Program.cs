@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Arma3TacMapWebApp.Entities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +32,7 @@ namespace Arma3TacMapWebApp
                 try
                 {
                     var context = services.GetRequiredService<Arma3TacMapContext>();
-                    context.Database.EnsureCreated();
+                    context.Database.Migrate();
                 }
                 catch (Exception ex)
                 {

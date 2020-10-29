@@ -1,0 +1,46 @@
+﻿@model Arma3TacMapWebApp.Entities.TacMap
+
+@{
+    ViewData["Title"] = "Oublier une carte tactique";
+}
+<div class="container">
+    <h1>Oublier une carte tactique</h1>
+
+    <h3>Êtes vous sûre de vouloir oublier cette carte tactique?</h3>
+
+    <p>La carte sera uniquement supprimée de votre liste, elle restera disponible pour son propriétaire.</p>
+
+    <div>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Owner)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Owner.UserLabel)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Created)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Created)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Label)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Label)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.WorldName)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.WorldName)
+            </dd>
+        </dl>
+
+        <form asp-action="Forget">
+            <input type="hidden" asp-for="TacMapID" />
+            <input type="submit" value="Oublier" class="btn btn-danger" />
+        </form>
+    </div>
+</div>

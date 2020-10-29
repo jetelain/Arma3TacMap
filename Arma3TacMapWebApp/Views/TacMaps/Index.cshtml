@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Arma3TacMapWebApp.Entities.TacMapAccess>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container">
+    <h1>Cartes tactiques</h1>
+    <p>
+        <a class="btn btn-primary" asp-action="Create">Créer une carte tactique</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.TacMap.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TacMap.Created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TacMap.WorldName)
+                </th>
+                <th>
+                    Accès
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var action = item.CanWrite ? "EditMap" : "ViewMap";
+                <tr>
+                    <td>
+                        <a asp-controller="Home" asp-action="@action" asp-route-id="@item.TacMapID">@Html.DisplayFor(modelItem => item.TacMap.Label)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TacMap.Created)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TacMap.MapInfos.title)
+                    </td>
+                    <td>
+                        @if (item.TacMap.OwnerUserID == item.UserID)
+                        {
+                            <span>Propriétaire</span>
+                        }
+                        else if (item.CanWrite)
+                        {
+                            <span>Modification</span>
+                        }
+                        else
+                        {
+                            <span>Lecture seule</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="@action" asp-route-id="@item.TacMapID">Afficher</a>
+                        @if (item.CanWrite)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Export" asp-route-id="@item.TacMapID">Exporter</a>
+                        }
+                        @if (item.TacMap.OwnerUserID == item.UserID)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.TacMapID">Modifier</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.TacMapID">Supprimer</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Forget" asp-route-id="@item.TacMapID">Oublier</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

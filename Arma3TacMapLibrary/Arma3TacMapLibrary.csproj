@@ -75,6 +75,7 @@
     <Content Remove="wwwroot\img\markers\mil_triangle.png" />
     <Content Remove="wwwroot\img\markers\mil_unknown.png" />
     <Content Remove="wwwroot\img\markers\mil_warning.png" />
+    <Content Remove="wwwroot\img\pointmap.png" />
     <Content Remove="wwwroot\js\arma3TacMap.js" />
     <Content Remove="wwwroot\js\milstdExtra.js" />
   </ItemGroup>
@@ -148,6 +149,7 @@
     <EmbeddedResource Include="wwwroot\img\markers\mil_triangle.png" />
     <EmbeddedResource Include="wwwroot\img\markers\mil_unknown.png" />
     <EmbeddedResource Include="wwwroot\img\markers\mil_warning.png" />
+    <EmbeddedResource Include="wwwroot\img\pointmap.png" />
     <EmbeddedResource Include="wwwroot\js\arma3TacMap.js" />
     <EmbeddedResource Include="wwwroot\js\milstdExtra.js" />
   </ItemGroup>

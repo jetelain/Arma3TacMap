@@ -31,15 +31,15 @@
                     </div>
                 </div>
 
-                <p>Exporter vers Arma3 (avec <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1508091616" target="_blank">Metis Marker</a>)</p>
+                <p>Exporter</p>
 
-                <p><a href="" class="btn btn-secondary">Export SQF</a> <a href="" class="btn btn-secondary">Export Données</a></p>
+                <p><a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="Export" asp-route-id="@Model.Access.TacMap.TacMapID" target="_blank">Export vers Arma3</a></p>
 
             </div>
         </div>
     </div>
 </div>
 
-<h1 class="h3 text-center">@Model.Access.TacMap.Label <a href="#" class="btn btn-sm btn-outline-secondary">Modifier</a></h1>
+<h1 class="h3 text-center">@Model.Access.TacMap.Label <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-outline-secondary">Modifier</a></h1>
 
 @await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = false })

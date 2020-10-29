@@ -1,0 +1,23 @@
+﻿@model Arma3TacMapWebApp.Models.ExportViewModel
+
+@{
+    ViewData["Title"] = "Exporter une carte tactique";
+}
+
+<div class="container">
+    <h1 class="text-center">Carte tactique</h1>
+    <p class="text-center">
+        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">Afficher la carte</a>
+        @if (Model.TacMap.OwnerUserID == Model.Access.UserID)
+        {
+        <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">Modifier</a>
+        }
+    </p>
+
+    <h2 class="mt-5">Export vers Arma3 avec Metis Marker</h2>
+    <p>Export le plus fidèle, nécessite le mod <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1508091616" target="_blank">Metis Marker</a></p>
+    <p><button class="btn btn-secondary btn-copy" type="button" data-copy="script">Copier</button></p>
+    <div class="input-group">
+        <textarea id="script" class="form-control" rows="10" readonly="readonly">@Model.Script</textarea>
+    </div>
+</div>

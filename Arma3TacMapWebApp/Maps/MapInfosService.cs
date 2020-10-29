@@ -19,9 +19,9 @@ namespace Arma3TacMapWebApp.Maps
             _cache = cache;
         }
 
-        public async Task<Dictionary<string, MapInfos>> GetMapsInfos()
+        public async Task<List<MapInfos>> GetMapsInfos()
         {
-            Dictionary<string, MapInfos> value;
+            List<MapInfos> value;
             if (_cache.TryGetValue(nameof(MapInfos), out value))
             {
                 return value;
@@ -31,7 +31,7 @@ namespace Arma3TacMapWebApp.Maps
             return value;
         }
 
-        private async Task<Dictionary<string, MapInfos>> ReadMapsInfos()
+        private async Task<List<MapInfos>> ReadMapsInfos()
         {
             try
             {
@@ -42,10 +42,15 @@ namespace Arma3TacMapWebApp.Maps
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        return await JsonSerializer.DeserializeAsync<Dictionary<string, MapInfos>>(responseStream, new JsonSerializerOptions
+                        var data = await JsonSerializer.DeserializeAsync<Dictionary<string, MapInfos>>(responseStream, new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
                         });
+                        foreach(var pair in data)
+                        {
+                            pair.Value.worldName = pair.Key;
+                        }
+                        return data.Values.OrderBy(v => v.worldName).ToList();
                     }
                 }
             }
@@ -53,7 +58,7 @@ namespace Arma3TacMapWebApp.Maps
             {
 
             }
-            return new Dictionary<string, MapInfos>();
+            return new List<MapInfos>();
         }
     }
 }

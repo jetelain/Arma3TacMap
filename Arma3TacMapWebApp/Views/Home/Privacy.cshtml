@@ -1,6 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Mentions légales";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<a class="github-fork-ribbon" href="https://github.com/jetelain/Arma3TacMap" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+
+<div class="container">
+    @if (System.IO.File.Exists("wwwroot/help/legal.html"))
+    {
+        @Html.Raw(System.IO.File.ReadAllText("wwwroot/help/legal.html"))
+    }
+    else
+    {
+        <p class="alert alert-danger">Configuration incomplète. Vous devez renseigner les informations légales dans le fichier wwwdata/help/legal.html.</p>
+    }
+
+    <h2>Cookies</h2>
+    <ul>
+        <li>Ce site utilise uniquement des cookies techniques nécessaires à l'authentification des utilisateurs connectés et à la sécurisation de la saisie dans les formulaires.</li>
+        <li>Ces cookies techniques sont uniquement pésent si vous vous êtes authentifiés. Ils sont supprimés lors de la déconnection, ou au bout d'au maximum 2 semaines.</li>
+        <li>
+            Vous pouvez refuser ces cookies via la configuration de votre navigateur, merci de vous référer à la documentation fourni par son éditeur. Il ne nous sera cependant
+            pas possible d'utiliser certaines fonctionnalités.
+        </li>
+    </ul>
+
+    <dl>
+        <dt>
+            <code>.AspNetCore.Cookies</code>
+        </dt>
+        <dd>
+            Identité de l'utilisateur, suite à la connection avec Steam. Conservé jusqu'a la déconnection, dans une limite de 2 semaines.
+        </dd>
+        <dt>
+            <code>.AspNetCore.Antiforgery.(valeur aléatoire)</code>
+        </dt>
+        <dd>
+            Sécurisation de la saisie dans les formulaires. Conservé jusqu'a la fermeture de l'onglet du navigateur.
+        </dd>
+    </dl>
+
+    <h2>Licences et notices de droits d'auteur</h2>
+    <p>Logiciel, images, et feuille de style sous licence MIT &copy; Julien Etelain (aka GrueArbre), à l'exception des logiciels et contenus de tierce partie listés ci-dessous.</p>
+
+    <ul>
+        @{await Html.RenderPartialAsync("_TacMapCredits");}
+        <li><a href="https://bootswatch.com/">Bootswatch</a> under MIT license. &copy; Thomas Park.</li>
+        <li><a href="https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers">AspNet.Security.OpenId.Providers</a> under Apache License 2.0.</li>
+    </ul>
+</div>
+
+@section Styles
+{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+}
