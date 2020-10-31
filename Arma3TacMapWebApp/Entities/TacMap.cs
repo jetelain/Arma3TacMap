@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-using Arma3TacMapWebApp.Maps;
+using Arma3TacMapLibrary.Arma3;
 
 namespace Arma3TacMapWebApp.Entities
 {

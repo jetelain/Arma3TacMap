@@ -14,7 +14,7 @@
                 {
                     <a class="btn btn-outline-secondary m-2" asp-action="CreateMap" asp-route-id="@map.worldName">
                         <div class="card">
-                            <img class="card-img" src="@("https://jetelain.github.io/Arma3Map" + map.tilePattern.Replace("{x}", "0").Replace("{y}", "0").Replace("{z}", "0"))" width="128" height="128" style="width:128px; height:128px;" />
+                            <img class="card-img" src="@map.fullMapTile" width="128" height="128" style="width:128px; height:128px;" />
                             <div class="card-img-overlay d-flex p-0">
                                 <p class="text-dark align-self-center mx-auto btn-image-text">@map.title</p>
                             </div>
@@ -38,7 +38,7 @@
                         <div class="row no-gutters">
                             <div class="col-2">
                                 <a asp-action="@action" asp-route-id="@map.TacMapID">
-                                    <img class="card-img" src="@("https://jetelain.github.io/Arma3Map" + map.TacMap.MapInfos.tilePattern.Replace("{x}", "0").Replace("{y}", "0").Replace("{z}", "0")) " />
+                                    <img class="card-img" src="@map.TacMap.MapInfos.fullMapTile " />
                                 </a>
                             </div>
                             <div class="col-10">

@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
+using Arma3TacMapLibrary.Arma3;
 
 namespace Arma3TacMapWebApp
 {

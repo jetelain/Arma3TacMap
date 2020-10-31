@@ -19,7 +19,7 @@
                 <div class="form-group">
                     <label asp-for="WorldName" class="control-label"></label>
                     <select asp-for="WorldName" class="form-control">
-                        @foreach (var name in (List<Arma3TacMapWebApp.Maps.MapInfos>)ViewBag.Maps)
+                        @foreach (var name in (List<Arma3TacMapLibrary.Arma3.MapInfos>)ViewBag.Maps)
                         {
                             <option value="@name.worldName">@name.title</option>
                         }

@@ -2,6 +2,8 @@
 {
     public class LiveMapModel
     {
+        internal string endpoint;
+
         public object mapId { get; set; }
 
         public string worldName { get; set; }

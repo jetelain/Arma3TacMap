@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Arma3TacMapWebApp.Maps
+namespace Arma3TacMapLibrary.Arma3
 {
     public class MapInfos
 	{
+		public string fullMapTile { get; set; }
+
 		public string worldName { get; set; }
 		public string tilePattern { get; set; }
 		public int maxZoom { get; set; }

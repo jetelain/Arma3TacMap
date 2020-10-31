@@ -1,4 +1,4 @@
-﻿namespace Arma3TacMapWebApp.Maps
+﻿namespace Arma3TacMapLibrary.Arma3
 {
 	public class CityInfos
 	{

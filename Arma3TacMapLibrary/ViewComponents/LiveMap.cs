@@ -7,12 +7,14 @@ using Arma3TacMapLibrary.Arma3;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
+using Microsoft.Extensions.Configuration;
 
 namespace Arma3TacMapLibrary.ViewComponents
 {
     public class LiveMap : ViewComponent
     {
         private readonly ITagHelperComponentManager _manager;
+        private readonly string _endpoint;
 
         private const string baseLineStyle = @"<link rel=""stylesheet"" href=""https://unpkg.com/leaflet@1.6.0/dist/leaflet.css""/>
 <link rel=""stylesheet"" href=""https://unpkg.com/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"" />
@@ -30,18 +32,19 @@ namespace Arma3TacMapLibrary.ViewComponents
 </script>
 <script src=""https://unpkg.com/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"">
 </script>
-<script src=""https://jetelain.github.io/Arma3Map/js/mapUtils.js"">
+<script src=""{endpoint}/js/mapUtils.js"">
 </script>
-<script src=""https://jetelain.github.io/Arma3Map/maps/all.js"">
+<script src=""{endpoint}/maps/all.js"">
 </script>
 <script src=""/js/milstdExtra.js?{version}"">
 </script>
 <script src=""/js/arma3TacMap.js?{version}"">
 </script>";
 
-        public LiveMap(ITagHelperComponentManager manager)
+        public LiveMap(ITagHelperComponentManager manager, IConfiguration configuration)
         {
             _manager = manager;
+            _endpoint = Arma3MapHelper.GetEndpoint(configuration);
         }
 
         public IViewComponentResult Invoke(object mapId, string worldName, bool isReadonly)
@@ -50,9 +53,14 @@ namespace Arma3TacMapLibrary.ViewComponents
             vm.isReadOnly = isReadonly;
             vm.worldName = worldName ?? "altis";
             vm.mapId = mapId;
+            vm.endpoint = _endpoint;
 
             var scripts = new List<IHtmlContent>();
-            scripts.Add(new HtmlString(baseLineScript.Replace("{version}", File.GetLastWriteTimeUtc(typeof(LiveMap).Assembly.Location).Ticks.ToString())));
+            scripts.Add(new HtmlString(baseLineScript
+                .Replace("{version}", File.GetLastWriteTimeUtc(typeof(LiveMap).Assembly.Location).Ticks.ToString())
+                .Replace("{endpoint}", _endpoint)
+                ));
+
             scripts.Add(new HtmlString($"<script>initLiveMap({JsonSerializer.Serialize(vm)});</script>"));
             _manager.Components.Add(new InjectTagHelperComponent("head", new HtmlString(baseLineStyle)));
             _manager.Components.Add(new InjectTagHelperComponent("body", scripts));

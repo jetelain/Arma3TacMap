@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 

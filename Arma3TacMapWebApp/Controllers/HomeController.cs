@@ -10,6 +10,7 @@ using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Arma3TacMapWebApp.Entities;
+using Arma3TacMapLibrary.Arma3;
 
 namespace Arma3TacMapWebApp.Controllers
 {

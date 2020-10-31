@@ -1,69 +1,4 @@
-﻿L.Control.OverlayButton = L.Control.extend({
-    options: {
-        position: 'bottomright',
-        baseClassName: 'btn',
-        className: 'btn-outline-secondary',
-        content: '',
-        click: null
-    },
-
-    _previousClass: '',
-
-    onAdd: function (map) {
-        this._previousClass = this.options.className;
-        this._container = L.DomUtil.create('button', this.options.baseClassName + ' ' + this.options.className);
-        L.DomEvent.disableClickPropagation(this._container);
-        this._container.innerHTML = this.options.content;
-        if (this.options.click) {
-            $(this._container).on('click', this.options.click);
-        }
-        return this._container;
-    },
-
-    onRemove: function (map) {
-
-    },
-
-    j: function () {
-        return $(this._container);
-    },
-
-    setClass: function (name) {
-        $(this._container).removeClass(this._previousClass);
-        $(this._container).addClass(name);
-        this._previousClass = name;
-    }
-});
-
-L.control.overlayButton = function (options) {
-    return new L.Control.OverlayButton(options);
-};
-
-L.Control.OverlayDiv = L.Control.extend({
-    options: {
-        position: 'bottomright',
-        content: ''
-    },
-
-    _previousClass: '',
-
-    onAdd: function (map) {
-        this._container = L.DomUtil.create('div', '');
-        L.DomEvent.disableClickPropagation(this._container);
-        $(this._container).append(this.options.content);
-        return this._container;
-    },
-
-    onRemove: function (map) {
-
-    }
-});
-
-L.control.overlayDiv = function (options) {
-    return new L.Control.OverlayDiv(options);
-};
-
-function applySymbolSet() {
+﻿function applySymbolSet() {
     var id = '0003';
     var symbolset = $('#set').val();
 
@@ -459,13 +394,13 @@ function addOrUpdateMarker(map, markers, marker, canEdit, backend) {
     }
 }
 
-function initMapArea(mapInfos) {
+function initMapArea(mapInfos, endpoint) {
     var map = L.map('map', {
         minZoom: mapInfos.minZoom,
         maxZoom: mapInfos.maxZoom,
         crs: mapInfos.CRS
     });
-    L.tileLayer('https://jetelain.github.io/Arma3Map' + mapInfos.tilePattern, {
+    L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
         attribution: mapInfos.attribution,
         tileSize: mapInfos.tileSize
     }).addTo(map);
@@ -691,7 +626,7 @@ function initLiveMap(config) {
 
         var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
 
-        var map = initMapArea(mapInfos);
+        var map = initMapArea(mapInfos, config.endpoint);
 
         var markers = {};
         var pointing = {};
