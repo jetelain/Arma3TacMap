@@ -37,7 +37,10 @@ namespace Arma3TacMapWebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
+
             services.AddSignalR();
             services.AddScoped<IMapService<MapId>, MapService>();
             services.AddScoped<MapService>();

@@ -1,11 +1,12 @@
 ﻿@model EditMapViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 <div class="modal" tabindex="-1" role="dialog" id="share">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    Partage et export
+                    @Localizer["Sharing and export"]
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -13,33 +14,33 @@
             </div>
             <div class="modal-body">
 
-                <p>Lien pour l'accès en lecture seule</p>
+                <p>@Localizer["Link for read only access"]</p>
 
                 <div class="input-group mb-3">
                     <input id="link-ro" class="form-control" type="text" readonly="readonly" value="@Url.Action("ViewMap", "Home", new { id = Model.Access.TacMap.TacMapID, t = Model.Access.TacMap.ReadOnlyToken }, Context.Request.Scheme)" />
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-ro">Copier</button>
+                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-ro">@Localizer["Copy"]</button>
                     </div>
                 </div>
 
-                <p>Lien pour l'accès en lecture et écriture</p>
+                <p>@Localizer["Link for read and write access"]</p>
 
                 <div class="input-group mb-3">
                     <input id="link-rw" class="form-control" type="text" readonly="readonly" value="@Url.Action("EditMap","Home", new { id = Model.Access.TacMap.TacMapID, t = Model.Access.TacMap.ReadWriteToken }, Context.Request.Scheme)" />
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-rw">Copier</button>
+                        <button class="btn btn-outline-secondary btn-copy" type="button" data-copy="link-rw">@Localizer["Copy"]</button>
                     </div>
                 </div>
 
-                <p>Exporter</p>
+                <p>@Localizer["Export"]</p>
 
-                <p><a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="Export" asp-route-id="@Model.Access.TacMap.TacMapID" target="_blank">Export vers Arma3</a></p>
+                <p><a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="Export" asp-route-id="@Model.Access.TacMap.TacMapID" target="_blank">@Localizer["Export to Arma3"]</a></p>
 
             </div>
         </div>
     </div>
 </div>
 
-<h1 class="h3 text-center">@Model.Access.TacMap.Label <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-outline-secondary">Modifier</a></h1>
+<h1 class="h3 text-center">@Model.Access.TacMap.Label <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-outline-secondary">@Localizer["Edit"]</a></h1>
 
 @await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = false })

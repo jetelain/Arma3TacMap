@@ -4,37 +4,37 @@ namespace Arma3TacMapLibrary.Arma3
 {
     public enum Arma3MarkerColor
     {
-        [Display(Name = "Noir")]
+        [Display(Name = "Black")]
         ColorBlack,
-        [Display(Name = "Gris")]
+        [Display(Name = "Grey")]
         ColorGrey,
-        [Display(Name = "Rouge")]
+        [Display(Name = "Red")]
         ColorRed,
-        [Display(Name = "Marron")]
+        [Display(Name = "Brown")]
         ColorBrown,
         [Display(Name = "Orange")]
         ColorOrange,
-        [Display(Name = "Jaune")]
+        [Display(Name = "Yellow")]
         ColorYellow,
         [Display(Name = "Khaki")]
         ColorKhaki,
-        [Display(Name = "Vert")]
+        [Display(Name = "Green")]
         ColorGreen,
-        [Display(Name = "Bleu")]
+        [Display(Name = "Blue")]
         ColorBlue,
-        [Display(Name = "Rose")]
+        [Display(Name = "Pink")]
         ColorPink,
-        [Display(Name = "Blanc")]
+        [Display(Name = "White")]
         ColorWhite,
-        [Display(Name = "Inconnu")]
+        [Display(Name = "UNKNOWN")]
         ColorUNKNOWN,
         [Display(Name = "BLUFOR")]
         colorBLUFOR,
         [Display(Name = "OPFOR")]
         colorOPFOR,
-        [Display(Name = "Indépendent")]
+        [Display(Name = "Independent")]
         colorIndependent,
-        [Display(Name = "Civil")]
+        [Display(Name = "Civilian")]
         colorCivilian
     }
 }

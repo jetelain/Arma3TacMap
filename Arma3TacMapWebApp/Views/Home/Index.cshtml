@@ -1,28 +1,15 @@
 ﻿@model IndexViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "PLANOPS Maps";
 }
 <div class="container">
     <div class="row">
 
         <div class="col-md-6">
-            <h2>Créer une carte tactique</h2>
+            <h2>@Localizer["Create tactical map"]</h2>
 
-            @*<form asp-action="CreateMap" class="row justify-content-center">
-                @foreach (var map in Model.Maps)
-                {
-                    <button class="btn btn-outline-secondary m-2" asp-action="CreateMap" asp-route-id="@map.worldName">
-                        <div class="card">
-                            <img class="card-img" src="@("https://jetelain.github.io/Arma3Map" + map.tilePattern.Replace("{x}", "0").Replace("{y}", "0").Replace("{z}", "0"))" width="128" height="128" style="width:128px; height:128px;" />
-                            <div class="card-img-overlay d-flex p-0">
-                                <p class="text-dark align-self-center mx-auto btn-image-text">@map.title</p>
-                            </div>
-                        </div>
-                    </button>
-                }
-            </form>*@
-
-           <div class="row justify-content-center">
+            <div class="row justify-content-center">
                 @foreach (var map in Model.Maps)
                 {
                     <a class="btn btn-outline-secondary m-2" asp-action="CreateMap" asp-route-id="@map.worldName">
@@ -37,10 +24,10 @@
             </div>
         </div>
         <div class="col-md-6">
-            <h2>Cartes tactiques existantes</h2>
+            <h2>@Localizer["Existing tactical maps"]</h2>
             @if (Model.TacMaps.Count == 0)
             {
-                <p>Vous n'avez pas de carte tactique existante.</p>
+                <p>@Localizer["You have no existing tactical map."]</p>
             }
             else
             {
@@ -62,21 +49,21 @@
                                             @map.TacMap.MapInfos.title
                                             @if (map.TacMap.OwnerUserID != map.UserID)
                                             {
-                                                <br /> @:partagé par @map.TacMap.Owner.UserLabel
-                                            }
-                                        </span>
+                                                <br /> @Localizer["shared by {0}", @map.TacMap.Owner.UserLabel]
+                                   }
+                                            </span>
                                     </h5>
-                                    <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">Afficher</a>
+                                    <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">@Localizer["Display"]</a>
                                     @if (map.TacMap.OwnerUserID == map.UserID)
                                     {
-                                        <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                        <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">@Localizer["Edit"]</a>
                                     }
                                 </div>
                             </div>
                         </div>
                     </div>
                 }
-                <p><a class="btn btn-sm btn-outline-secondary" asp-controller="TacMaps" asp-action="Index">Voir la liste complète</a></p>
+                <p><a class="btn btn-sm btn-outline-secondary" asp-controller="TacMaps" asp-action="Index">@Localizer["See full list"]</a></p>
             }
         </div>
     </div>

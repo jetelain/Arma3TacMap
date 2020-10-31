@@ -1,0 +1,228 @@
+﻿<Manifest>
+  <ManifestVersion>1.0</ManifestVersion>
+  <FileSystem>
+    <Directory Name="wwwroot">
+      <Directory Name="css">
+        <File Name="arma3TacMap.css">
+          <ResourcePath>Arma3TacMapLibrary.wwwroot.css.arma3TacMap.css</ResourcePath>
+        </File>
+      </Directory>
+      <Directory Name="img">
+        <File Name="home-solid.svg">
+          <ResourcePath>Arma3TacMapLibrary.wwwroot.img.home-solid.svg</ResourcePath>
+        </File>
+        <Directory Name="markers">
+          <File Name="flag_aaf.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_aaf.png</ResourcePath>
+          </File>
+          <File Name="flag_altis.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_altis.png</ResourcePath>
+          </File>
+          <File Name="flag_altiscolonial.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_altiscolonial.png</ResourcePath>
+          </File>
+          <File Name="flag_belgium.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_belgium.png</ResourcePath>
+          </File>
+          <File Name="flag_canada.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_canada.png</ResourcePath>
+          </File>
+          <File Name="flag_catalonia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_catalonia.png</ResourcePath>
+          </File>
+          <File Name="flag_croatia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_croatia.png</ResourcePath>
+          </File>
+          <File Name="flag_csat.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_csat.png</ResourcePath>
+          </File>
+          <File Name="flag_ctrg.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_ctrg.png</ResourcePath>
+          </File>
+          <File Name="flag_czechrepublic.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_czechrepublic.png</ResourcePath>
+          </File>
+          <File Name="flag_denmark.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_denmark.png</ResourcePath>
+          </File>
+          <File Name="flag_eu.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_eu.png</ResourcePath>
+          </File>
+          <File Name="flag_fia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_fia.png</ResourcePath>
+          </File>
+          <File Name="flag_france.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_france.png</ResourcePath>
+          </File>
+          <File Name="flag_georgia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_georgia.png</ResourcePath>
+          </File>
+          <File Name="flag_germany.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_germany.png</ResourcePath>
+          </File>
+          <File Name="flag_greece.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_greece.png</ResourcePath>
+          </File>
+          <File Name="flag_hungary.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_hungary.png</ResourcePath>
+          </File>
+          <File Name="flag_iceland.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_iceland.png</ResourcePath>
+          </File>
+          <File Name="flag_italy.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_italy.png</ResourcePath>
+          </File>
+          <File Name="flag_luxembourg.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_luxembourg.png</ResourcePath>
+          </File>
+          <File Name="flag_nato.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_nato.png</ResourcePath>
+          </File>
+          <File Name="flag_netherlands.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_netherlands.png</ResourcePath>
+          </File>
+          <File Name="flag_norway.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_norway.png</ResourcePath>
+          </File>
+          <File Name="flag_poland.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_poland.png</ResourcePath>
+          </File>
+          <File Name="flag_portugal.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_portugal.png</ResourcePath>
+          </File>
+          <File Name="flag_russia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_russia.png</ResourcePath>
+          </File>
+          <File Name="flag_slovakia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_slovakia.png</ResourcePath>
+          </File>
+          <File Name="flag_slovenia.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_slovenia.png</ResourcePath>
+          </File>
+          <File Name="flag_spain.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_spain.png</ResourcePath>
+          </File>
+          <File Name="flag_syndicat.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_syndicat.png</ResourcePath>
+          </File>
+          <File Name="flag_tanoa.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_tanoa.png</ResourcePath>
+          </File>
+          <File Name="flag_tanoagendarmerie.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_tanoagendarmerie.png</ResourcePath>
+          </File>
+          <File Name="flag_uk.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_uk.png</ResourcePath>
+          </File>
+          <File Name="flag_un.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_un.png</ResourcePath>
+          </File>
+          <File Name="flag_usa.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_usa.png</ResourcePath>
+          </File>
+          <File Name="flag_viper.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.flag_viper.png</ResourcePath>
+          </File>
+          <File Name="hd_ambush.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_ambush.png</ResourcePath>
+          </File>
+          <File Name="hd_arrow.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_arrow.png</ResourcePath>
+          </File>
+          <File Name="hd_destroy.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_destroy.png</ResourcePath>
+          </File>
+          <File Name="hd_dot.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_dot.png</ResourcePath>
+          </File>
+          <File Name="hd_end.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_end.png</ResourcePath>
+          </File>
+          <File Name="hd_flag.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_flag.png</ResourcePath>
+          </File>
+          <File Name="hd_join.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_join.png</ResourcePath>
+          </File>
+          <File Name="hd_objective.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_objective.png</ResourcePath>
+          </File>
+          <File Name="hd_pickup.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_pickup.png</ResourcePath>
+          </File>
+          <File Name="hd_start.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_start.png</ResourcePath>
+          </File>
+          <File Name="hd_unknown.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_unknown.png</ResourcePath>
+          </File>
+          <File Name="hd_warning.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.hd_warning.png</ResourcePath>
+          </File>
+          <File Name="mil_ambush.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_ambush.png</ResourcePath>
+          </File>
+          <File Name="mil_arrow.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_arrow.png</ResourcePath>
+          </File>
+          <File Name="mil_arrow2.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_arrow2.png</ResourcePath>
+          </File>
+          <File Name="mil_box.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_box.png</ResourcePath>
+          </File>
+          <File Name="mil_circle.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_circle.png</ResourcePath>
+          </File>
+          <File Name="mil_destroy.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_destroy.png</ResourcePath>
+          </File>
+          <File Name="mil_dot.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_dot.png</ResourcePath>
+          </File>
+          <File Name="mil_end.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_end.png</ResourcePath>
+          </File>
+          <File Name="mil_flag.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_flag.png</ResourcePath>
+          </File>
+          <File Name="mil_join.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_join.png</ResourcePath>
+          </File>
+          <File Name="mil_marker.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_marker.png</ResourcePath>
+          </File>
+          <File Name="mil_objective.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_objective.png</ResourcePath>
+          </File>
+          <File Name="mil_pickup.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_pickup.png</ResourcePath>
+          </File>
+          <File Name="mil_start.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_start.png</ResourcePath>
+          </File>
+          <File Name="mil_triangle.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_triangle.png</ResourcePath>
+          </File>
+          <File Name="mil_unknown.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_unknown.png</ResourcePath>
+          </File>
+          <File Name="mil_warning.png">
+            <ResourcePath>Arma3TacMapLibrary.wwwroot.img.markers.mil_warning.png</ResourcePath>
+          </File>
+        </Directory>
+        <File Name="pointmap.png">
+          <ResourcePath>Arma3TacMapLibrary.wwwroot.img.pointmap.png</ResourcePath>
+        </File>
+      </Directory>
+      <Directory Name="js">
+        <File Name="arma3TacMap.js">
+          <ResourcePath>Arma3TacMapLibrary.wwwroot.js.arma3TacMap.js</ResourcePath>
+        </File>
+        <File Name="milstdExtra.js">
+          <ResourcePath>Arma3TacMapLibrary.wwwroot.js.milstdExtra.js</ResourcePath>
+        </File>
+      </Directory>
+    </Directory>
+  </FileSystem>
+</Manifest>

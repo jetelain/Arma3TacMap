@@ -1,5 +1,5 @@
 ﻿@using Arma3TacMapLibrary.Arma3
-@model Arma3TacMapLibrary.ViewComponents.LiveMapModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<Arma3TacMapLibrary.LibraryResource> Localizer
 
 <div class="alert alert-danger" role="alert" id="connectionlost" style="display:none;">
     La connection a été perdue avec le serveur.
@@ -11,227 +11,227 @@
 @if (!Model.isReadOnly)
 {
 
-<div class="modal" tabindex="-1" role="dialog" id="milsymbol">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <span id="milsymbol-grid"></span>
-                    : Symbole OTAN APP-6 (D)
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="bg-light text-center mb-1 p-1">
-                    <div id="symbolNumber" class="text-dark">
-                    </div>
-                    <div id="symbolPreview">
-                    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="milsymbol">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="milsymbol-grid"></span>
+                        : @Localizer["NATO APP-6 (D) Symbol"]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="id2" class="control-label">Identité</label>
-                            <select id="id2" class="form-control  form-control-sm">
-                                <option value="0">En attente (jaune)</option>
-                                <option value="1">Inconnu (jaune)</option>
-                                <option value="2">Présumé ami (bleu)</option>
-                                <option value="3" selected="selected">Ami (bleu)</option>
-                                <option value="4">Neutre (vert)</option>
-                                <option value="5">Suspect (rouge)</option>
-                                <option value="6">Hostile (rouge)</option>
-                            </select>
+                <div class="modal-body">
+                    <div class="bg-light text-center mb-1 p-1">
+                        <div id="symbolNumber" class="text-dark">
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="set" class="control-label">Jeu de symboles</label>
-                            <select id="set" class="form-control  form-control-sm">
-                            </select>
+                        <div id="symbolPreview">
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="status" class="control-label">Statut</label>
-                            <select id="status" class="form-control  form-control-sm">
-                                <option value="0" selected="selected">Présent</option>
-                                <option value="1">Prévu, anticipé, supecté</option>
-                                <option value="2">Présent/Capacité complète</option>
-                                <option value="3">Présent/Endomagé</option>
-                                <option value="4">Présent/Détruit</option>
-                                <option value="5">Présent/Complet</option>
-                            </select>
+                    </div>
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="id2" class="control-label">@Localizer["Standard Identity"]</label>
+                                <select id="id2" class="form-control  form-control-sm">
+                                    <option value="0">@Localizer["Pending (yellow)"]</option>
+                                    <option value="1">@Localizer["Unknown (yellow)"]</option>
+                                    <option value="2">@Localizer["Assumed Friend (blue)"]</option>
+                                    <option value="3" selected="selected">@Localizer["Friend (blue)"]</option>
+                                    <option value="4">@Localizer["Neutral (green)"]</option>
+                                    <option value="5">@Localizer["Suspect (red)"]</option>
+                                    <option value="6">@Localizer["Hostile (red)"]</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="set" class="control-label">@Localizer["Symbol set"]</label>
+                                <select id="set" class="form-control  form-control-sm">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="status" class="control-label">@Localizer["Status"]</label>
+                                <select id="status" class="form-control  form-control-sm">
+                                    <option value="0" selected="selected">@Localizer["Present"]</option>
+                                    <option value="1">@Localizer["Planned/Anticiped/Supect"]</option>
+                                    <option value="2">@Localizer["Present/Fully capable"]</option>
+                                    <option value="3">@Localizer["Present/Damaged"]</option>
+                                    <option value="4">@Localizer["Present/Destroyed"]</option>
+                                    <option value="5">@Localizer["Present/Full to capacity"]</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="hq" class="control-label">HQ, TF</label>
+                                <select id="hq" class="form-control  form-control-sm">
+                                    <option value="0" selected="selected">n/a</option>
+                                    <option value="1">Feint/Dummy</option>
+                                    <option value="2">Headquarters</option>
+                                    <option value="3">Feint/Dummy Headquarters</option>
+                                    <option value="4">Task Force</option>
+                                    <option value="5">Feint/Dummy Task Force</option>
+                                    <option value="6">Task Force Headquarters</option>
+                                    <option value="7">Feint/Dummy Task Force Headquarters</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="hq" class="control-label">HQ, TF</label>
-                            <select id="hq" class="form-control  form-control-sm">
-                                <option value="0" selected="selected">n/a</option>
-                                <option value="1">Feint/Dummy</option>
-                                <option value="2">Headquarters</option>
-                                <option value="3">Feint/Dummy Headquarters</option>
-                                <option value="4">Task Force</option>
-                                <option value="5">Feint/Dummy Task Force</option>
-                                <option value="6">Task Force Headquarters</option>
-                                <option value="7">Feint/Dummy Task Force Headquarters</option>
-                            </select>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="icon" class="control-label">@Localizer["Symbol"]</label>
+                                <select id="icon" class="form-control  form-control-sm" data-live-search="true">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="mod1" class="control-label">@Localizer["Icon Modifier 1"]</label>
+                                <select id="mod1" class="form-control  form-control-sm" data-live-search="true">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="mod2" class="control-label">@Localizer["Icon Modifier 2"]</label>
+                                <select id="mod2" class="form-control  form-control-sm" data-live-search="true">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="size" class="control-label">@Localizer["Echelon"]</label>
+                                <select id="size" class="form-control  form-control-sm">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="additionalInformation" class="control-label">@Localizer["Additional Information"]</label>
+                                <input type="text" id="additionalInformation" class="form-control  form-control-sm" />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="higherFormation" class="control-label">Higher Formation</label>
+                                <input type="text" id="higherFormation" class="form-control  form-control-sm" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="uniqueDesignation" class="control-label">@Localizer["Unique Designation Designation"]</label>
+                                <input type="text" maxlength="21" id="uniqueDesignation" class="form-control  form-control-sm" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="direction" class="control-label">@Localizer["Direction (mil)"]</label>
+                                <input type="number" max="6400" min="0" id="direction" class="form-control  form-control-sm" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="reinforcedReduced" class="control-label">@Localizer["Reinforced"]</label>
+                                <select id="reinforcedReduced" class="form-control  form-control-sm">
+                                    <option value=""></option>
+                                    <option value="(+)">(+) reinforced</option>
+                                    <option value="(-)">(-) reduced</option>
+                                    <option value="(±)">(±) reinforced and reduced</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="icon" class="control-label">Symbole</label>
-                            <select id="icon" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="mod1" class="control-label">Modificateur 1</label>
-                            <select id="mod1" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="mod2" class="control-label">Modificateur 2</label>
-                            <select id="mod2" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="size" class="control-label">Echelon</label>
-                            <select id="size" class="form-control  form-control-sm">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="additionalInformation" class="control-label">Informations additionnelles</label>
-                            <input type="text" id="additionalInformation" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="higherFormation" class="control-label">Higher Formation</label>
-                            <input type="text" id="higherFormation" class="form-control  form-control-sm" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="uniqueDesignation" class="control-label">Identifiant unique</label>
-                            <input type="text" maxlength="21" id="uniqueDesignation" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="direction" class="control-label">Direction (mil)</label>
-                            <input type="number" max="6400" min="0" id="direction" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="reinforcedReduced" class="control-label">Renforcé</label>
-                            <select id="reinforcedReduced" class="form-control  form-control-sm">
-                                <option value=""></option>
-                                <option value="(+)">(+) reinforced</option>
-                                <option value="(-)">(-) reduced</option>
-                                <option value="(±)">(±) reinforced and reduced</option>
-                            </select>
-                        </div>
-                    </div>
+
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger mr-5" id="milsymbol-delete">@Localizer["Delete"]</button>
 
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger mr-5" id="milsymbol-delete">Supprimer</button>
-
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-success" id="milsymbol-insert">Insérer</button>
-                <button type="button" class="btn btn-success" id="milsymbol-update">Modifier</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-success" id="milsymbol-insert">@Localizer["Insert"]</button>
+                    <button type="button" class="btn btn-success" id="milsymbol-update">@Localizer["Update"]</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal" tabindex="-1" role="dialog" id="basicsymbol">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <span id="basicsymbol-grid"></span>
-                    : Symbole basique
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="basic-type" class="control-label">Forme</label>
-                            <select id="basic-type" class="form-control">
-                                @foreach (var type in Arma3MarkerTypeHelper.GetAll())
-                                {
-                                    <option data-content="<img src='/img/markers/ColorGrey/@(type).png' height='24' /> @Html.DisplayFor(m => type)" value="@type">@Html.DisplayFor(m => type)</option>
-                                }
-                            </select>
+    <div class="modal" tabindex="-1" role="dialog" id="basicsymbol">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="basicsymbol-grid"></span>
+                        : @Localizer["Basic symbole"]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="basic-type" class="control-label">@Localizer["Shape"]</label>
+                                <select id="basic-type" class="form-control">
+                                    @foreach (var type in Arma3MarkerTypeHelper.GetAll())
+                                    {
+                                        <option data-content="<img src='/img/markers/ColorGrey/@(type).png' height='24' /> @Html.DisplayFor(m => type)" value="@type">@Html.DisplayFor(m => type)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="basic-color" class="control-label">@Localizer["Color"]</label>
+                                <select id="basic-color" class="form-control">
+                                    @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                                    {
+                                        <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="basic-dir" class="control-label">@Localizer["Rotation (mil)"]</label>
+                                <input type="number" max="6400" min="0" id="basic-dir" class="form-control" />
+                            </div>
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="basic-color" class="control-label">Couleur</label>
-                            <select id="basic-color" class="form-control">
-                                @foreach (var color in Arma3MarkerColorHelper.GetAll())
-                                {
-                                    <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="basic-dir" class="control-label">Rotation (mil)</label>
-                            <input type="number" max="6400" min="0" id="basic-dir" class="form-control" />
-                        </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="basic-label" class="control-label">Libellé</label>
-                            <input type="text" id="basic-label" class="form-control" />
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="basic-label" class="control-label">@Localizer["Label"]</label>
+                                <input type="text" id="basic-label" class="form-control" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger mr-5" id="basicsymbol-delete">Supprimer</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-success" id="basicsymbol-insert">Insérer</button>
-                <button type="button" class="btn btn-success" id="basicsymbol-update">Modifier</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger mr-5" id="basicsymbol-delete">@Localizer["Delete"]</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-success" id="basicsymbol-insert">@Localizer["Insert"]</button>
+                    <button type="button" class="btn btn-success" id="basicsymbol-update">@Localizer["Update"]</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal" tabindex="-1" role="dialog" id="line">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Ligne
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="line-color" class="control-label">Couleur</label>
-                            <select id="line-color" class="form-control">
-                                @foreach (var color in Arma3MarkerColorHelper.GetAll())
-                                {
-                                    <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
-                                }
-                            </select>
+    <div class="modal" tabindex="-1" role="dialog" id="line">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @Localizer["Line"]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="line-color" class="control-label">@Localizer["Color"]</label>
+                                <select id="line-color" class="form-control">
+                                    @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                                    {
+                                        <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger mr-5" id="line-delete">Supprimer</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-success" id="line-update">Modifier</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger mr-5" id="line-delete">@Localizer["Delete"]</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="button" class="btn btn-success" id="line-update">@Localizer["Update"]</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 }
 
@@ -240,7 +240,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    Chercher
+                    @Localizer["Search"]
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -248,8 +248,8 @@
             </div>
             <div class="modal-body">
                 <div class="form-row">
-                    <label for="search-term" class="sr-only">Ville ou marqueur</label>
-                    <input type="text" id="search-term" class="form-control" placeholder="Ville ou marqueur" />
+                    <label for="search-term" class="sr-only">@Localizer["City or marker"]</label>
+                    <input type="text" id="search-term" class="form-control" placeholder="@Localizer["City or marker"]" />
                 </div>
                 <ul id="search-results" style="height:50vh" class="overflow-auto list-unstyled mt-2">
                 </ul>

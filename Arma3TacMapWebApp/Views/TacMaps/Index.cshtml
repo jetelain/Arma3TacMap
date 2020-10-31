@@ -1,13 +1,14 @@
 ﻿@model IEnumerable<Arma3TacMapWebApp.Entities.TacMapAccess>
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = @Localizer["Tactical maps"];
 }
 
 <div class="container">
-    <h1>Cartes tactiques</h1>
+    <h1>@Localizer["Tactical maps"]</h1>
     <p>
-        <a class="btn btn-primary" asp-action="Create">Créer une carte tactique</a>
+        <a class="btn btn-primary" asp-action="Create">@Localizer["Create tactical map"]</a>
     </p>
     <table class="table">
         <thead>
@@ -22,7 +23,7 @@
                     @Html.DisplayNameFor(model => model.TacMap.WorldName)
                 </th>
                 <th>
-                    Accès
+                    @Localizer["Access"]
                 </th>
                 <th></th>
             </tr>
@@ -44,31 +45,31 @@
                     <td>
                         @if (item.TacMap.OwnerUserID == item.UserID)
                         {
-                            <span>Propriétaire</span>
+                            <span>@Localizer["Owner"]</span>
                         }
                         else if (item.CanWrite)
                         {
-                            <span>Modification</span>
+                            <span>@Localizer["Editable"],<br />@Localizer["shared by {0}", item.TacMap.Owner.UserLabel]</span>
                         }
                         else
                         {
-                            <span>Lecture seule</span>
+                            <span>@Localizer["Read only"],<br /> @Localizer["shared by {0}", item.TacMap.Owner.UserLabel]</span>
                         }
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="@action" asp-route-id="@item.TacMapID">Afficher</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Home" asp-action="@action" asp-route-id="@item.TacMapID">@Localizer["Display"]</a>
                         @if (item.CanWrite)
                         {
-                            <a class="btn btn-sm btn-outline-secondary" asp-action="Export" asp-route-id="@item.TacMapID">Exporter</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Export" asp-route-id="@item.TacMapID">@Localizer["Export"]</a>
                         }
                         @if (item.TacMap.OwnerUserID == item.UserID)
                         {
-                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.TacMapID">Modifier</a>
-                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.TacMapID">Supprimer</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.TacMapID">@Localizer["Edit"]</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.TacMapID">@Localizer["Delete"]</a>
                         }
                         else
                         {
-                            <a class="btn btn-sm btn-outline-danger" asp-action="Forget" asp-route-id="@item.TacMapID">Oublier</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Forget" asp-route-id="@item.TacMapID">@Localizer["Forget"]</a>
                         }
                     </td>
                 </tr>

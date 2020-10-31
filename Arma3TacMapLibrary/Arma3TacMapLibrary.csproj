@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -78,6 +77,10 @@
     <Content Remove="wwwroot\img\pointmap.png" />
     <Content Remove="wwwroot\js\arma3TacMap.js" />
     <Content Remove="wwwroot\js\milstdExtra.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Manifest.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -159,13 +162,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.9" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
+    <EmbeddedResource Include="Manifest.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\NewFolder\" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.9" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
   </ItemGroup>
-
-
 </Project>

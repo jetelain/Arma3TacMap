@@ -1,21 +1,21 @@
 ﻿@model Arma3TacMapWebApp.Entities.TacMap
-
+@inject IHtmlLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Modifier une carte tactique";
+    ViewData["Title"] = Model.Label;
 }
 
 
 
 <div class="container">
 
-    <h1 class="text-center">Carte tactique</h1>
+    <h1 class="text-center">@Localizer["Tactical map"]</h1>
 
     <p class="text-center">
-        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMapID">Afficher la carte</a>
-        <a class="btn btn-outline-secondary" asp-action="Export" asp-route-id="@Model.TacMapID">Export vers Arma3</a>
+        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMapID">@Localizer["Display map"]</a>
+        <a class="btn btn-outline-secondary" asp-action="Export" asp-route-id="@Model.TacMapID">@Localizer["Export to Arma3"]</a>
     </p>
 
-    <h2 class="mt-5">Modifier le libellé</h2>
+    <h2 class="mt-5">@Localizer["Change label"]</h2>
     <div class="row">
         <div class="col-md-6">
 
@@ -26,7 +26,7 @@
                 <div class="input-group">
                     <input asp-for="Label" class="form-control" />
                     <div class="input-group-append">
-                        <input type="submit" value="Enregistrer" class="btn btn-primary" />
+                        <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
                     </div>
                 </div>
                 <div asp-validation-for="Label" class="text-danger">
@@ -35,24 +35,24 @@
         </div>
     </div>
 
-    <h2 class="mt-5">Partage</h2>
+    <h2 class="mt-5">@Localizer["Sharing"]</h2>
 
     <div class="row">
         <div class="col-md-6">
-            <p>Lien pour l'accès en lecture seule</p>
+            <p>@Localizer["Link for read only access"]</p>
             <div class="input-group mb-3">
                 <input id="link-ro" class="form-control" type="text" readonly="readonly" value="@Url.Action("ViewMap", "Home", new { id = Model.TacMapID, t = Model.ReadOnlyToken }, Context.Request.Scheme)" />
                 <div class="input-group-append">
-                    <button class="btn btn-secondary btn-copy" type="button" data-copy="link-ro">Copier</button>
+                    <button class="btn btn-secondary btn-copy" type="button" data-copy="link-ro">@Localizer["Copy"]</button>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <p>Lien pour l'accès en lecture et écriture</p>
+            <p>@Localizer["Link for read and write access"]</p>
             <div class="input-group mb-3">
                 <input id="link-rw" class="form-control" type="text" readonly="readonly" value="@Url.Action("EditMap","Home", new { id = Model.TacMapID, t = Model.ReadWriteToken }, Context.Request.Scheme)" />
                 <div class="input-group-append">
-                    <button class="btn btn-secondary btn-copy" type="button" data-copy="link-rw">Copier</button>
+                    <button class="btn btn-secondary btn-copy" type="button" data-copy="link-rw">@Localizer["Copy"]</button>
                 </div>
             </div>
         </div>

@@ -1,12 +1,13 @@
 ﻿@model Arma3TacMapWebApp.Entities.TacMap
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
-    ViewData["Title"] = "Supprimer une carte tactique";
+    ViewData["Title"] = Localizer["Delete a tactical map"];
 }
 <div class="container">
-    <h1>Supprimer une carte tactique</h1>
+    <h1>@Localizer["Delete a tactical map"]</h1>
 
-    <h3>Êtes vous sûre de vouloir supprimer cette carte tactique?</h3>
+    <h3>@Localizer["Are you sure you want to detele this tactical map?"]</h3>
     <div>
         <dl class="row">
             <dt class="col-sm-2">
@@ -31,7 +32,7 @@
 
         <form asp-action="Delete">
             <input type="hidden" asp-for="TacMapID" />
-            <input type="submit" value="Supprimer" class="btn btn-danger" />
+            <input type="submit" value="@Localizer["Delete"]" class="btn btn-danger" />
         </form>
     </div>
 </div>

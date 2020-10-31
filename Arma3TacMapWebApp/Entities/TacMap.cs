@@ -12,15 +12,15 @@ namespace Arma3TacMapWebApp.Entities
     {
         public int TacMapID { get; set; }
 
-        [Display(Name = "Propriétaire")]
+        [Display(Name = "Owner")]
         public int OwnerUserID { get; set; }
-        [Display(Name = "Propriétaire")]
+        [Display(Name = "Owner")]
         public User Owner { get; set; }
 
-        [Display(Name = "Date de création")]
+        [Display(Name = "Creation date")]
         public DateTime Created { get; set; }
 
-        [Display(Name = "Libellé")]
+        [Display(Name = "Label")]
         [Required]
         public string Label { get; set; }
 
@@ -28,7 +28,7 @@ namespace Arma3TacMapWebApp.Entities
 
         public string ReadWriteToken { get; set; }
 
-        [Display(Name = "Fond de carte")]
+        [Display(Name = "Map background")]
         [Required]
         public string WorldName { get; set; }
 

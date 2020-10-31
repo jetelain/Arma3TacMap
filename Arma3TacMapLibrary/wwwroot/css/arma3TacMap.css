@@ -1,7 +1,7 @@
 ﻿
 .arma3-ColorBlack {
     background-color: #000000 !important;
-    color: white;
+    color: white !important;
 }
 
 .arma3-ColorGrey {
@@ -34,6 +34,7 @@
 
 .arma3-ColorBlue {
     background-color: #0000FF !important;
+    color: white !important;
 }
 
 .arma3-ColorPink {
@@ -50,18 +51,22 @@
 
 .arma3-colorBLUFOR {
     background-color: #004C99 !important;
+    color: white !important;
 }
 
 .arma3-colorOPFOR {
     background-color: #7F0000 !important;
+    color: white !important;
 }
 
 .arma3-colorIndependent {
     background-color: #007F00 !important;
+    color: white !important;
 }
 
 .arma3-colorCivilian {
     background-color: #66007F !important;
+    color: white !important;
 }
 
 .leaflet-left {

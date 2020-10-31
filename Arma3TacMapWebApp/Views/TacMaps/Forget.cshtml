@@ -1,14 +1,14 @@
 ﻿@model Arma3TacMapWebApp.Entities.TacMap
-
+@inject IHtmlLocalizer<SharedResource> Localizer
 @{
-    ViewData["Title"] = "Oublier une carte tactique";
+    ViewData["Title"] = Localizer["Forget a tactical map"];
 }
 <div class="container">
-    <h1>Oublier une carte tactique</h1>
+    <h1>@Localizer["Forget a tactical map"]</h1>
 
-    <h3>Êtes vous sûre de vouloir oublier cette carte tactique?</h3>
+    <h3>@Localizer["Are you sure you want to forget this tactical map?"]</h3>
 
-    <p>La carte sera uniquement supprimée de votre liste, elle restera disponible pour son propriétaire.</p>
+    <p>@Localizer["Map will be only removed from your list, it will remain available for its owner."]</p>
 
     <div>
         <dl class="row">
@@ -40,7 +40,7 @@
 
         <form asp-action="Forget">
             <input type="hidden" asp-for="TacMapID" />
-            <input type="submit" value="Oublier" class="btn btn-danger" />
+            <input type="submit" value="@Localizer["Forget"]" class="btn btn-danger" />
         </form>
     </div>
 </div>
