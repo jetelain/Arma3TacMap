@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using Arma3TacMapLibrary.Arma3;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Arma3TacMapWebApp
 {
@@ -86,6 +87,11 @@ namespace Arma3TacMapWebApp
             }
             else
             {
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+                });
+
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
