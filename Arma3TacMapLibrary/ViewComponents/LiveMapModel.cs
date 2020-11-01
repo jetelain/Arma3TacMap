@@ -2,7 +2,7 @@
 {
     public class LiveMapModel
     {
-        internal string endpoint;
+        public string endpoint { get; set; }
 
         public object mapId { get; set; }
 

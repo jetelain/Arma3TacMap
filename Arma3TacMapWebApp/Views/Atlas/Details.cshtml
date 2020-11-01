@@ -1,0 +1,19 @@
+﻿@model Arma3TacMapLibrary.Arma3.MapInfos
+@inject IHtmlLocalizer<SharedResource> Localizer
+<h1 class="h3 text-center">
+    @Model.title
+
+    @if (!string.IsNullOrEmpty(Model.dlc))
+    {
+        <a href="@Model.dlc" class="btn btn-sm btn-secondary"><i class="fab fa-steam"></i> DLC</a>
+    }
+    @if (!string.IsNullOrEmpty(Model.steamWorkshop))
+    {
+        <a href="@Model.steamWorkshop" class="btn btn-sm btn-secondary"><i class="fab fa-steam"></i> Steam Workshop</a>
+    }
+
+    <a asp-controller="TacMaps" asp-action="Create" asp-route-worldName="@Model.worldName" class="btn btn-sm btn-outline-secondary">@Localizer["Create tactical map"]</a>
+
+</h1>
+
+@await Component.InvokeAsync("StaticMap", new { markers = new List<Arma3TacMapLibrary.Maps.StoredMarker>(), worldName = Model.worldName, center = ViewBag.Center })

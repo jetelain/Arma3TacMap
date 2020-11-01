@@ -231,4 +231,10 @@
   <data name="Tactical maps" xml:space="preserve">
     <value>Cartes tactiques</value>
   </data>
+  <data name="Cities" xml:space="preserve">
+    <value>Villes</value>
+  </data>
+  <data name="{0}x{0}km, {1} cities" xml:space="preserve">
+    <value>{0}x{0}km, {1} villes</value>
+  </data>
 </root>

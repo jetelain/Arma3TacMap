@@ -394,7 +394,7 @@ function addOrUpdateMarker(map, markers, marker, canEdit, backend) {
     }
 }
 
-function initMapArea(mapInfos, endpoint) {
+function initMapArea(mapInfos, endpoint, center) {
     var map = L.map('map', {
         minZoom: mapInfos.minZoom,
         maxZoom: mapInfos.maxZoom,
@@ -404,7 +404,13 @@ function initMapArea(mapInfos, endpoint) {
         attribution: mapInfos.attribution,
         tileSize: mapInfos.tileSize
     }).addTo(map);
-    map.setView(mapInfos.center, mapInfos.defaultZoom);
+
+    if (center) { 
+        map.setView(center, mapInfos.maxZoom);
+    } else {
+        map.setView(mapInfos.center, mapInfos.defaultZoom);
+    }
+
     L.latlngGraticule({ zoomInterval: [{ start: 0, end: 10, interval: 1000 }] }).addTo(map);
     L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
     L.control.gridMousePosition().addTo(map);
@@ -617,6 +623,11 @@ function setupEditTools(map, backend) {
     selectTool(map, 0);
 }
 
+function setupSeach(map, mapInfos, markers) {
+    L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#search').modal('show'); search(map, mapInfos, markers); }, content: '<i class="fas fa-search"></i>' }).addTo(map);
+    $('#search-term').on('keyup', function () { search(map, mapInfos, markers); });
+}
+
 function initLiveMap(config) {
     $(function () {
 
@@ -636,10 +647,10 @@ function initLiveMap(config) {
         if ($('#share').length) {
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
         }
-        L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#search').modal('show'); search(map, mapInfos, markers); }, content: '<i class="fas fa-search"></i>' }).addTo(map);
-        //L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { }, content: '<i class="fas fa-lock-open"></i>' }).addTo(map);
 
-        $('#search-term').on('keyup', function () { search(map, mapInfos, markers); });
+        setupSeach(map, mapInfos, markers);
+
+                //L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { }, content: '<i class="fas fa-lock-open"></i>' }).addTo(map);
 
         var pointingIcon = new L.icon({ iconUrl: '/img/pointmap.png', iconSize: [16, 16], iconAnchor: [8, 8] });
 
@@ -685,3 +696,19 @@ function initLiveMap(config) {
     });
 }
 
+function initStaticMap(config) {
+    $(function () {
+
+        var worldName = config.worldName;
+        var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
+        var markers = {};
+
+        var map = initMapArea(mapInfos, config.endpoint, config.center);
+
+        setupSeach(map, mapInfos, markers);
+
+        Object.getOwnPropertyNames(config.markers).forEach(function (id) {
+            addOrUpdateMarker(map, markers, { id: id, data: config.markers[id] }, false, null);
+        });
+    });
+}
