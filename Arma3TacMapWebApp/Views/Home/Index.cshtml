@@ -53,7 +53,7 @@
                                    }
                                             </span>
                                     </h5>
-                                    <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">@Localizer["Display"]</a>
+                                    <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-primary">@Localizer["Display"]</a>
                                     @if (map.TacMap.OwnerUserID == map.UserID)
                                     {
                                         <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-secondary">@Localizer["Edit"]</a>

@@ -6,17 +6,20 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapLibrary.Arma3
 {
     public class MapInfosService
     {
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<MapInfosService> _logger;
         private readonly IMemoryCache _cache;
         private readonly string _endpoint;
 
-        public MapInfosService(IMemoryCache cache, IHttpClientFactory clientFactory, IConfiguration configuration)
+        public MapInfosService(IMemoryCache cache, IHttpClientFactory clientFactory, IConfiguration configuration, ILogger<MapInfosService> logger)
         {
+            _logger = logger;
             _clientFactory = clientFactory;
             _cache = cache;
             _endpoint = Arma3MapHelper.GetEndpoint(configuration);
@@ -59,9 +62,9 @@ namespace Arma3TacMapLibrary.Arma3
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
-
+                _logger.LogWarning(e, "Failed");
             }
             return new List<MapInfos>();
         }

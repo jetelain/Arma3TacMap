@@ -7,10 +7,10 @@
 <div class="container">
     <h1 class="text-center">@Localizer["Tactical map"]</h1>
     <p class="text-center">
-        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
         @if (Model.TacMap.OwnerUserID == Model.Access.UserID)
         {
-            <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Edit"]</a>
+            <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Edit"]</a>
         }
     </p>
 

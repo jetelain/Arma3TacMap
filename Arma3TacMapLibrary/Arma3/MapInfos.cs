@@ -14,7 +14,7 @@ namespace Arma3TacMapLibrary.Arma3
 		public string attribution { get; set; }
 		public int tileSize { get; set; }
 		public List<int> center { get; set; }
-		public int worldSize { get; set; }
+		public double worldSize { get; set; }
 		public string preview { get; set; }
 		public string dlc { get; set; }
 		public string title { get; set; }
