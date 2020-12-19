@@ -92,7 +92,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
                         var length = Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
 
                         rectMarkers.Add(new List<object>() {
-                            marker.Id,
+                            marker.Id + (i > 2 ? $"_{i/2}" : ""),
                             x1 + ((x2 - x1) / 2d),
                             y1 + ((y2 - y1) / 2d),
                             length / 2d,
