@@ -38,7 +38,7 @@
                         <div class="row no-gutters">
                             <div class="col-2">
                                 <a asp-action="@action" asp-route-id="@map.TacMapID">
-                                    <img class="card-img" src="@map.TacMap.MapInfos.fullMapTile " />
+                                    <img class="card-img" src="/ViewMap/@map.TacMapID/Preview/256" />
                                 </a>
                             </div>
                             <div class="col-10">
@@ -50,7 +50,7 @@
                                             @if (map.TacMap.OwnerUserID != map.UserID)
                                             {
                                                 <br /> @Localizer["shared by {0}", @map.TacMap.Owner.UserLabel]
-                                   }
+                                            }
                                             </span>
                                     </h5>
                                     <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-primary">@Localizer["Display"]</a>

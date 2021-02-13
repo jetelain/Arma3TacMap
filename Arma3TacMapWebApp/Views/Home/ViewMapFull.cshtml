@@ -1,0 +1,5 @@
+﻿@model StaticMapData
+@{
+    Layout = "_LayoutFull";
+}
+@await Component.InvokeAsync("StaticMap", new { markers = Model.Markers, center = Model.Center, worldName = Model.WorldName, fullScreen = true })

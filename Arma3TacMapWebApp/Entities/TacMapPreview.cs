@@ -5,17 +5,15 @@ using System.Threading.Tasks;
 
 namespace Arma3TacMapWebApp.Entities
 {
-    public class TacMapMarker
+    public class TacMapPreview
     {
-        public int TacMapMarkerID { get; set; }
-
         public int TacMapID { get; set; }
+
         public TacMap TacMap { get; set; }
 
-        public int? UserID { get; set; }
-        public User User { get; set; }
+        public int Size { get; set; }
 
-        public string MarkerData { get; set; }
+        public byte[] Data { get; set; }
 
         public DateTime? LastUpdate { get; set; }
     }

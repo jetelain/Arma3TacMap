@@ -47,13 +47,14 @@ namespace Arma3TacMapLibrary.ViewComponents
             _endpoint = Arma3MapHelper.GetEndpoint(configuration);
         }
 
-        public IViewComponentResult Invoke(object mapId, string worldName, bool isReadonly)
+        public IViewComponentResult Invoke(object mapId, string worldName, bool isReadonly, string hub)
         {
             var vm = new LiveMapModel();
             vm.isReadOnly = isReadonly;
             vm.worldName = worldName ?? "altis";
             vm.mapId = mapId;
             vm.endpoint = _endpoint;
+            vm.hub = hub ?? "/MapHub";
 
             var version = File.GetLastWriteTimeUtc(typeof(LiveMap).Assembly.Location).Ticks.ToString();
 

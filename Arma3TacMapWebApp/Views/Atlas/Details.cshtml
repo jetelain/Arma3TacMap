@@ -16,4 +16,4 @@
 
 </h1>
 
-@await Component.InvokeAsync("StaticMap", new { markers = new List<Arma3TacMapLibrary.Maps.StoredMarker>(), worldName = Model.worldName, center = ViewBag.Center })
+@await Component.InvokeAsync("StaticMap", new { markers = new List<Arma3TacMapLibrary.Maps.StoredMarker>(), worldName = Model.worldName, center = ViewBag.Center, fullScreen = false })

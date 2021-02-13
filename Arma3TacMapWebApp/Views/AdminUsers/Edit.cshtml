@@ -1,0 +1,43 @@
+﻿@model Arma3TacMapWebApp.Entities.User
+
+@{
+    ViewData["Title"] = "Edit a user";
+}
+<div class="container">
+    <h1>Edit a user</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="UserID" />
+                <div class="form-group">
+                    <label asp-for="UserLabel" class="control-label"></label>
+                    <input asp-for="UserLabel" class="form-control" />
+                    <span asp-validation-for="UserLabel" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SteamId" class="control-label"></label>
+                    <input asp-for="SteamId" class="form-control" />
+                    <span asp-validation-for="SteamId" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsService" /> @Html.DisplayNameFor(model => model.IsService)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -29,6 +29,8 @@ namespace Arma3TacMapWebApp.Entities
         [Required]
         public string WorldName { get; set; }
 
+        public Uri EventHref { get; set; }
+
         [NotMapped]
         public MapInfos MapInfos { get; set; }
 

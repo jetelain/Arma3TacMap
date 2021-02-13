@@ -1,6 +1,9 @@
 ﻿@model EditMapViewModel
 @inject IHtmlLocalizer<SharedResource> Localizer
-
+@{
+    ViewData["Title"] = Model.Access.TacMap.Label;
+    ViewData["og:image"] = Url.Action("ViewMapScreenShot", "Home", new { id = Model.Access.TacMapID, t = Model.Access.TacMap.ReadOnlyToken, size = 256 }, "https");
+}
 <div class="modal" tabindex="-1" role="dialog" id="share">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -42,11 +45,16 @@
 </div>
 
 <h1 class="h3 text-center">
-@Model.Access.TacMap.Label
-@if (Model.Access.TacMap.OwnerUserID == Model.Access.UserID)
-{
-    <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-secondary">@Localizer["Edit"]</a>
-}
+    @Model.Access.TacMap.Label
+    @if (Model.Access.TacMap.OwnerUserID == Model.Access.UserID)
+    {
+        <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-secondary">@Localizer["Edit"]</a>
+    }
+    <a asp-controller="TacMaps" asp-action="Clone" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-secondary"><i class="far fa-clone"></i> @Localizer["Create a copy"]</a>
+    @if (Model.Access.TacMap.EventHref != null)
+    {
+        <a href="@Model.Access.TacMap.EventHref.AbsoluteUri" class="btn btn-sm btn-secondary"><i class="fas fa-external-link-alt"></i> @Localizer["Return to {0}", Model.Access.TacMap.EventHref.Host]</a>
+    }
 </h1>
 
 @await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = false })

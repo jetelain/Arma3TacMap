@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Arma3TacMapWebApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Arma3TacMapWebApp.Maps
@@ -24,7 +24,7 @@ namespace Arma3TacMapWebApp.Maps
         {
             if (user?.Identity?.IsAuthenticated ?? false)
             {
-                var nameClaim = user.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+                var nameClaim = user.FindFirst(ClaimTypes.NameIdentifier);
                 if (nameClaim != null && nameClaim.Value.StartsWith("https://steamcommunity.com/openid/id/"))
                 {
                     return nameClaim.Value.Substring("https://steamcommunity.com/openid/id/".Length);
@@ -35,7 +35,7 @@ namespace Arma3TacMapWebApp.Maps
 
         public async Task<TacMapAccess> CanWrite(ClaimsPrincipal user, MapId mapId)
         {
-            if(mapId.IsReadOnly)
+            if (mapId.IsReadOnly)
             {
                 return null;
             }
@@ -43,13 +43,18 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
-        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label)
+        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label, Uri eventHref)
         {
             var dbUser = await GetOrCreateUser(user);
+            if (dbUser == null)
+            {
+                throw new InvalidOperationException();
+            }
             var map = new TacMap()
             {
                 Created = DateTime.UtcNow,
                 Label = label,
+                EventHref = eventHref,
                 Owner = dbUser,
                 WorldName = worldName,
                 ReadWriteToken = GenerateToken(),
@@ -57,9 +62,9 @@ namespace Arma3TacMapWebApp.Maps
             };
             var access = new TacMapAccess()
             {
-               TacMap = map,
-               User = dbUser,
-               CanWrite = true
+                TacMap = map,
+                User = dbUser,
+                CanWrite = true
             };
             await _db.AddAsync(map);
             await _db.AddAsync(access);
@@ -100,6 +105,10 @@ namespace Arma3TacMapWebApp.Maps
         internal async Task<TacMapAccess> GrantWriteAccess(ClaimsPrincipal user, int id, string t)
         {
             var dbUser = await GetOrCreateUser(user);
+            if (dbUser == null)
+            {
+                throw new InvalidOperationException();
+            }
             var access = await _db.TacMapAccesses.Include(a => a.TacMap).FirstOrDefaultAsync(a => a.UserID == dbUser.UserID && a.TacMapID == id);
             if (access != null)
             {
@@ -132,17 +141,31 @@ namespace Arma3TacMapWebApp.Maps
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
             {
-                return null;
+                return await GetApiUser(user);
             }
             return await _db.Users.FirstOrDefaultAsync(u => u.SteamId == steamId);
+        }
+
+        private async Task<User> GetApiUser(ClaimsPrincipal user)
+        {
+            if (user?.Identity?.IsAuthenticated ?? false)
+            {
+                var userIDClaim = user.FindFirst(User.UserIDClaim);
+                if (userIDClaim != null)
+                {
+                    var userID = int.Parse(userIDClaim.Value);
+                    return await _db.Users.FirstOrDefaultAsync(u => u.UserID == userID);
+                }
+            }
+            return null;
         }
 
         private async Task<User> GetOrCreateUser(ClaimsPrincipal user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
-            { 
-                return null;
+            {
+                return await GetApiUser(user);
             }
             var dbUser = await _db.Users.FirstOrDefaultAsync(u => u.SteamId == steamId);
             if (dbUser == null)
@@ -170,7 +193,8 @@ namespace Arma3TacMapWebApp.Maps
             {
                 TacMapID = access.TacMapID,
                 UserID = access.UserID,
-                MarkerData = markerData
+                MarkerData = markerData,
+                LastUpdate = DateTime.UtcNow
             };
             await _db.AddAsync(marker);
             await _db.SaveChangesAsync();
@@ -219,11 +243,11 @@ namespace Arma3TacMapWebApp.Maps
         {
             return (await _db.TacMapMarkers.Where(m => m.TacMapID == tacMapID).ToListAsync())
                 .Select(m => new StoredMarker()
-                    {
-                        Id = m.TacMapMarkerID,
-                        IsReadOnly = isReadOnly,
-                        MarkerData = m.MarkerData
-                    })
+                {
+                    Id = m.TacMapMarkerID,
+                    IsReadOnly = isReadOnly,
+                    MarkerData = m.MarkerData
+                })
                 .ToList();
         }
 
@@ -266,17 +290,20 @@ namespace Arma3TacMapWebApp.Maps
             {
                 marker.MarkerData = markerData;
                 marker.UserID = access.UserID;
+                marker.LastUpdate = DateTime.UtcNow;
                 _db.Update(marker);
                 await _db.SaveChangesAsync();
                 return ToStored(marker);
             }
             return null;
         }
-        private string GenerateToken()
+        internal static string GenerateToken()
         {
             var random = new byte[32];
-            var rng = new RNGCryptoServiceProvider();
-            rng.GetBytes(random);
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(random);
+            }
             return Convert.ToBase64String(random).Replace("+", "-").Replace("/", "_").TrimEnd('=');
         }
 
@@ -289,5 +316,21 @@ namespace Arma3TacMapWebApp.Maps
             }
             return new List<TacMapAccess>();
         }
+
+
+        public async Task<StaticMapData> GetStaticMapModel(int id, string t)
+        {
+            var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadOnlyToken == t);
+            if (map == null)
+            {
+                return null;
+            }
+            return new StaticMapData()
+            {
+                Markers = await GetMarkers(map.TacMapID, true),
+                WorldName = map.WorldName
+            };
+        }
+
     }
 }

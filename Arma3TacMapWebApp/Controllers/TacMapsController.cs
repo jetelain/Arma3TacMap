@@ -58,7 +58,7 @@ namespace Arma3TacMapWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label);
+                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label, null);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
             ViewBag.Maps = await _mapInfos.GetMapsInfos();
@@ -224,6 +224,50 @@ namespace Arma3TacMapWebApp.Controllers
         private bool TacMapExists(int id)
         {
             return _context.TacMaps.Any(e => e.TacMapID == id);
+        }
+
+
+        // GET: TacMaps/Edit/5
+        public async Task<IActionResult> Clone(int id)
+        {
+            var tacMap = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (tacMap == null)
+            {
+                return NotFound();
+            }
+            tacMap.TacMap.Label += " (copy)";
+            return View(tacMap.TacMap);
+        }
+
+        // POST: TacMaps/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Clone(int id, [Bind("WorldName,Label")] TacMap cloneInfos)
+        {
+            var tacMap = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (tacMap == null)
+            {
+                return NotFound();
+            }
+            if (ModelState.IsValid)
+            {
+                var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, cloneInfos.Label, null);
+                foreach(var marker in await _mapSvc.GetMarkers(tacMap.TacMapID, true))
+                {
+                    await _context.AddAsync(new TacMapMarker()
+                    {
+                        TacMapID = clone.TacMapID,
+                        UserID = tacMap.UserID,
+                        MarkerData = marker.MarkerData,
+                        LastUpdate = DateTime.UtcNow
+                    });
+                }
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = clone.TacMapID });
+            }
+            return View(tacMap.TacMap);
         }
     }
 }

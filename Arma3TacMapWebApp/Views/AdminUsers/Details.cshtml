@@ -1,0 +1,83 @@
+﻿@model Arma3TacMapWebApp.Entities.User
+
+@{
+    ViewData["Title"] = Model.UserLabel;
+    var createdKey = ViewData["CreatedKey"] as string;
+}
+
+<div class="container">
+    <h1>@Model.UserLabel</h1>
+
+    <h2>Infos</h2>
+    <div>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.UserLabel)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.UserLabel)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.SteamId)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.SteamId)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.IsService)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.IsService)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.UserID">Edit</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+    <h2>API Keys</h2>
+
+    @if (!string.IsNullOrEmpty(createdKey))
+    {
+        <p>
+            API key created : <code>@createdKey</code>. Warning: This value is not stored, and will be lost if not copied.
+        </p>
+    }
+
+    <form asp-action="CreateApiKey" asp-route-id="@Model.UserID">
+        <p>
+            <button>Create an API Key</button>
+        </p>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Key
+                </th>
+                <th>
+                    Expires
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ApiKeys)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaskedKey)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ValidUntil)
+                    </td>
+                    <td>
+                        <a asp-action="DeleteApiKey" asp-route-id="@item.UserApiKeyID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

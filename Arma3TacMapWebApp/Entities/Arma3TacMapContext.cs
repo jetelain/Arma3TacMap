@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -17,6 +19,11 @@ namespace Arma3TacMapWebApp.Entities
 
         public DbSet<TacMapMarker> TacMapMarkers { get; set; }
 
+        public DbSet<UserApiKey> UserApiKeys { get; set; }
+
+        public DbSet<TacMapPreview> TacMapPreviews { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(User));
@@ -26,6 +33,23 @@ namespace Arma3TacMapWebApp.Entities
             modelBuilder.Entity<TacMapAccess>().ToTable(nameof(TacMapAccess));
 
             modelBuilder.Entity<TacMapMarker>().ToTable(nameof(TacMapMarker));
+
+            var userApiKey = modelBuilder.Entity<UserApiKey>();
+            userApiKey.ToTable(nameof(UserApiKey));
+
+            var tacMapPreview = modelBuilder.Entity<TacMapPreview>();
+            tacMapPreview.HasKey(m => new { m.TacMapID, m.Size });
+            tacMapPreview.ToTable(nameof(TacMapPreview));
+        }
+
+        internal void UpgradeData()
+        {
+            foreach(var marker in TacMapMarkers.Where(m => m.LastUpdate == null))
+            {
+                marker.LastUpdate = DateTime.UtcNow;
+                Update(marker);
+            }
+            SaveChanges();
         }
     }
 }

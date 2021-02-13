@@ -237,4 +237,13 @@
   <data name="{0}x{0}km, {1} cities" xml:space="preserve">
     <value>{0}x{0}km, {1} villes</value>
   </data>
+  <data name="Return to {0}" xml:space="preserve">
+    <value>Retourner à {0}</value>
+  </data>
+  <data name="Create a copy" xml:space="preserve">
+    <value>Créer une copie</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Aide</value>
+  </data>
 </root>

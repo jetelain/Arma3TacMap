@@ -3,8 +3,10 @@ using Arma3TacMapLibrary.Maps;
 
 namespace Arma3TacMapLibrary.ViewComponents
 {
-    internal class StaticMapModel
+    public class StaticMapModel
     {
+        public bool fullScreen { get; set; }
+
         public double[] center { get; set; }
 
         public Dictionary<string,MarkerData> markers { get; set; }

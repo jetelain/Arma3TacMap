@@ -1,5 +1,15 @@
 ﻿@model EditMapViewModel
-
-<h1 class="h3 text-center">@Model.Access.TacMap.Label</h1>
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{ 
+    ViewData["Title"] = Model.Access.TacMap.Label;
+    ViewData["og:image"] = Url.Action("ViewMapScreenShot", "Home", new { id = Model.Access.TacMapID, t = Model.Access.TacMap.ReadOnlyToken, size = 256 }, "https");
+}
+<h1 class="h3 text-center">
+    @Model.Access.TacMap.Label
+    @if (Model.Access.TacMap.EventHref != null)
+    {
+        <a href="@Model.Access.TacMap.EventHref.AbsoluteUri" class="btn btn-sm btn-secondary"><i class="fas fa-external-link-alt"></i> @Localizer["Return to {0}", Model.Access.TacMap.EventHref.Host]</a>
+    }
+</h1>
 
 @await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = true })

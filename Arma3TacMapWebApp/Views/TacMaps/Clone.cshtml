@@ -1,0 +1,34 @@
+﻿@model Arma3TacMapWebApp.Entities.TacMap
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["Create a copy"];
+}
+<div class="container">
+    <h1>@SharedLocalizer["Create a copy"]</h1>
+
+    <p class="text-center"><img src="/ViewMap/@Model.TacMapID/Preview/512" /></p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Clone" asp-route-id="@Model.TacMapID">
+                <input asp-for="WorldName" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Label" class="control-label"></label>
+                    <input asp-for="Label" class="form-control" />
+                    <span asp-validation-for="Label" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="@SharedLocalizer["Create"]" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

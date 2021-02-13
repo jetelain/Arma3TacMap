@@ -1,10 +1,15 @@
 ﻿@inject IHtmlLocalizer<SharedResource> Localizer
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PLANOPS Maps</title>
+@if (!string.IsNullOrEmpty(ViewData["og:image"] as string))
+{
+    <meta property="og:title" content="@ViewData["Title"]" />
+    <meta property="og:image" content="@ViewData["og:image"]" />
+}
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
@@ -28,6 +33,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="https://github.com/jetelain/Arma3TacMap/wiki" target="_blank">@Localizer["Help"]</a>
                         </li>
                     </ul>
 

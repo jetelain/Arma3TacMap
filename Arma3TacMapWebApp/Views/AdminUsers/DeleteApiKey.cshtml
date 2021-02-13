@@ -1,0 +1,27 @@
+﻿@model Arma3TacMapWebApp.Entities.UserApiKey
+
+@{
+    ViewData["Title"] = "Delete an API key";
+}
+<div class="container">
+    <h1>Delete an API key</h1>
+
+    <h3>Are you sure you want to delete "@Model.MaskedKey"?</h3>
+
+    <div>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.MaskedKey)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.MaskedKey)
+            </dd>
+        </dl>
+
+        <form asp-action="DeleteApiKey">
+            <input type="hidden" asp-for="UserApiKeyID" />
+            <input type="submit" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to List</a>
+        </form>
+    </div>
+</div>

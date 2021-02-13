@@ -1,28 +1,26 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Arma3TacMapLibrary.ViewComponents;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
+using System.Security.Claims;
 using Arma3TacMapLibrary;
-using Arma3TacMapLibrary.Maps;
-using Arma3TacMapWebApp.Maps;
+using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Hubs;
+using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
-using Microsoft.EntityFrameworkCore;
+using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Security;
+using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
-using System.IO;
-using Arma3TacMapLibrary.Arma3;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Arma3TacMapWebApp
 {
@@ -47,6 +45,9 @@ namespace Arma3TacMapWebApp
             services.AddScoped<IMapService<MapId>, MapService>();
             services.AddScoped<MapService>();
             services.AddScoped<MapInfosService>();
+            services.AddScoped<MapPreviewService>();
+            services.AddSingleton<ScreenshotService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDbContext<Arma3TacMapContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString(nameof(Arma3TacMapContext))));
@@ -61,13 +62,19 @@ namespace Arma3TacMapWebApp
                 options.LogoutPath = "/Authentication/SignOut";
                 options.AccessDeniedPath = "/Authentication/Denied";
             })
-            .AddSteam(s => s.ApplicationKey = Configuration.GetValue<string>("Steam:Key"));
+            .AddSteam(s => s.ApplicationKey = Configuration.GetValue<string>("Steam:Key"))
+            .AddApiKeyInHeader<ApiKeyProvider>(options => {
+                options.SuppressWWWAuthenticateHeader = true;
+                options.KeyName = "ApiKey";
+            });
 
             services.AddAuthorization(options =>
             {
                 var admins = Configuration.GetSection("Admins").Get<string[]>();
-                options.AddPolicy("Admin", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",admins.ToArray()));
-                options.AddPolicy("LoggedUser", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.ToArray()));
+                options.AddPolicy("ApiClient", policy => policy.RequireClaim(User.IsServiceClaim, "true"));
+                options.AddPolicy("AnyAuthenticated", policy => policy.RequireAuthenticatedUser());
+                options.AddPolicy("LoggedUser", policy => policy.RequireAssertion(ctx => !string.IsNullOrEmpty(MapService.GetSteamId(ctx.User))));
             });
 
             if (Environment.OSVersion.Platform == PlatformID.Unix)
@@ -76,6 +83,15 @@ namespace Arma3TacMapWebApp
                     .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetValue<string>("UnixKeysDirectory")))
                     .SetApplicationName("Arma3Event");
             }
+
+            var origins = Configuration.GetSection("CorsOrigins").Get<string[]>();
+            services.AddCors(o => o.AddPolicy("SignalRHub", builder =>
+            {
+                builder.WithOrigins(origins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .DisallowCredentials();
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -96,12 +112,13 @@ namespace Arma3TacMapWebApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseArma3TacMapStaticFiles();
 
             app.UseRouting();
-
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCookiePolicy(new CookiePolicyOptions()
@@ -117,7 +134,7 @@ namespace Arma3TacMapWebApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                endpoints.MapHub<MapHub<MapId>>("/MapHub");
+                endpoints.MapHub<MapHub<MapId>>("/MapHub").RequireCors("SignalRHub");
             });
         }
     }

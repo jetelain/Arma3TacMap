@@ -1,4 +1,6 @@
-﻿function applySymbolSet() {
+﻿var arma3TacMapLoaded = false;
+
+function applySymbolSet() {
     var id = '0003';
     var symbolset = $('#set').val();
 
@@ -394,26 +396,33 @@ function addOrUpdateMarker(map, markers, marker, canEdit, backend) {
     }
 }
 
-function initMapArea(mapInfos, endpoint, center) {
+function initMapArea(mapInfos, endpoint, center, fullScreen) {
     var map = L.map('map', {
         minZoom: mapInfos.minZoom,
         maxZoom: mapInfos.maxZoom,
-        crs: mapInfos.CRS
+        crs: mapInfos.CRS,
+        zoomSnap: fullScreen ? 0.01 : 1,
+        zoomControl: !fullScreen
     });
     L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
         attribution: mapInfos.attribution,
         tileSize: mapInfos.tileSize
-    }).addTo(map);
+    })
+        .on('load', function (event) { arma3TacMapLoaded = true })
+        .addTo(map);
 
-    if (center) { 
+    if (fullScreen) {
+        map.fitBounds([[0, 0], [mapInfos.worldSize, mapInfos.worldSize]]);
+    } else if (center) { 
         map.setView(center, mapInfos.maxZoom);
     } else {
         map.setView(mapInfos.center, mapInfos.defaultZoom);
     }
-
     L.latlngGraticule({ zoomInterval: [{ start: 0, end: 10, interval: 1000 }] }).addTo(map);
-    L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
-    L.control.gridMousePosition().addTo(map);
+    if (!fullScreen) {
+        L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
+        L.control.gridMousePosition().addTo(map);
+    }
     return map;
 }
 
@@ -508,9 +517,9 @@ function search(map, mapInfos, markers) {
 var Backend =
 {
     SignalR: {
-        create: function (mapid) {
+        create: function (mapid, hub) {
             this.connection = new signalR.HubConnectionBuilder()
-                .withUrl("/MapHub")
+                .withUrl(hub || "/MapHub")
                 .withAutomaticReconnect()
                 .build();
             this.mapid = mapid;
@@ -642,7 +651,7 @@ function initLiveMap(config) {
         var markers = {};
         var pointing = {};
         var backend = Backend.SignalR;
-        backend.create(mapId);
+        backend.create(mapId, config.hub);
 
         if ($('#share').length) {
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
@@ -703,9 +712,11 @@ function initStaticMap(config) {
         var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
         var markers = {};
 
-        var map = initMapArea(mapInfos, config.endpoint, config.center);
+        var map = initMapArea(mapInfos, config.endpoint, config.center, config.fullScreen);
 
-        setupSeach(map, mapInfos, markers);
+        if (!config.fullScreen) {
+            setupSeach(map, mapInfos, markers);
+        }
 
         Object.getOwnPropertyNames(config.markers).forEach(function (id) {
             addOrUpdateMarker(map, markers, { id: id, data: config.markers[id] }, false, null);

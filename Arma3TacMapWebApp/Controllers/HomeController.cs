@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapLibrary.Arma3;
+using Arma3TacMapLibrary.ViewComponents;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -19,11 +20,14 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MapInfosService _mapInfos;
         private readonly MapService _mapSvc;
-        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc)
+        private readonly MapPreviewService _preview;
+
+        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview)
         {
             _logger = logger;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
+            _preview = preview;
         }
 
         public async Task<IActionResult> Index()
@@ -94,6 +98,32 @@ namespace Arma3TacMapWebApp.Controllers
                 },
                 Access = access
             });
+        }
+
+        [Route("ViewMap/{id}/FullScreen")]
+        public async Task<IActionResult> ViewMapFull(int id, string t)
+        {
+            var data = await _mapSvc.GetStaticMapModel(id, t);
+            if (data == null)
+            {
+                return Forbid();
+            }
+            return View(data);
+        }
+
+        [Route("ViewMap/{id}/Preview/{size=512}")]
+        public async Task<IActionResult> ViewMapScreenShot(int id, int size, string t)
+        {
+            var access = await _mapSvc.GrantReadAccess(User, id, t);
+            if (access == null)
+            {
+                return Forbid();
+            }
+            if (!MapPreviewService.ValidSizes.Contains(size))
+            {
+                return NotFound();
+            }
+            return File(await _preview.GetPreview(access, size), size > 512 ? "image/jpeg" : "image/png");
         }
 
         public IActionResult Privacy()

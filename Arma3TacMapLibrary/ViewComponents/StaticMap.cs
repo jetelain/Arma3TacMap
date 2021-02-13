@@ -43,13 +43,14 @@ namespace Arma3TacMapLibrary.ViewComponents
             _endpoint = Arma3MapHelper.GetEndpoint(configuration);
         }
 
-        public IViewComponentResult Invoke(List<StoredMarker> markers, string worldName, double[] center)
+        public IViewComponentResult Invoke(List<StoredMarker> markers, string worldName, double[] center, bool fullScreen)
         {
             var vm = new StaticMapModel();
             vm.worldName = worldName ?? "altis";
             vm.markers = markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData));
             vm.endpoint = _endpoint;
             vm.center = center;
+            vm.fullScreen = fullScreen;
 
             var version = File.GetLastWriteTimeUtc(typeof(LiveMap).Assembly.Location).Ticks.ToString();
 

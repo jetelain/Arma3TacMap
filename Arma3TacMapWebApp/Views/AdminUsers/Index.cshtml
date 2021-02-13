@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Arma3TacMapWebApp.Entities.User>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container">
+    <h1>Users</h1>
+    <p>
+        <a asp-action="Create">Create an API user</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserLabel)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsService)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.UserID">@Html.DisplayFor(modelItem => item.UserLabel)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsService)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
