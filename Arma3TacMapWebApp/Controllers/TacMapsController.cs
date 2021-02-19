@@ -11,6 +11,10 @@ using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapLibrary.Arma3;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System.IO;
+using SixLabors.ImageSharp.Processing;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -21,12 +25,14 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly Arma3TacMapContext _context;
         private readonly MapInfosService _mapInfos;
         private readonly MapService _mapSvc;
+        private readonly MapPreviewService _preview;
 
-        public TacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc)
+        public TacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview)
         {
             _context = context;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
+            _preview = preview;
         }
 
         // GET: TacMaps
@@ -269,5 +275,49 @@ namespace Arma3TacMapWebApp.Controllers
             }
             return View(tacMap.TacMap);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExportTexture(int id, int size, TextureFormat format)
+        {
+            if (!new[] {1024, 2048}.Contains(size))
+            {
+                return BadRequest();
+            }
+            var tacMap = await _mapSvc.GrantReadAccess(User, id, null);
+            if (tacMap == null)
+            {
+                return NotFound();
+            }
+            var preview = await _preview.GetPreview(tacMap, 2048);
+
+            using (var target = new Image<Rgba32>(size, size, format == TextureFormat.WhiteBoard ? new Rgba32(255, 255, 255) : new Rgba32(0, 0, 0)))
+            {
+                using (var source = Image.Load(preview))
+                {
+                    if (format == TextureFormat.WhiteBoard)
+                    {
+                        var sizeValue = (int)(size * 0.7d);
+                        var position = (size - sizeValue) / 2;
+                        source.Mutate(x => x.Resize(sizeValue, sizeValue));
+                        target.Mutate(x => x.DrawImage(source, new SixLabors.ImageSharp.Point(position, position), 1.0f));
+                    }
+                    else
+                    {
+                        var sizeValue = size / 2;
+                        var position = (size - sizeValue) / 2;
+                        source.Mutate(x => x.Resize(sizeValue, size));
+                        target.Mutate(x => x.DrawImage(source, new SixLabors.ImageSharp.Point(position, 0), 1.0f));
+                    }
+                }
+                using (var ms = new MemoryStream())
+                {
+                    target.SaveAsJpeg(ms);
+                    return File(ms.ToArray(), "image/jpeg", $"{id}-{size}-{format}.jpg");
+                }
+            }
+        }
+        
     }
 }

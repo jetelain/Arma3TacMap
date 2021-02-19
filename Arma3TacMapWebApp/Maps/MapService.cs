@@ -88,6 +88,7 @@ namespace Arma3TacMapWebApp.Maps
             {
                 var access = new TacMapAccess()
                 {
+                    TacMapID = map.TacMapID,
                     TacMap = map,
                     User = dbUser,
                     CanWrite = false

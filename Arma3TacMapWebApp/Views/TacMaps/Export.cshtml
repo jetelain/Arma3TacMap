@@ -31,4 +31,28 @@
         }
     </ul>
 
+    <h2 class="mt-5">@Localizer["Export as ready-to-use texture"]</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="ExportTexture" asp-route-id="@Model.Access.TacMapID">
+                <div class="form-group">
+                    <label for="size" class="control-label">@Localizer["Quality"]</label>
+                    <select name="size" class="form-control">
+                        <option value="1024" selected="selected">1024x1024 (JPEG ~200 Ko)</option>
+                        <option value="2048">2048x2048 (JPEG ~800 Ko)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="format" class="control-label">@Localizer["Format"]</label>
+                    <select name="format" class="form-control">
+                        <option value="WhiteBoard">@Localizer["Map board (Land_MapBoard_F, Land_MapBoard_01_Wall_F)"]</option>
+                        <option value="LargeScreen">@Localizer["Large screen (Land_TripodScreen_01_large_F)"]</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Generate texture"]" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
