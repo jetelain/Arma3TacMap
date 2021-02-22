@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ namespace Arma3TacMapWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLocalization();
             services.AddHttpClient();
             services.AddControllersWithViews()
                 .AddViewLocalization()
@@ -128,6 +130,12 @@ namespace Arma3TacMapWebApp
                 MinimumSameSitePolicy = SameSiteMode.Lax
             });
 
+            app.UseRequestLocalization(option => {
+                var supportedCultures = new[] { "en-US", "en", "fr-FR", "fr" };
+                option.DefaultRequestCulture = new RequestCulture(supportedCultures[0]);
+                option.AddSupportedCultures(supportedCultures);
+                option.AddSupportedUICultures(supportedCultures);
+            });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

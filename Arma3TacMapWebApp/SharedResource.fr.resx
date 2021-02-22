@@ -246,4 +246,13 @@
   <data name="Help" xml:space="preserve">
     <value>Aide</value>
   </data>
+  <data name="Signin with Steam" xml:space="preserve">
+    <value>Se connecter avec Steam</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Se rappeler de moi</value>
+  </data>
+  <data name="Your steam id will be associated with the maps you will create, and to maps you will edit." xml:space="preserve">
+    <value>Votre identifiant steam sera associé aux cartes que vous allez créer, et aux cartes que vous modifirez.</value>
+  </data>
 </root>
