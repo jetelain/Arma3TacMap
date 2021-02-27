@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapLibrary.Arma3
 {
-    public class MapInfosService
+    public class MapInfosService : IMapInfosService
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger<MapInfosService> _logger;
@@ -35,6 +35,11 @@ namespace Arma3TacMapLibrary.Arma3
             value = await ReadMapsInfos();
             _cache.Set(nameof(MapInfos), value, TimeSpan.FromMinutes(60));
             return value;
+        }
+
+        public async Task<MapInfos> GetMapsInfos(string worldName)
+        {
+            return (await GetMapsInfos()).FirstOrDefault(m => string.Equals(m.worldName, worldName, StringComparison.OrdinalIgnoreCase));
         }
 
         private async Task<List<MapInfos>> ReadMapsInfos()

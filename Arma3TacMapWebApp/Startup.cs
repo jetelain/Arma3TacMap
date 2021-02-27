@@ -65,7 +65,8 @@ namespace Arma3TacMapWebApp
                 options.AccessDeniedPath = "/Authentication/Denied";
             })
             .AddSteam(s => s.ApplicationKey = Configuration.GetValue<string>("Steam:Key"))
-            .AddApiKeyInHeader<ApiKeyProvider>(options => {
+            .AddApiKeyInHeader<ApiKeyProvider>("API", options =>
+            {
                 options.SuppressWWWAuthenticateHeader = true;
                 options.KeyName = "ApiKey";
             });
@@ -74,8 +75,8 @@ namespace Arma3TacMapWebApp
             {
                 var admins = Configuration.GetSection("Admins").Get<string[]>();
                 options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.ToArray()));
-                options.AddPolicy("ApiClient", policy => policy.RequireClaim(User.IsServiceClaim, "true"));
-                options.AddPolicy("AnyAuthenticated", policy => policy.RequireAuthenticatedUser());
+                options.AddPolicy("ApiClient", policy => { policy.RequireClaim(User.IsServiceClaim, "true");  policy.AddAuthenticationSchemes("API"); });
+                options.AddPolicy("ApiAny", policy => { policy.RequireAuthenticatedUser(); policy.AddAuthenticationSchemes("API", CookieAuthenticationDefaults.AuthenticationScheme); });
                 options.AddPolicy("LoggedUser", policy => policy.RequireAssertion(ctx => !string.IsNullOrEmpty(MapService.GetSteamId(ctx.User))));
             });
 
@@ -92,7 +93,7 @@ namespace Arma3TacMapWebApp
                 builder.WithOrigins(origins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .DisallowCredentials();
+                    .AllowCredentials();
             }));
         }
 
@@ -113,9 +114,9 @@ namespace Arma3TacMapWebApp
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseArma3TacMapStaticFiles();
 

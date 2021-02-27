@@ -12,7 +12,7 @@ using Arma3TacMapLibrary.TacMaps;
 
 namespace Arma3TacMapWebApp.Controllers
 {
-    [Authorize(Policy = "AnyAuthenticated")]
+    [Authorize(Policy = "ApiAny")]
     [Route("api/TacMaps")]
     [ApiController]
     public class ApiTacMapsController : ControllerBase
@@ -56,22 +56,23 @@ namespace Arma3TacMapWebApp.Controllers
         {
             var map = new ApiTacMap()
             {
+                Id = access.TacMap.TacMapID,
                 WorldName = access.TacMap.WorldName,
                 Label = access.TacMap.Label,
                 EventHref = access.TacMap.EventHref,
                 Markers = includeMarkers ? await _mapSvc.GetMarkers(access.TacMap.TacMapID, true) : null,
                 ReadOnlyToken = access.TacMap.ReadOnlyToken,
-                ReadOnlyHref = Url.Action(nameof(HomeController.ViewMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, "https")
+                ReadOnlyHref = Url.Action(nameof(HomeController.ViewMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme)
             };
             if (access.TacMap.OwnerUserID == user.UserID)
             {
                 map.ReadWriteToken = access.TacMap.ReadWriteToken;
-                map.ReadWriteHref = Url.Action(nameof(HomeController.EditMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadWriteToken }, "https");
+                map.ReadWriteHref = Url.Action(nameof(HomeController.EditMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadWriteToken }, Request.Scheme);
             }
             map.PreviewHref = new Dictionary<int, string>();
             foreach(var size in MapPreviewService.ValidSizes)
             {
-                map.PreviewHref.Add(size, Url.Action(nameof(HomeController.ViewMapScreenShot), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken, size }, "https"));
+                map.PreviewHref.Add(size, Url.Action(nameof(HomeController.ViewMapScreenShot), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken, size }, Request.Scheme));
             }
             return map;
         }
@@ -81,6 +82,21 @@ namespace Arma3TacMapWebApp.Controllers
         public async Task<IActionResult> Post([FromBody] ApiTacMapCreate value)
         {
             var id = await _mapSvc.CreateMap(User, value.WorldName, value.Label, value.EventHref);
+            if (value.Markers != null && value.Markers.Count > 0 )
+            {
+                var dbUser = await _mapSvc.GetUser(User);
+                foreach (var marker in value.Markers)
+                {
+                    await _context.AddAsync(new TacMapMarker()
+                    {
+                        TacMapID = id.TacMapID,
+                        UserID = dbUser.UserID,
+                        MarkerData = marker.MarkerData,
+                        LastUpdate = DateTime.UtcNow
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
             return await Get(id.TacMapID);
         }
 
@@ -98,8 +114,8 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
-            tacMap.Label = value.Label;
-            tacMap.EventHref = value.EventHref;
+            tacMap.Label = value.Label ?? tacMap.Label;
+            tacMap.EventHref = value.EventHref ?? tacMap.EventHref;
             _context.TacMaps.Update(tacMap);
             await _context.SaveChangesAsync();
             return await Get(id);

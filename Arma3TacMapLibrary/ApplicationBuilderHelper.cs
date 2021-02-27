@@ -20,7 +20,7 @@ namespace Arma3TacMapLibrary
                 FileProvider = new ManifestEmbeddedFileProvider(assembly, "wwwroot", "Arma3TacMapLibrary.Manifest.xml", File.GetLastWriteTimeUtc(assembly.Location))
             });
         }
-        public static void UseArma3TacMapApi(this IServiceCollection svc, IConfiguration config)
+        public static void AddArma3TacMapApi(this IServiceCollection svc, IConfiguration config)
         {
             svc.AddHttpClient<IApiTacMaps, ApiTacMaps>(c =>
             {
