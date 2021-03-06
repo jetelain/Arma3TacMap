@@ -17,15 +17,17 @@ namespace Arma3TacMapWebApp.Maps
     public class MapPreviewService
     {
         private readonly Arma3TacMapContext _db;
+        private readonly Arma3TacMapPreviewContext _pdb;
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _accessor;
         private readonly ScreenshotService _screenshot;
 
         public static int[] ValidSizes = new[] { 256, 512, 1024, 2048 };
 
-        public MapPreviewService(Arma3TacMapContext db, IHttpContextAccessor accessor, LinkGenerator linkGenerator, ScreenshotService screenshot)
+        public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, ScreenshotService screenshot)
         {
             _db = db;
+            _pdb = pdb;
             _linkGenerator = linkGenerator; 
             _accessor = accessor;
             _screenshot = screenshot;
@@ -44,7 +46,7 @@ namespace Arma3TacMapWebApp.Maps
                 lastUpdate = (await _db.TacMaps.FindAsync(access.TacMapID)).Created;
             }
 
-            var preview = await _db.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.LastUpdate >= lastUpdate);
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.LastUpdate >= lastUpdate);
             if (preview != null)
             {
                 return preview.Data;
@@ -53,18 +55,18 @@ namespace Arma3TacMapWebApp.Maps
             using (var image = Image.Load(await MakeScreenshot(access)))
             {
 
-                using (var transaction = _db.Database.BeginTransaction())
+                using (var transaction = _pdb.Database.BeginTransaction())
                 {
                     await AddPreview(access, 2048, lastUpdate, ToJpeg(image, 2048));;
                     await AddPreview(access, 1024, lastUpdate, ToJpeg(image, 1024));
                     await AddPreview(access, 512, lastUpdate, ToPng(image, 512));
                     await AddPreview(access, 256, lastUpdate, ToPng(image, 256));
-                    await _db.SaveChangesAsync();
+                    await _pdb.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
             }
 
-            return (await _db.TacMapPreviews.AsNoTracking().FirstAsync(p => p.TacMapID == access.TacMapID && p.Size == size)).Data;
+            return (await _pdb.TacMapPreviews.AsNoTracking().FirstAsync(p => p.TacMapID == access.TacMapID && p.Size == size)).Data;
         }
 
         private byte[] ToJpeg(Image<Rgba32> image, int size)
@@ -96,7 +98,7 @@ namespace Arma3TacMapWebApp.Maps
 
         private async Task AddPreview(TacMapAccess access, int size, DateTime? lastUpdate, byte[] data)
         {
-            var preview = await _db.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size);
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size);
             if (preview == null)
             {
                 preview = new TacMapPreview()
@@ -106,13 +108,13 @@ namespace Arma3TacMapWebApp.Maps
                     TacMapID = access.TacMapID,
                     Size = size
                 };
-                _db.TacMapPreviews.Add(preview);
+                _pdb.TacMapPreviews.Add(preview);
             }
             else
             {
                 preview.Data = data;
                 preview.LastUpdate = lastUpdate;
-                _db.TacMapPreviews.Update(preview);
+                _pdb.TacMapPreviews.Update(preview);
             }
         }
 

@@ -54,6 +54,9 @@ namespace Arma3TacMapWebApp
             services.AddDbContext<Arma3TacMapContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString(nameof(Arma3TacMapContext))));
 
+            services.AddDbContext<Arma3TacMapPreviewContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString(nameof(Arma3TacMapPreviewContext))));
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

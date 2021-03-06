@@ -34,6 +34,9 @@ namespace Arma3TacMapWebApp
                     var context = services.GetRequiredService<Arma3TacMapContext>();
                     context.Database.Migrate();
                     context.UpgradeData();
+
+                    var context2 = services.GetRequiredService<Arma3TacMapPreviewContext>();
+                    context2.Database.Migrate();
                 }
                 catch (Exception ex)
                 {

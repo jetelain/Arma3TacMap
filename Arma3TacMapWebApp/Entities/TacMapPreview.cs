@@ -9,8 +9,6 @@ namespace Arma3TacMapWebApp.Entities
     {
         public int TacMapID { get; set; }
 
-        public TacMap TacMap { get; set; }
-
         public int Size { get; set; }
 
         public byte[] Data { get; set; }

@@ -21,9 +21,6 @@ namespace Arma3TacMapWebApp.Entities
 
         public DbSet<UserApiKey> UserApiKeys { get; set; }
 
-        public DbSet<TacMapPreview> TacMapPreviews { get; set; }
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(User));
@@ -36,10 +33,6 @@ namespace Arma3TacMapWebApp.Entities
 
             var userApiKey = modelBuilder.Entity<UserApiKey>();
             userApiKey.ToTable(nameof(UserApiKey));
-
-            var tacMapPreview = modelBuilder.Entity<TacMapPreview>();
-            tacMapPreview.HasKey(m => new { m.TacMapID, m.Size });
-            tacMapPreview.ToTable(nameof(TacMapPreview));
         }
 
         internal void UpgradeData()
