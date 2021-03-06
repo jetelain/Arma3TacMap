@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Julien ETELAIN</Authors>
+    <Product>Arma3TacMap</Product>
+    <RepositoryUrl>https://github.com/jetelain/Arma3TacMap</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/jetelain/Arma3TacMap</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -169,5 +176,12 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.9" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>
