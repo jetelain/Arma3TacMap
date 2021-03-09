@@ -1,0 +1,59 @@
+﻿@model Arma3TacMapWebApp.Entities.ReplayMap
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>ReplayMap</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReplayMapID" />
+            <div class="form-group">
+                <label asp-for="OwnerUserID" class="control-label"></label>
+                <select asp-for="OwnerUserID" class="form-control" asp-items="ViewBag.OwnerUserID"></select>
+                <span asp-validation-for="OwnerUserID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Created" class="control-label"></label>
+                <input asp-for="Created" class="form-control" />
+                <span asp-validation-for="Created" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Label" class="control-label"></label>
+                <input asp-for="Label" class="form-control" />
+                <span asp-validation-for="Label" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReadOnlyToken" class="control-label"></label>
+                <input asp-for="ReadOnlyToken" class="form-control" />
+                <span asp-validation-for="ReadOnlyToken" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorldName" class="control-label"></label>
+                <input asp-for="WorldName" class="form-control" />
+                <span asp-validation-for="WorldName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TacMapID" class="control-label"></label>
+                <select asp-for="TacMapID" class="form-control" asp-items="ViewBag.TacMapID"></select>
+                <span asp-validation-for="TacMapID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

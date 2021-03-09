@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Arma3TacMapWebApp.Entities.ReplayMap>
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = @Localizer["After Action Reports"];
+}
+
+<div class="container">
+    <h1>@Localizer["After Action Reports"]</h1>
+    <p>
+        <a asp-action="Create">@Localizer["Import an After Action Report"]</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Owner)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ReadOnlyToken)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WorldName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TacMap)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Owner.UserID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Created)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Label)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReadOnlyToken)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorldName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TacMap.Label)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ReplayMapID">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.ReplayMapID">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ReplayMapID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

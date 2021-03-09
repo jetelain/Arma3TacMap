@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Arma3TacMapWebApp.Entities;
+using System.Text.Json;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -33,6 +35,17 @@ namespace Arma3TacMapWebApp.Entities
 
             var userApiKey = modelBuilder.Entity<UserApiKey>();
             userApiKey.ToTable(nameof(UserApiKey));
+
+            modelBuilder.Entity<ReplayMap>().ToTable(nameof(ReplayMap));
+            var frame = modelBuilder.Entity<ReplayFrame>();
+            frame.Property(e => e.Data).HasConversion(
+                    v => JsonSerializer.Serialize(v, null),
+                    v => JsonSerializer.Deserialize<ReplayFrameData>(v, null));
+            frame.ToTable(nameof(ReplayFrame)).HasKey(t => new { t.ReplayMapID, t.FrameNumber }); 
+            modelBuilder.Entity<ReplayPlayer>().ToTable(nameof(ReplayPlayer)).HasKey(t => new { t.ReplayMapID, t.PlayerNumber });
+            modelBuilder.Entity<ReplayGroup>().ToTable(nameof(ReplayGroup)).HasKey(t => new { t.ReplayMapID, t.GroupNumber });
+            modelBuilder.Entity<ReplayVehicle>().ToTable(nameof(ReplayVehicle)).HasKey(t => new { t.ReplayMapID, t.VehicleNumber });
+            modelBuilder.Entity<ReplayUnit>().ToTable(nameof(ReplayUnit)).HasKey(t => new { t.ReplayMapID, t.UnitNumber });
         }
 
         internal void UpgradeData()
@@ -44,5 +57,7 @@ namespace Arma3TacMapWebApp.Entities
             }
             SaveChanges();
         }
+
+        public DbSet<Arma3TacMapWebApp.Entities.ReplayMap> ReplayMap { get; set; }
     }
 }

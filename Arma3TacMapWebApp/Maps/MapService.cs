@@ -161,7 +161,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        private async Task<User> GetOrCreateUser(ClaimsPrincipal user)
+        public async Task<User> GetOrCreateUser(ClaimsPrincipal user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
