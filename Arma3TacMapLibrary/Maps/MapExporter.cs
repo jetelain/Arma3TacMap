@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Arma3TacMapLibrary.Arma3;
 
 namespace Arma3TacMapLibrary.Maps
 {
@@ -10,7 +11,7 @@ namespace Arma3TacMapLibrary.Maps
         {
             return @"private _data = " + GetData(list) + @";
 
-_data params ['_icons', '_rects', '_metis'];
+_data params ['_icons', '_poly', '_metis'];
 
 if (!isNil 'gtd_map_allMarkers') then {
   {
@@ -28,15 +29,14 @@ gtd_map_allMarkers = [];
 gtd_map_allMetisMarkers = [];
 
 {
-  _x params ['_id', '_x', '_y', '_w', '_h', '_color', '_rotate'];
+  _x params ['_id', '_points', '_color'];
+  _points params ['_x', '_y'];
   private _marker = createMarker [ format ['_USER_DEFINED #0/planops%1/0', _id], [_x, _y]];
-  _marker setMarkerShape 'RECTANGLE';
-  _marker setMarkerBrush 'SolidBorder';
-  _marker setMarkerDir _rotate;
+  _marker setMarkerShape 'polyline';
+  _marker setMarkerPolylineLocal _points;
   _marker setMarkerColor _color; 
-  _marker setMarkerSize [_w,2];
   gtd_map_allMarkers pushBack _marker;
-} forEach _rects;
+} forEach _poly;
 
 {
   _x params ['_id', '_x', '_y', '_icon', '_color', '_text', '_rotate'];
@@ -62,7 +62,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
         public static string GetData(IEnumerable<StoredMarker> markers)
         {
             var iconMarkers = new List<List<object>>();
-            var rectMarkers = new List<List<object>>();
+            var polyMarkers = new List<List<object>>();
             var metisMarkers = new List<List<object>>();
             foreach (var marker in markers)
             {
@@ -82,24 +82,18 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 }
                 else if (data.type == "line")
                 {
-                    for (int i = 2; i < data.pos.Length; i += 2)
+                    var points = new List<double>();
+                    for (int i = 0; i < data.pos.Length; i += 2)
                     {
-                        var y1 = data.pos[i - 2];
-                        var x1 = data.pos[i - 1];
-                        var y2 = data.pos[i];
-                        var x2 = data.pos[i + 1];
-
-                        var length = Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
-
-                        rectMarkers.Add(new List<object>() {
-                            marker.Id + (i > 2 ? $"_{i/2}" : ""),
-                            x1 + ((x2 - x1) / 2d),
-                            y1 + ((y2 - y1) / 2d),
-                            length / 2d,
-                            2,
-                            Get(data.config, "color", "ColorBlack"),
-                            GetAngle((x2 - x1),(y2 - y1)) * -1 });
+                        var x = data.pos[i + 1];
+                        var y = data.pos[i];
+                        points.Add(x);
+                        points.Add(y);
                     }
+                    polyMarkers.Add(new List<object>() {
+                        marker.Id,
+                        points,
+                        Get(data.config, "color", "ColorBlack")});
                 }
                 else if (data.type == "mil")
                 {
@@ -118,7 +112,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
                     });
                 }
             }
-            return JsonSerializer.Serialize(new[] { iconMarkers, rectMarkers, metisMarkers }); // FIXME: This is an approximation
+            return ArmaSerializer.ToSimpleArrayString(new[] { iconMarkers, polyMarkers, metisMarkers });
         }
 
         private static int ToSize(string v)
@@ -143,6 +137,10 @@ publicVariable 'gtd_map_allMetisMarkers';";
 
         private static int ToMod2(string v)
         {
+            switch(v)
+            {
+                case "51": return 7;
+            }
             return 0;
         }
 
@@ -168,9 +166,10 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 case "120600": return 12; // Rotary Wing
                 case "121000": return 37; // Combined Arms
                 case "150600": return 0; // Intercept
+                case "120501": return 22; // Intercept
             }
             return 0;
-        }
+        } 
 
         private static bool ToDashed(char i, char v)
         {
@@ -193,10 +192,10 @@ publicVariable 'gtd_map_allMetisMarkers';";
             return "unk";
         }
 
-        private static double GetAngle(double dx, double dy)
-        {
-            return Math.Atan2(dy, dx) * 180d / Math.PI;
-        }
+        //private static double GetAngle(double dx, double dy)
+        //{
+        //    return Math.Atan2(dy, dx) * 180d / Math.PI;
+        //}
 
         private static string Get(Dictionary<string, string> config, string key, string defaultValue)
         {
