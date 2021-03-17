@@ -255,4 +255,7 @@
   <data name="Your steam id will be associated with the maps you will create, and to maps you will edit." xml:space="preserve">
     <value>Votre identifiant steam sera associé aux cartes que vous allez créer, et aux cartes que vous modifirez.</value>
   </data>
+  <data name="Provided by the 1er GTD" xml:space="preserve">
+    <value>Proposé par le 1er GTD</value>
+  </data>
 </root>
