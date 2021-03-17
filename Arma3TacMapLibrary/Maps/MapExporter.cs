@@ -59,20 +59,19 @@ publicVariable 'gtd_map_allMarkers';
 publicVariable 'gtd_map_allMetisMarkers';";
         }
 
-        public static string GetMarkerData(StoredMarker marker)
+        public static string GetMarkerData(int id, MarkerData data)
         {
-            var data = JsonSerializer.Deserialize<MarkerData>(marker.MarkerData);
             if (data.type == "basic")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "icon", GetBasic(marker, data) });
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "icon", GetBasic(id, data) });
             }
             if (data.type == "line")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "poly", GetLine(marker, data) });
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "poly", GetLine(id, data) });
             }
             if (data.type == "mil")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "mtis", GetMilAsMetis(marker, data) });
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "mtis", GetMilAsMetis(id, data) });
             }
             return "[]";
         }
@@ -87,25 +86,25 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 var data = JsonSerializer.Deserialize<MarkerData>(marker.MarkerData);
                 if (data.type == "basic")
                 {
-                    iconMarkers.Add(GetBasic(marker, data));
+                    iconMarkers.Add(GetBasic(marker.Id, data));
                 }
                 else if (data.type == "line")
                 {
-                    polyMarkers.Add(GetLine(marker, data));
+                    polyMarkers.Add(GetLine(marker.Id, data));
                 }
                 else if (data.type == "mil")
                 {
-                    metisMarkers.Add(GetMilAsMetis(marker, data));
+                    metisMarkers.Add(GetMilAsMetis(marker.Id, data));
                 }
             }
             return ArmaSerializer.ToSimpleArrayString(new[] { iconMarkers, polyMarkers, metisMarkers });
         }
 
-        private static List<object> GetMilAsMetis(StoredMarker marker, MarkerData data)
+        private static List<object> GetMilAsMetis(int id, MarkerData data)
         {
             return new List<object>()
                     {
-                        marker.Id,
+                        id,
                         data.pos[1],
                         data.pos[0],
                         ToIdentify(data.symbol[3]),
@@ -118,7 +117,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
                     };
         }
 
-        private static List<object> GetLine(StoredMarker marker, MarkerData data)
+        private static List<object> GetLine(int id, MarkerData data)
         {
             var points = new List<double>();
             for (int i = 0; i < data.pos.Length; i += 2)
@@ -129,17 +128,17 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 points.Add(y);
             }
             return new List<object>() {
-                        marker.Id,
+                        id,
                         points,
                         Get(data.config, "color", "ColorBlack")};
         }
 
-        private static List<object> GetBasic(StoredMarker marker, MarkerData data)
+        private static List<object> GetBasic(int id, MarkerData data)
         {
             var dir = Get(data.config, "dir", "");
 
             return new List<object>() {
-                        marker.Id,
+                        id,
                         data.pos[1],
                         data.pos[0],
                         data.symbol,
