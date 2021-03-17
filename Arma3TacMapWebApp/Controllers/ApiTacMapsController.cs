@@ -8,6 +8,7 @@ using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Arma3TacMapLibrary.TacMaps;
+using Microsoft.AspNetCore.Cors;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Arma3TacMapWebApp.Controllers
@@ -29,13 +30,17 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ApiTacMap>> Get()
+        [EnableCors("Web")]
+        public async Task<IEnumerable<ApiTacMap>> Get(string worldName)
         {
             var list = new List<ApiTacMap>();
             var user = await _mapSvc.GetUser(User);
             foreach (var access in await _mapSvc.GetUserMaps(User))
             {
-                list.Add(await ToApiTacMap(access, user, false));
+                if (worldName == null || string.Equals(access.TacMap.WorldName, worldName, StringComparison.OrdinalIgnoreCase))
+                {
+                    list.Add(await ToApiTacMap(access, user, false));
+                }
             }
             return list;
         }

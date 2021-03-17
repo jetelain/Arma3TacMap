@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/jetelain/Arma3TacMap</PackageProjectUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

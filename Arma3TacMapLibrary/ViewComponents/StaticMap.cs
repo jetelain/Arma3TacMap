@@ -17,16 +17,16 @@ namespace Arma3TacMapLibrary.ViewComponents
         private readonly ITagHelperComponentManager _manager;
         private readonly string _endpoint;
 
-        private const string baseLineStyle = @"<link rel=""stylesheet"" href=""https://unpkg.com/leaflet@1.6.0/dist/leaflet.css""/>
+        private const string baseLineStyle = @"<link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css""/>
 <link rel=""stylesheet"" href=""https://use.fontawesome.com/releases/v5.5.0/css/all.css"" />
 <link rel=""stylesheet"" href=""/css/arma3TacMap.css?{version}"" />";
         
 
-        private const string baseLineScript = @"<script src=""https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"">
+        private const string baseLineScript = @"<script src=""https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"">
 </script>
-<script src=""https://unpkg.com/milsymbol@2.0.0/dist/milsymbol.js"">
+<script src=""https://cdn.jsdelivr.net/npm/milsymbol@2.0.0/dist/milsymbol.js"">
 </script>
-<script src=""https://unpkg.com/milstd@0.1.6/milstd.js"">
+<script src=""https://cdn.jsdelivr.net/npm/milstd@0.1.6/milstd.js"">
 </script>
 <script src=""{endpoint}/js/mapUtils.js"">
 </script>
@@ -60,7 +60,7 @@ namespace Arma3TacMapLibrary.ViewComponents
                 .Replace("{endpoint}", _endpoint)
                 ));
 
-            scripts.Add(new HtmlString($"<script>initStaticMap({JsonSerializer.Serialize(vm)});</script>"));
+            scripts.Add(new HtmlString($"<script>Arma3TacMap.initStaticMap({JsonSerializer.Serialize(vm)});</script>"));
             _manager.Components.Add(new InjectTagHelperComponent("head", new HtmlString(baseLineStyle.Replace("{version}", version))));
             _manager.Components.Add(new InjectTagHelperComponent("body", scripts));
             return View(vm);
