@@ -567,7 +567,7 @@ var Arma3TacMap;
                 this.connection.invoke("EndPointMap");
             },
             close: function () {
-                this.connection.close();
+                this.connection.stop();
             }
         }
     };
