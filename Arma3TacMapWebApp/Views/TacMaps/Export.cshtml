@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = "Exporter une carte tactique";
 }
+@section Styles {
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
+}
 
 <div class="container">
     <h1 class="text-center">@Localizer["Tactical map"]</h1>
@@ -20,6 +23,13 @@
     <div class="input-group">
         <textarea id="script" class="form-control" rows="10" readonly="readonly">@Model.Script</textarea>
     </div>
+
+    <h2 class="mt-5">@Localizer["Real time export to Arma3 with SIT 1erGTD"]</h2>
+    <p>@Localizer["Export in real time data to Arma 3 with <a href=\"{0}\">SIT 1erGTD</a> and <a href=\"{1}\">Metis Marker</a> mods.", "https://steamcommunity.com/workshop/filedetails/?id=2262009445", "https://steamcommunity.com/sharedfiles/filedetails/?id=1508091616"]</p>
+    <p>@Localizer["By default map is user specific, an administrator can share the map with all users using the chat command <code>#tacmap global</code>."]</p>
+    <p>@Localizer["On your connected mobile device, click on menu icon <i class=\"fas fa-bars\"></i>, then on \"Load from {0}\", and then select map.", "maps.plan-ops.fr"]</p>
+
+
 
     <h2 class="mt-5">@Localizer["Export to Image"]</h2>
     <p>@Localizer["Images can be used on a web page, a document, or can be used as a texture in Arma 3."]</p>

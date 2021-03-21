@@ -33,7 +33,7 @@ gtd_map_allMetisMarkers = [];
   _points params ['_x', '_y'];
   private _marker = createMarker [ format ['_USER_DEFINED #0/planops%1/0', _id], [_x, _y]];
   _marker setMarkerShape 'polyline';
-  _marker setMarkerPolylineLocal _points;
+  _marker setMarkerPolyline _points;
   _marker setMarkerColor _color; 
   gtd_map_allMarkers pushBack _marker;
 } forEach _poly;
@@ -59,6 +59,23 @@ publicVariable 'gtd_map_allMarkers';
 publicVariable 'gtd_map_allMetisMarkers';";
         }
 
+        public static string GetMarkerData(int id, MarkerData data)
+        {
+            if (data.type == "basic")
+            {
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "icon", GetBasic(id, data) });
+            }
+            if (data.type == "line")
+            {
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "poly", GetLine(id, data) });
+            }
+            if (data.type == "mil")
+            {
+                return ArmaSerializer.ToSimpleArrayString(new object[] { "mtis", GetMilAsMetis(id, data) });
+            }
+            return "[]";
+        }
+
         public static string GetData(IEnumerable<StoredMarker> markers)
         {
             var iconMarkers = new List<List<object>>();
@@ -69,37 +86,25 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 var data = JsonSerializer.Deserialize<MarkerData>(marker.MarkerData);
                 if (data.type == "basic")
                 {
-                    var dir = Get(data.config, "dir", "");
-
-                    iconMarkers.Add(new List<object>() {
-                        marker.Id,
-                        data.pos[1],
-                        data.pos[0],
-                        data.symbol,
-                        Get(data.config, "color", "ColorBlack"),
-                        Get(data.config, "label", ""),
-                        !string.IsNullOrEmpty(dir) ? (double.Parse(dir) * 360d / 6400d) : 0d });
+                    iconMarkers.Add(GetBasic(marker.Id, data));
                 }
                 else if (data.type == "line")
                 {
-                    var points = new List<double>();
-                    for (int i = 0; i < data.pos.Length; i += 2)
-                    {
-                        var x = data.pos[i + 1];
-                        var y = data.pos[i];
-                        points.Add(x);
-                        points.Add(y);
-                    }
-                    polyMarkers.Add(new List<object>() {
-                        marker.Id,
-                        points,
-                        Get(data.config, "color", "ColorBlack")});
+                    polyMarkers.Add(GetLine(marker.Id, data));
                 }
                 else if (data.type == "mil")
                 {
-                    metisMarkers.Add(new List<object>()
+                    metisMarkers.Add(GetMilAsMetis(marker.Id, data));
+                }
+            }
+            return ArmaSerializer.ToSimpleArrayString(new[] { iconMarkers, polyMarkers, metisMarkers });
+        }
+
+        private static List<object> GetMilAsMetis(int id, MarkerData data)
+        {
+            return new List<object>()
                     {
-                        marker.Id,
+                        id,
                         data.pos[1],
                         data.pos[0],
                         ToIdentify(data.symbol[3]),
@@ -109,10 +114,37 @@ publicVariable 'gtd_map_allMetisMarkers';";
                         ToMod2(data.symbol.Substring(18, 2)),
                         ToSize(data.symbol.Substring(8, 2)),
                         Get(data.config, "uniqueDesignation", null) ?? Get(data.config, "higherFormation", null) ?? ""
-                    });
-                }
+                    };
+        }
+
+        private static List<object> GetLine(int id, MarkerData data)
+        {
+            var points = new List<double>();
+            for (int i = 0; i < data.pos.Length; i += 2)
+            {
+                var x = data.pos[i + 1];
+                var y = data.pos[i];
+                points.Add(x);
+                points.Add(y);
             }
-            return ArmaSerializer.ToSimpleArrayString(new[] { iconMarkers, polyMarkers, metisMarkers });
+            return new List<object>() {
+                        id,
+                        points,
+                        Get(data.config, "color", "ColorBlack")};
+        }
+
+        private static List<object> GetBasic(int id, MarkerData data)
+        {
+            var dir = Get(data.config, "dir", "");
+
+            return new List<object>() {
+                        id,
+                        data.pos[1],
+                        data.pos[0],
+                        data.symbol,
+                        Get(data.config, "color", "ColorBlack"),
+                        Get(data.config, "label", ""),
+                        !string.IsNullOrEmpty(dir) ? (double.Parse(dir) * 360d / 6400d) : 0d };
         }
 
         private static int ToSize(string v)

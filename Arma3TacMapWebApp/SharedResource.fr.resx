@@ -258,4 +258,16 @@
   <data name="Provided by the 1er GTD" xml:space="preserve">
     <value>Proposé par le 1er GTD</value>
   </data>
+  <data name="By default map is user specific, an administrator can share the map with all users using the chat command &lt;code&gt;#tacmap global&lt;/code&gt;." xml:space="preserve">
+    <value>Par défaut la carte est propre à l'utilisateur, un administrateur peut partager la carte avec tous les utilisateurs en écrivant dans le tchat &lt;code&gt;#tacmap global&lt;/code&gt;.</value>
+  </data>
+  <data name="Export in real time data to Arma 3 with &lt;a href=&quot;{0}&quot;&gt;SIT 1erGTD&lt;/a&gt; and &lt;a href=&quot;{1}&quot;&gt;Metis Marker&lt;/a&gt; mods." xml:space="preserve">
+    <value>Export en temps réel vers Arma 3 avec les mods &lt;a href="{0}"&gt;SIT 1erGTD&lt;/a&gt; et &lt;a href="{1}"&gt;Metis Marker&lt;/a&gt;.</value>
+  </data>
+  <data name="On your connected mobile device, click on menu icon &lt;i class=&quot;fas fa-bars&quot;&gt;&lt;/i&gt;, then on &quot;Load from {0}&quot;, and then select map." xml:space="preserve">
+    <value>Sur votre appareil mobile, cliquer sur l'icone &lt;i class="fas fa-bars"&gt;&lt;/i&gt;, puis sur "Charger depuis {0}", et sélectionner la carte.</value>
+  </data>
+  <data name="Real time export to Arma3 with SIT 1erGTD" xml:space="preserve">
+    <value>Export en temps réel avec SIT 1erGTD</value>
+  </data>
 </root>

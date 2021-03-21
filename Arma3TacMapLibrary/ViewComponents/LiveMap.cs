@@ -16,21 +16,21 @@ namespace Arma3TacMapLibrary.ViewComponents
         private readonly ITagHelperComponentManager _manager;
         private readonly string _endpoint;
 
-        private const string baseLineStyle = @"<link rel=""stylesheet"" href=""https://unpkg.com/leaflet@1.6.0/dist/leaflet.css""/>
-<link rel=""stylesheet"" href=""https://unpkg.com/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"" />
+        private const string baseLineStyle = @"<link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css""/>
+<link rel=""stylesheet"" href=""https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css"" />
 <link rel=""stylesheet"" href=""https://use.fontawesome.com/releases/v5.5.0/css/all.css"" />
 <link rel=""stylesheet"" href=""/css/arma3TacMap.css?{version}"" />";
         
 
-        private const string baseLineScript = @"<script src=""https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"">
+        private const string baseLineScript = @"<script src=""https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js"">
 </script>
-<script src=""https://unpkg.com/@microsoft/signalr@3.1.4/dist/browser/signalr.min.js"">
+<script src=""https://cdn.jsdelivr.net/npm/@microsoft/signalr@5.0.4/dist/browser/signalr.min.js"">
 </script>
-<script src=""https://unpkg.com/milsymbol@2.0.0/dist/milsymbol.js"">
+<script src=""https://cdn.jsdelivr.net/npm/milsymbol@2.0.0/dist/milsymbol.min.js"">
 </script>
-<script src=""https://unpkg.com/milstd@0.1.6/milstd.js"">
+<script src=""https://cdn.jsdelivr.net/npm/milstd@0.1.6/milstd.min.js"">
 </script>
-<script src=""https://unpkg.com/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"">
+<script src=""https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/js/bootstrap-select.min.js"">
 </script>
 <script src=""{endpoint}/js/mapUtils.js"">
 </script>
@@ -64,7 +64,7 @@ namespace Arma3TacMapLibrary.ViewComponents
                 .Replace("{endpoint}", _endpoint)
                 ));
 
-            scripts.Add(new HtmlString($"<script>initLiveMap({JsonSerializer.Serialize(vm)});</script>"));
+            scripts.Add(new HtmlString($"<script>Arma3TacMap.initLiveMap({JsonSerializer.Serialize(vm)});</script>"));
             _manager.Components.Add(new InjectTagHelperComponent("head", new HtmlString(baseLineStyle.Replace("{version}", version))));
             _manager.Components.Add(new InjectTagHelperComponent("body", scripts));
             return View(vm);

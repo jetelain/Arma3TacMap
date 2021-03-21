@@ -91,6 +91,7 @@ namespace Arma3TacMapWebApp
             }
 
             var origins = Configuration.GetSection("CorsOrigins").Get<string[]>();
+
             services.AddCors(o => o.AddPolicy("SignalRHub", builder =>
             {
                 builder.WithOrigins(origins)
@@ -98,6 +99,14 @@ namespace Arma3TacMapWebApp
                     .AllowAnyHeader()
                     .AllowCredentials();
             }));
+
+            services.AddCors(o => o.AddPolicy("Web", builder =>
+            {
+                builder.WithOrigins(origins)
+                    .WithMethods("GET")
+                    .AllowCredentials();
+            }));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
