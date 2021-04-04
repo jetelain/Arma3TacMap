@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -71,6 +72,70 @@ namespace Arma3TacMapLibrary.TacMaps
             _cache.Remove($"/api/TacMaps/{id}");
             var result = await _httpClient.DeleteAsync($"/api/TacMaps/{id}");
             result.EnsureSuccessStatusCode();
+        }
+
+        public async Task<ApiTacMap> Get(string link)
+        {
+            var uri = new Uri(link, UriKind.Absolute);
+            if (uri.DnsSafeHost != _httpClient.BaseAddress.DnsSafeHost)
+            {
+                _logger.LogWarning("Hostname mismatch, '{0}' != '{1}'", uri.DnsSafeHost, _httpClient.BaseAddress.DnsSafeHost);
+                return null;
+            }
+
+            var readOnly  = uri.AbsolutePath.StartsWith("/ViewMap/");
+            var readWrite = uri.AbsolutePath.StartsWith("/EditMap/");
+            if (!readOnly && !readWrite)
+            {
+                _logger.LogWarning("Unknown path '{0}'", uri.AbsolutePath);
+                return null;
+            }
+
+            int id;
+            if(!int.TryParse(uri.AbsolutePath.Substring(9), out id))
+            {
+                _logger.LogWarning("Unknown id '{0}'", uri.AbsolutePath);
+                return null;
+            }
+
+            var token = HttpUtility.ParseQueryString(uri.Query).Get("t");
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Missing token '{0}'", uri.Query);
+                return null;
+            }
+            var content = new FormUrlEncodedContent(new Dictionary<string, string>() {
+                { readOnly ? "readOnlyToken" : "readWriteToken",  token}
+            });
+            var result = await _httpClient.PostAsync($"/api/TacMaps/{id}/grant", content);
+            result.EnsureSuccessStatusCode();
+            return await result.Content.ReadFromJsonAsync<ApiTacMap>();
+        }
+
+        public bool IsTacMapLink(string link)
+        {
+            var uri = new Uri(link, UriKind.Absolute);
+            if (uri.DnsSafeHost != _httpClient.BaseAddress.DnsSafeHost)
+            {
+                return false;
+            }
+            var readOnly = uri.AbsolutePath.StartsWith("/ViewMap/");
+            var readWrite = uri.AbsolutePath.StartsWith("/EditMap/");
+            if (!readOnly && !readWrite)
+            {
+                return false;
+            }
+            int id;
+            if (!int.TryParse(uri.AbsolutePath.Substring(9), out id))
+            {
+                return false;
+            }
+            var token = HttpUtility.ParseQueryString(uri.Query).Get("t");
+            if (string.IsNullOrEmpty(token))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

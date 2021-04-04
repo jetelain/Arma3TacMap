@@ -57,6 +57,26 @@ namespace Arma3TacMapWebApp.Controllers
             return Ok(await ToApiTacMap(access, user, true));
         }
 
+        [HttpPost("{id}/grant")]
+        public async Task<IActionResult> GrantReadWrite(int id, [FromForm] string readWriteToken, [FromForm] string readOnlyToken)
+        {
+            TacMapAccess access;
+            if (!string.IsNullOrEmpty(readWriteToken))
+            {
+                access = await _mapSvc.GrantWriteAccess(User, id, readWriteToken);
+            }
+            else
+            {
+                access = await _mapSvc.GrantReadAccess(User, id, readOnlyToken);
+            }
+            if (access == null)
+            {
+                return NotFound();
+            }
+            var user = await _mapSvc.GetUser(User);
+            return Ok(await ToApiTacMap(access, user, true));
+        }
+
         private async Task<ApiTacMap> ToApiTacMap(TacMapAccess access, User user, bool includeMarkers)
         {
             var map = new ApiTacMap()
@@ -69,7 +89,7 @@ namespace Arma3TacMapWebApp.Controllers
                 ReadOnlyToken = access.TacMap.ReadOnlyToken,
                 ReadOnlyHref = Url.Action(nameof(HomeController.ViewMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme)
             };
-            if (access.TacMap.OwnerUserID == user.UserID)
+            if (access.CanWrite)
             {
                 map.ReadWriteToken = access.TacMap.ReadWriteToken;
                 map.ReadWriteHref = Url.Action(nameof(HomeController.EditMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadWriteToken }, Request.Scheme);
