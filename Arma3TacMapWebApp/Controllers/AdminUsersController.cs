@@ -78,7 +78,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return NotFound();
             }
-            var token = MapService.GenerateToken();
+            var token = MapService.GenerateToken() + MapService.GenerateToken();
             var key = new UserApiKey();
             key.User = user;
             key.ValidUntil = DateTime.UtcNow.AddYears(1);
