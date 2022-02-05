@@ -25,6 +25,16 @@ namespace Arma3TacMapLibrary.Arma3
             _endpoint = Arma3MapHelper.GetEndpoint(configuration);
         }
 
+        public async Task<List<MapInfos>> GetMapsInfosFilter(bool includeWorkInProgressMaps)
+        {
+            var value = await GetMapsInfos();
+            if ( !includeWorkInProgressMaps)
+            {
+                value = value.Where(m => m.worldName != "gossi").ToList();
+            }
+            return value;
+        }
+
         public async Task<List<MapInfos>> GetMapsInfos()
         {
             List<MapInfos> value;
@@ -47,6 +57,7 @@ namespace Arma3TacMapLibrary.Arma3
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, _endpoint + "/maps/all.json");
+                request.Headers.Add("User-Agent","Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0");
                 var client = _clientFactory.CreateClient();
                 var response = await client.SendAsync(request);
                 if (response.IsSuccessStatusCode)
