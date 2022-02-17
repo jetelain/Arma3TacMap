@@ -153,6 +153,7 @@ var Arma3TacMap;
     var modalMarkerData;
     var clickPosition = null;
     var currentLine = null;
+    var currentMeasure = null;
     var colorPicker;
 
     function updateMarkerHandler(e) {
@@ -185,6 +186,8 @@ var Arma3TacMap;
             $('#line-color').val(modalMarkerData.config.color);
             $('select').selectpicker('render');
             $('#line').modal('show');
+        } else if (modalMarkerData.type == 'measure') {
+            $('#measure').modal('show');
         }
 
     };
@@ -287,6 +290,14 @@ var Arma3TacMap;
         });
     }
 
+    function measureMarkerTool(backend) {
+        $('#measure-delete').on('click', function () {
+            backend.removeMarker(modalMarkerId);
+            $('#measure').modal('hide');
+        });
+
+    }
+
     function insertLine(latlng, map, append, backend) {
         var point = latlng;
 
@@ -306,6 +317,23 @@ var Arma3TacMap;
                 type: 'line',
                 symbol: 'line',
                 config: { color: colorPicker.val() },
+                pos: data.map(function (e) { return [e.lat, e.lng]; }).flat()
+            });
+        }
+    }
+
+
+    function insertMeasure(latlng, map, backend) {
+        if (!currentMeasure) {
+            currentMeasure = L.polyline([latlng, latlng], { color: '#000000', weight: 1.3, dashArray: '4', interactive: false }).addTo(map);
+        }
+        else {
+            var data = currentMeasure.getLatLngs();
+            currentMeasure = null;
+            backend.addMarker({
+                type: 'measure',
+                symbol: 'measure',
+                config: {},
                 pos: data.map(function (e) { return [e.lat, e.lng]; }).flat()
             });
         }
@@ -372,7 +400,25 @@ var Arma3TacMap;
                 }
                 markers[markerId] = mapMarker;
             }
-        } else {
+        }
+        else if (markerData.type == 'measure') {
+            var posList = [[markerData.pos[0], markerData.pos[1]],
+            [markerData.pos[2], markerData.pos[3]]];
+
+            if (existing) {
+                existing.setLatLngs(posList);
+                computeDistanceAndShowTooltip(map, existing, posList, canEdit);
+                existing.options.markerData = markerData;
+            } else {
+                var mapMarker = L.polyline(posList, { color: '#000000', weight: 1.3, dashArray: '4', interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['measure'] ?? 1.0 }).addTo(map);
+                computeDistanceAndShowTooltip(map, mapMarker, posList, canEdit);
+                if (canEdit) {
+                    mapMarker.on('click', updateMarkerHandler);
+                }
+                markers[markerId] = mapMarker;
+            }
+        }
+        else {
             var icon = generateIcon(markerData);
             if (existing) {
                 existing.setIcon(icon);
@@ -579,7 +625,8 @@ var Arma3TacMap;
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 1); }, content: '<i class="far fa-hand-pointer"></i>' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 2); }, content: '<img height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAzCAYAAADfP/VGAAACTElEQVRoge3ZsUsCcRTA8TdZaurZmJG2RtASURBI0BRELVG0BBFYi0tDkQSOQf0BTTW1FU01tQhBtNSWi8NFFNSc82soT9PTu/N+7/d+d+fwQLg70C8f7n73EwAg0hvbAxEAwN5Yjt4Sqz+WQC2VDvwkhkYwFI2ZxwrHk8aB1MQUbl7eY1HHQM7q6RVqw5lfPHGtNZaWSmPu5glHZ+aMaNn8IfsXlzkHL984uZ4zfv/44hrmSxXzWLWL5veOAqesUVM4kcSl4zMs6oiFcrVzrKKOgVFmpmn38d04bitWEJS109Q4jmL5UZmVJlex/KTMjiYhsbyszIkmYbG8qKxZ0/LJue1rhcTygrJuNZHEUlmZG02ksVRSJkITeSwVlInSJC0WhzLRmqTGkqmMQhNLLEpllJrYYlEoo9bEHkuEMlmalIjlRplMTUrFcqKMQ5Nysewo49KkbCwzZbM7+6yalI5lpgwAsC8aY9GkfKzmexP3O6aysczuTarsZCgTy+pJp8JOhhKxnDzpOJWxxup23cSljC2WiHWTbGXSY4lehctUJjUW5SpchjIpsWS901ErI4/F8U5HpYwsFvcOAYUyklgq7BBQKBMai1sTtTJhsf5p0gbZdwgolLmOpaomCmWuYnlBk0hlXcXymiZRyhzH8rImt8psx/KLJjfKbMXyo6ZulHWM5XdN7Wb79tlUWdtYQdJkV9nGxV1rrFB0wDhpbGEF86UKFsrVQM7W9QNmprPN/zTVY/XGcl5rsXQA+AKAt7/PvanPBwB8AoD+A4WfYoYlQx+dAAAAAElFTkSuQmCC" />' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map)
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map),
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '↔' }).addTo(map)
         ];
 
         colorPicker = createColorPicker();
@@ -590,6 +637,8 @@ var Arma3TacMap;
         basicsymbolMarkerTool(backend);
 
         lineMarkerTool(backend);
+
+        measureMarkerTool(backend);
 
         map.on('click', function (e) {
             clickPosition = e.latlng;
@@ -602,6 +651,9 @@ var Arma3TacMap;
                 }
                 else if (currentTool == 4) {
                     insertLine(e.latlng, map, e.originalEvent.ctrlKey, backend);
+                }
+                else if (currentTool == 5) {
+                    insertMeasure(e.latlng, map, backend);
                 }
             }
         });
@@ -617,6 +669,12 @@ var Arma3TacMap;
                 data[data.length - 1] = [e.latlng.lat, e.latlng.lng];
                 currentLine.setLatLngs(data);
             }
+            if (currentMeasure) {
+                var posList = currentMeasure.getLatLngs();
+                posList[1] = e.latlng;
+                currentMeasure.setLatLngs(posList);
+                computeDistanceAndShowTooltip(map, currentMeasure, posList, false);
+            }
         });
 
         map.on('mousedown', function (e) {
@@ -631,12 +689,30 @@ var Arma3TacMap;
                 backend.endPointMap();
             }
         });
-        map.on('contextmenu', function (e) { });
+        map.on('contextmenu', function (e) {
+            if (currentMeasure) { // un clic droit lors d'une mesure la supprime.
+                currentMeasure.remove();
+                currentMeasure = null;
+            }
+        });
 
         $('select').selectpicker();
 
         selectTool(map, 0);
+
+
     }
+
+    function computeDistanceAndShowTooltip(map, line, posList, interactive) {
+        var distance = map.distance(posList[0], posList[1]).toFixed();
+        var formatedDistance = new Intl.NumberFormat().format(distance) + ' m';
+
+        if (line.getTooltip()) {
+            line.unbindTooltip();
+        }
+        line.bindTooltip(formatedDistance, { direction: 'center', permanent: true, interactive: interactive, opacity: 0.8 });
+    }
+
 
     function setupSearch(map, mapInfos, markers) {
         L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#search').modal('show'); search(map, mapInfos, markers); }, content: '<i class="fas fa-search"></i>' }).addTo(map);
@@ -684,7 +760,7 @@ var Arma3TacMap;
         });
     }
 
-    var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0 };
+    var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0, 'measure': 1.0 };
 
     /**
      * Displays, in real time, a tacmap on a preconfigured Leaflet map.
@@ -720,7 +796,7 @@ var Arma3TacMap;
             var worldName = config.worldName;
             var mapId = config.mapId;
             var canEdit = !config.isReadOnly;
-            
+
 
             var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
 
