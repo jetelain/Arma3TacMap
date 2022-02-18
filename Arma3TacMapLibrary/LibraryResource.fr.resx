@@ -162,8 +162,11 @@
   <data name="Label" xml:space="preserve">
     <value>Libellé</value>
   </data>
-  <data name="Line" xml:space="preserve">
+	<data name="Line" xml:space="preserve">
     <value>Ligne</value>
+  </data>
+	<data name="Measure" xml:space="preserve">
+    <value>Distance</value>
   </data>
   <data name="NATO APP-6 (D) Symbol" xml:space="preserve">
     <value>Symbole OTAN APP-6 (D)</value>
