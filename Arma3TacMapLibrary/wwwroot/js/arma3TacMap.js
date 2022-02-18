@@ -329,6 +329,7 @@ var Arma3TacMap;
         }
         else {
             var data = currentMeasure.getLatLngs();
+            currentMeasure.remove();
             currentMeasure = null;
             backend.addMarker({
                 type: 'measure',
