@@ -360,4 +360,25 @@
   <data name="Visibility" xml:space="preserve">
     <value>Visibilité</value>
   </data>
+  <data name="Configure ORBAT" xml:space="preserve">
+    <value>Configurer l'ODB</value>
+  </data>
+  <data name="Friendly" xml:space="preserve">
+    <value>Ami</value>
+  </data>
+  <data name="Hostile" xml:space="preserve">
+    <value>Ennemi</value>
+  </data>
+  <data name="Insert a symbol from ORBAT" xml:space="preserve">
+    <value>Insérer un symbole depuis l'ODB</value>
+  </data>
+  <data name="Insert an other symbol" xml:space="preserve">
+    <value>Insérer un autre symbole</value>
+  </data>
+  <data name="Assumed" xml:space="preserve">
+    <value>Présumé</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Confirmé</value>
+  </data>
 </root>

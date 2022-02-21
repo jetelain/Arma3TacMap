@@ -48,7 +48,7 @@ namespace Arma3TacMapWebApp.Entities
 
         public int Position { get; set; }
 
-        public string GetNatoSymbol(char c) => "100" + c + "100" +
+        public string GetNatoSymbol(char c, char e = '0') => "100" + c + "10" + e +
             (NatoSymbolHQ ?? string.Empty).PadLeft(1, '0') +
             (NatoSymbolSize ?? string.Empty).PadLeft(2, '0') +
             (NatoSymbolIcon ?? string.Empty).PadLeft(6, '0') +
