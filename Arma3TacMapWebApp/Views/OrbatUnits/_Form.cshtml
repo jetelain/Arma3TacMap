@@ -1,0 +1,83 @@
+﻿@model Arma3TacMapWebApp.Entities.OrbatUnit
+@inject IHtmlLocalizer<SharedResource> Localizer
+
+<input type="hidden" asp-for="OrbatID" />
+<input type="hidden" asp-for="NatoSymbolFriendlyImageBase64" />
+<input type="hidden" asp-for="NatoSymbolHostileImageBase64" />
+<input type="hidden" asp-for="Trigram" />
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label asp-for="ParentOrbatUnitID" class="control-label"></label>
+        <select asp-for="ParentOrbatUnitID" class="form-control" asp-items="ViewBag.ParentOrbatUnitID">
+            <option value="">@Localizer["(none)"]</option>
+        </select>
+        <span asp-validation-for="ParentOrbatUnitID" class="text-danger"></span>
+    </div>
+    <div class="form-group col-md-6">
+        <label asp-for="Position" class="control-label"></label>
+        <input asp-for="Position" class="form-control" />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group col-md-6">
+        <label asp-for="UniqueDesignation" class="control-label"></label>
+        <input asp-for="UniqueDesignation" class="form-control" />
+        <span asp-validation-for="UniqueDesignation" class="text-danger"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-8">
+        <label asp-for="NatoSymbolIcon" class="control-label"></label>
+        <select asp-for="NatoSymbolIcon" class="form-control" data-selected="@Model.NatoSymbolIcon"></select>
+        <span asp-validation-for="NatoSymbolIcon" class="text-danger"></span>
+    </div>
+
+    <div class="form-group col-md-4">
+        <label asp-for="NatoSymbolSize" class="control-label"></label>
+        <select asp-for="NatoSymbolSize" class="form-control" data-selected="@Model.NatoSymbolSize"></select>
+        <span asp-validation-for="NatoSymbolSize" class="text-danger"></span>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label asp-for="NatoSymbolMod1" class="control-label"></label>
+        <select asp-for="NatoSymbolMod1" class="form-control" data-selected="@Model.NatoSymbolMod1"></select>
+        <span asp-validation-for="NatoSymbolMod1" class="text-danger"></span>
+    </div>
+    <div class="form-group col-md-4">
+        <label asp-for="NatoSymbolMod2" class="control-label"></label>
+        <select asp-for="NatoSymbolMod2" class="form-control" data-selected="@Model.NatoSymbolMod2"></select>
+        <span asp-validation-for="NatoSymbolMod2" class="text-danger"></span>
+    </div>
+    <div class="form-group col-md-4">
+        <label asp-for="NatoSymbolHQ" class="control-label"></label>
+        <select asp-for="NatoSymbolHQ" class="form-control">
+            <option value="0" selected="selected">n/a</option>
+            <option value="1">Feint/Dummy</option>
+            <option value="2">Headquarters</option>
+            <option value="3">Feint/Dummy Headquarters</option>
+            <option value="4">Task Force</option>
+            <option value="5">Feint/Dummy Task Force</option>
+            <option value="6">Task Force Headquarters</option>
+            <option value="7">Feint/Dummy Task Force Headquarters</option>
+        </select>
+        <span asp-validation-for="NatoSymbolHQ" class="text-danger"></span>
+    </div>
+</div>
+<div class="form-row text-center align-items-center">
+    <h4 class="col-6">
+        @Html.DisplayNameFor(model => model.NatoSymbolFriendlyImageBase64)
+    </h4>
+    <h4 class="col-6">
+        @Html.DisplayNameFor(model => model.NatoSymbolHostileImageBase64)
+    </h4>
+    <div class="col-6" id="PreviewFriendly"></div>
+    <div class="col-6" id="PreviewHostile"></div>
+</div>
+

@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Change label" xml:space="preserve">
-    <value>Modifier le libellé</value>
+  <data name="Change informations" xml:space="preserve">
+    <value>Modifier les informations</value>
   </data>
   <data name="Copy" xml:space="preserve">
     <value>Copier</value>
@@ -269,5 +269,95 @@
   </data>
   <data name="Real time export to Arma3 with SIT 1erGTD" xml:space="preserve">
     <value>Export en temps réel avec SIT 1erGTD</value>
+  </data>
+  <data name="ORBATs" xml:space="preserve">
+    <value>ODBs</value>
+  </data>
+  <data name="(none)" xml:space="preserve">
+    <value>(aucun)</value>
+  </data>
+  <data name="Add an unit" xml:space="preserve">
+    <value>Ajouter une unité</value>
+  </data>
+  <data name="Are you sure you want to detele this order of battle?" xml:space="preserve">
+    <value>Êtres vous sûre de vouloir supprimer cet ordre de bataille ?</value>
+  </data>
+  <data name="Are you sure you want to detele this unit?" xml:space="preserve">
+    <value>Êtes vous sûre de vouloir supprimer cette unité ?</value>
+  </data>
+  <data name="Call sign" xml:space="preserve">
+    <value>Indicatif</value>
+  </data>
+  <data name="Create an order of battle" xml:space="preserve">
+    <value>Créer un ordre de bataille</value>
+  </data>
+  <data name="Create an unit" xml:space="preserve">
+    <value>Créer une unité</value>
+  </data>
+  <data name="Delete an order of battle" xml:space="preserve">
+    <value>Supprimer un ordre de bataille</value>
+  </data>
+  <data name="Delete an unit" xml:space="preserve">
+    <value>Supprimer une unité</value>
+  </data>
+  <data name="Echelon" xml:space="preserve">
+    <value>Echelon</value>
+  </data>
+  <data name="Edit an order of battle" xml:space="preserve">
+    <value>Modifier un ordre de bataille</value>
+  </data>
+  <data name="Edit an unit" xml:space="preserve">
+    <value>Modifier une unité</value>
+  </data>
+  <data name="Friendly ORBAT" xml:space="preserve">
+    <value>ODB Ami</value>
+  </data>
+  <data name="Friendly Symbol" xml:space="preserve">
+    <value>Symbole ami</value>
+  </data>
+  <data name="Hostile ORBAT" xml:space="preserve">
+    <value>ODB Ennemi</value>
+  </data>
+  <data name="Hostile Symbol" xml:space="preserve">
+    <value>Symbole ennemi</value>
+  </data>
+  <data name="Icon Modifier 1" xml:space="preserve">
+    <value>Modificateur 1</value>
+  </data>
+  <data name="Icon Modifier 2" xml:space="preserve">
+    <value>Modificateur 2</value>
+  </data>
+  <data name="Label" xml:space="preserve">
+    <value>Libellé</value>
+  </data>
+  <data name="Orders of battle" xml:space="preserve">
+    <value>Ordres de bataille</value>
+  </data>
+  <data name="Orders of battle allows you to quickly pick-up pre-defined symbols on a tactical map. A same order of battle can be used as freindly or as hostile." xml:space="preserve">
+    <value>Les ordres de bataille vous permettent de sélectionner rapidement des symboles pré-définits sur une carte tactique. Un même ordre de bataille peut être utilisé en tant qu'ami ou en tant qu'ennemi.</value>
+  </data>
+  <data name="Parent Unit" xml:space="preserve">
+    <value>Unité parent</value>
+  </data>
+  <data name="Public" xml:space="preserve">
+    <value>Publique</value>
+  </data>
+  <data name="Symbol" xml:space="preserve">
+    <value>Symbole</value>
+  </data>
+  <data name="Trigram" xml:space="preserve">
+    <value>Trigramme</value>
+  </data>
+  <data name="Unique Designation" xml:space="preserve">
+    <value>Désignation unique</value>
+  </data>
+  <data name="User Defined" xml:space="preserve">
+    <value>Définits par l'utilisateur</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Consulter</value>
+  </data>
+  <data name="Visibility" xml:space="preserve">
+    <value>Visibilité</value>
   </data>
 </root>

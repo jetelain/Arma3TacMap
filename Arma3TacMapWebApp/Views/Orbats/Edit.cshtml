@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<SharedResource> Localizer
+@model Arma3TacMapWebApp.Entities.Orbat
+
+@{
+    ViewData["Title"] = "Edit an order of battle";
+}
+
+<div class="container">
+    <h1>@Localizer["Edit an order of battle"]</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="OrbatID" />
+                <div class="form-group">
+                    <label asp-for="Label" class="control-label"></label>
+                    <input asp-for="Label" class="form-control" />
+                    <span asp-validation-for="Label" class="text-danger"></span>
+                </div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
+                {
+                    <div class="form-group">
+                        <label asp-for="Visibility" class="control-label"></label>
+                        <select asp-for="Visibility" class="form-control" asp-items="Html.GetEnumSelectList<Arma3TacMapWebApp.Entities.OrbatVisibility>()"></select>
+                        <span asp-validation-for="Visibility" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Visibility" />
+                }
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

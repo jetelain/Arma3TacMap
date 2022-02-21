@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Arma3TacMapLibrary.Arma3;
+using Arma3TacMapLibrary.Maps;
+using Arma3TacMapWebApp.Entities;
+using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Arma3TacMapWebApp.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Arma3TacMapWebApp.Maps;
-using Arma3TacMapWebApp.Models;
-using Arma3TacMapLibrary.Maps;
-using Arma3TacMapLibrary.Arma3;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System.IO;
 using SixLabors.ImageSharp.Processing;
 
 namespace Arma3TacMapWebApp.Controllers
@@ -50,7 +49,12 @@ namespace Arma3TacMapWebApp.Controllers
         // GET: TacMaps/Create
         public async Task<IActionResult> Create(string worldName)
         {
-            ViewBag.Maps = await _mapInfos.GetMapsInfos(); 
+            ViewBag.Maps = await _mapInfos.GetMapsInfos();
+
+            var user = await _mapSvc.GetUser(User);
+
+            await PrepareOrbatDropdown(user);
+
             return View(new TacMap()
             {
                 WorldName = worldName,
@@ -58,15 +62,36 @@ namespace Arma3TacMapWebApp.Controllers
             });
         }
 
+        private async Task PrepareOrbatDropdown(User user)
+        {
+            var userId = user?.UserID;
+            var orbatList = await _context.Orbats
+                .Where(o => o.OwnerUserID == userId || o.Visibility != OrbatVisibility.Default)
+                .Include(o => o.Owner)
+                .OrderBy(o => o.Visibility)
+                .ThenByDescending(o => o.Created)
+                .ToListAsync();
+            var defaultGroup = new SelectListGroup() { Name = "User defined" };
+            var publicGroup = new SelectListGroup() { Name = "Public" };
+            ViewBag.OrbatID = orbatList.Select(o => new SelectListItem()
+            {
+                Value = o.OrbatID.ToString(),
+                Text = o.Label,
+                Group = o.Visibility == OrbatVisibility.Default ? defaultGroup : publicGroup
+            }).ToList();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Label,WorldName")] TacMap tacMap)
+        public async Task<IActionResult> Create([Bind("Label,WorldName,FriendlyOrbatID,HostileOrbatID")] TacMap tacMap)
         {
             if (ModelState.IsValid)
             {
-                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label, null);
+                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label, null, tacMap.FriendlyOrbatID, tacMap.HostileOrbatID);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
+            var user = await _mapSvc.GetUser(User);
+            await PrepareOrbatDropdown(user);
             ViewBag.Maps = await _mapInfos.GetMapsInfos();
             return View(tacMap);
         }
@@ -86,10 +111,12 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return NotFound();
             }
-            if (tacMap.OwnerUserID != (await _mapSvc.GetUser(User)).UserID)
+            var user = await _mapSvc.GetUser(User);
+            if (tacMap.OwnerUserID != user.UserID)
             {
                 return Forbid();
             }
+            await PrepareOrbatDropdown(user);
             return View(tacMap);
         }
 
@@ -98,7 +125,7 @@ namespace Arma3TacMapWebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TacMapID,Label,WorldName")] TacMap edited)
+        public async Task<IActionResult> Edit(int id, [Bind("TacMapID,Label,WorldName,FriendlyOrbatID,HostileOrbatID")] TacMap edited)
         {
             if (id != edited.TacMapID)
             {
@@ -108,11 +135,13 @@ namespace Arma3TacMapWebApp.Controllers
                 .Include(t => t.Owner)
                 .FirstOrDefaultAsync(m => m.TacMapID == id);
 
-            if (tacMap.OwnerUserID != (await _mapSvc.GetUser(User)).UserID)
+            var user = await _mapSvc.GetUser(User);
+            if (tacMap.OwnerUserID != user.UserID)
             {
                 return Forbid();
             }
-
+            tacMap.FriendlyOrbatID = edited.FriendlyOrbatID;
+            tacMap.HostileOrbatID = edited.HostileOrbatID;
             tacMap.Label = edited.Label;
             if (ModelState.IsValid)
             {
@@ -134,6 +163,7 @@ namespace Arma3TacMapWebApp.Controllers
                 }
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = edited.TacMapID });
             }
+            await PrepareOrbatDropdown(user);
             return View(tacMap);
         }
 
@@ -259,7 +289,7 @@ namespace Arma3TacMapWebApp.Controllers
             }
             if (ModelState.IsValid)
             {
-                var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, cloneInfos.Label, null);
+                var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, cloneInfos.Label, null, tacMap.TacMap.FriendlyOrbatID, tacMap.TacMap.HostileOrbatID);
                 foreach(var marker in await _mapSvc.GetMarkers(tacMap.TacMapID, true))
                 {
                     await _context.AddAsync(new TacMapMarker()

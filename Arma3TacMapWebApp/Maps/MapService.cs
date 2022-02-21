@@ -43,7 +43,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
-        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label, Uri eventHref)
+        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label, Uri eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
         {
             var dbUser = await GetOrCreateUser(user);
             if (dbUser == null)
@@ -58,7 +58,9 @@ namespace Arma3TacMapWebApp.Maps
                 Owner = dbUser,
                 WorldName = worldName,
                 ReadWriteToken = GenerateToken(),
-                ReadOnlyToken = GenerateToken()
+                ReadOnlyToken = GenerateToken(),
+                FriendlyOrbatID = friendlyOrbatID,
+                HostileOrbatID = hostileOrbatID
             };
             var access = new TacMapAccess()
             {
@@ -333,5 +335,35 @@ namespace Arma3TacMapWebApp.Maps
             };
         }
 
+        public async Task<List<OrbatUnit>> GetOrbatUnits(int? orbatID)
+        {
+            if (orbatID == null)
+            {
+                return new List<OrbatUnit>();
+            }
+            return SortAndSetLevel(await _db.OrbatUnits
+               .Include(u => u.Parent)
+               .Where(u => u.OrbatID == orbatID)
+               .ToListAsync());
+        }
+
+        internal static List<OrbatUnit> SortAndSetLevel(IEnumerable<OrbatUnit> units)
+        {
+            return SortAndSetLevel(null, units, 0).ToList();
+        }
+
+        private static IEnumerable<OrbatUnit> SortAndSetLevel(int? parentID, IEnumerable<OrbatUnit> units, int level)
+        {
+            var childLevel = level + 1;
+            foreach (var unit in units.Where(u => u.ParentOrbatUnitID == parentID).OrderBy(u => u.Position))
+            {
+                unit.RelativeLevel = 0;
+                yield return unit;
+                foreach (var child in SortAndSetLevel(unit.OrbatUnitID, units.Where(u => u.ParentOrbatUnitID != parentID), childLevel))
+                {
+                    yield return child;
+                }
+            }
+        }
     }
 }

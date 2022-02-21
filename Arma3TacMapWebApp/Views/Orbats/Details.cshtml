@@ -1,0 +1,86 @@
+﻿@model Arma3TacMapWebApp.Entities.Orbat
+@inject IHtmlLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = Model.Label;
+    var canEdit = (bool?)ViewBag.CanEdit ?? false;
+}
+<div class="container">
+    <h1>@Model.Label</h1>
+    <div>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Owner)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.Owner.UserLabel)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Visibility)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.Visibility)
+            </dd>
+        </dl>
+    </div>
+    @if (canEdit)
+    {
+        <p>
+            <a asp-controller="OrbatUnits" asp-action="Create" asp-route-orbatID="@Model.OrbatID" class="btn btn-primary">@Localizer["Add an unit"]</a>
+            <a asp-action="Edit" asp-route-id="@Model.OrbatID" class="btn btn-secondary">@Localizer["Edit"]</a>
+        </p>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Localizer["Symbol"]
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Units[0].UniqueDesignation)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Units[0].Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Units[0].Trigram)
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Units)
+            {
+            <tr>
+                <td>
+                    <img src="@item.NatoSymbolFriendlyImageBase64" height="64" alt="@item.GetNatoSymbol('3')" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueDesignation)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Trigram)
+                </td>
+                <td>
+                    @if (canEdit)
+                    {
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="OrbatUnits" asp-action="Edit" asp-route-id="@item.OrbatUnitID">@Localizer["Edit"]</a>
+                        @if (item.Children == null || item.Children.Count == 0)
+                        {
+                            <a class="btn btn-sm btn-outline-danger" asp-controller="OrbatUnits" asp-action="Delete" asp-route-id="@item.OrbatUnitID">@Localizer["Delete"]</a>
+                        }
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>

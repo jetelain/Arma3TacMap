@@ -15,25 +15,59 @@
         <a class="btn btn-secondary" asp-action="Export" asp-route-id="@Model.TacMapID">@Localizer["Export to Arma3"]</a>
     </p>
 
-    <h2 class="mt-5">@Localizer["Change label"]</h2>
-    <div class="row">
-        <div class="col-md-6">
+    <h2 class="mt-5">@Localizer["Change informations"]</h2>
 
+    <div class="row">
+        <div class="col-md-8">
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="TacMapID" />
                 <input type="hidden" asp-for="WorldName" />
-                <div class="input-group">
+                <div class="form-group">
+                    <label asp-for="Label" class="control-label"></label>
                     <input asp-for="Label" class="form-control" />
-                    <div class="input-group-append">
-                        <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
+                    <span asp-validation-for="Label" class="text-danger"></span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="FriendlyOrbatID" class="control-label"></label>
+                        <select asp-for="FriendlyOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                            <option value="">@Localizer["(none)"]</option>
+                        </select>
+                        <span asp-validation-for="FriendlyOrbatID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="HostileOrbatID" class="control-label"></label>
+                        <select asp-for="HostileOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                            <option value="">@Localizer["(none)"]</option>
+                        </select>
+                        <span asp-validation-for="HostileOrbatID" class="text-danger"></span>
                     </div>
                 </div>
-                <div asp-validation-for="Label" class="text-danger">
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
                 </div>
             </form>
         </div>
     </div>
+    @*<div class="row">
+        <div class="col-md-6">
+
+            <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="TacMapID" />
+                    <input type="hidden" asp-for="WorldName" />
+                    <div class="input-group">
+                        <input asp-for="Label" class="form-control" />
+                        <div class="input-group-append">
+                            <input type="submit" value="@Localizer["Save"]" class="btn btn-primary" />
+                        </div>
+                    </div>
+                    <div asp-validation-for="Label" class="text-danger">
+                    </div>
+                </form>
+        </div>
+    </div>*@
 
     <h2 class="mt-5">@Localizer["Sharing"]</h2>
 

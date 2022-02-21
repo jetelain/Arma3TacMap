@@ -52,7 +52,12 @@ namespace Arma3TacMapWebApp.Maps
                 return preview.Data;
             }
 
-            using (var image = Image.Load(await MakeScreenshot(access)))
+            var bytes = await MakeScreenshot(access);
+            if (bytes == null)
+            {
+                return File.ReadAllBytes(@"wwwroot/img/transparent.png");
+            }
+            using (var image = Image.Load(bytes))
             {
 
                 using (var transaction = _pdb.Database.BeginTransaction())

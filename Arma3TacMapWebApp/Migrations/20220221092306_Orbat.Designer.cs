@@ -3,14 +3,16 @@ using System;
 using Arma3TacMapWebApp.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
-    partial class Arma3TacMapContextModelSnapshot : ModelSnapshot
+    [Migration("20220221092306_Orbat")]
+    partial class Orbat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

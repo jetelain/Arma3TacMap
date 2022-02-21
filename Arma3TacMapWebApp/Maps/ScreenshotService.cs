@@ -34,6 +34,10 @@ namespace Arma3TacMapWebApp.Maps
 
         public async Task<byte[]> MakeScreenshotAsync(string uri)
         {
+            if (string.IsNullOrEmpty(chromePath))
+            {
+                return null;
+            }
             var browser = await GetBrowser();
             var page = await browser.NewPageAsync();
             await page.GoToAsync(uri);

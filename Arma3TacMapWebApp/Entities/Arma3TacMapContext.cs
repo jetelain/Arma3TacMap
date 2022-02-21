@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Arma3TacMapWebApp.Entities;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -21,15 +22,26 @@ namespace Arma3TacMapWebApp.Entities
 
         public DbSet<UserApiKey> UserApiKeys { get; set; }
 
+        public DbSet<Orbat> Orbats { get; set; }
+
+        public DbSet<OrbatUnit> OrbatUnits { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(User));
 
-            modelBuilder.Entity<TacMap>().ToTable(nameof(TacMap));
+            var tacMap = modelBuilder.Entity<TacMap>();
+            tacMap.HasOne(t => t.HostileOrbat).WithMany().OnDelete(DeleteBehavior.SetNull);
+            tacMap.HasOne(t => t.FriendlyOrbat).WithMany().OnDelete(DeleteBehavior.SetNull);
+            tacMap.ToTable(nameof(TacMap));
 
             modelBuilder.Entity<TacMapAccess>().ToTable(nameof(TacMapAccess));
 
             modelBuilder.Entity<TacMapMarker>().ToTable(nameof(TacMapMarker));
+
+            modelBuilder.Entity<Orbat>().ToTable(nameof(Orbat));
+
+            modelBuilder.Entity<OrbatUnit>().ToTable(nameof(OrbatUnit));
 
             var userApiKey = modelBuilder.Entity<UserApiKey>();
             userApiKey.ToTable(nameof(UserApiKey));
