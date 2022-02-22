@@ -61,26 +61,49 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h6>@Localizer["Friendly"]</h6>
+                    
+                    <ul class="nav nav-tabs mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">@Localizer["Friendly"]</a>
+                        </li>
+                    </ul>
+
                     @foreach (var item in Model.Friendly)
                     {
                         <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('3')" data-unique-designation="@item.UniqueDesignation">
                             <img src="@item.NatoSymbolFriendlyImageBase64" alt="@item.GetNatoSymbol('3')" />
                         </button>
                     }
-                    <h6 class="mt-2">
-                        @Localizer["Hostile"]
-                        <input type="radio" name="orbat-hostile" id="orbat-hostile-confirmed" value="0" checked>
-                        <label class="orbat-radio" for="orbat-hostile-confirmed"> @Localizer["Confirmed"]</label>
-                        <input type="radio" name="orbat-hostile" id="orbat-hostile-assumed" value="1">
-                        <label class="orbat-radio" for="orbat-hostile-assumed"> @Localizer["Assumed"]</label>
-                    </h6>
-                    @foreach (var item in Model.Friendly)
-                    {
-                        <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('6')" data-unique-designation="@item.UniqueDesignation" data-milsymbol-assumed="@item.GetNatoSymbol('6','1')">
-                            <img src="@item.NatoSymbolHostileImageBase64" alt="@item.GetNatoSymbol('6')" />
-                        </button>
-                    }
+
+                    <ul class="nav nav-tabs mt-2 mb-2" id="orbat-eni" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="orbat-eni-0-label" data-toggle="tab" href="#orbat-eni-0" role="tab" aria-controls="orbat-eni-0" aria-selected="true">@Localizer["Hostile"] - @Localizer["Present"]</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="orbat-eni-1-label" data-toggle="tab" href="#orbat-eni-1" role="tab" aria-controls="orbat-eni-1" aria-selected="false">@Localizer["Hostile"] - @Localizer["Anticiped/Supect"]</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane show active" id="orbat-eni-0" role="tabpanel" aria-labelledby="orbat-eni-0-label">
+                            @foreach (var item in Model.Hostile)
+                            {
+                                <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('6')" data-unique-designation="@item.UniqueDesignation">
+                                    <img src="@item.NatoSymbolHostileImageBase64" alt="@item.GetNatoSymbol('6')" />
+                                </button>
+                            }
+                        </div>
+                        <div class="tab-pane" id="orbat-eni-1" role="tabpanel" aria-labelledby="orbat-eni-1-label">
+
+                            @foreach (var item in Model.Hostile)
+                            {
+                                <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('6','1')" data-unique-designation="@item.UniqueDesignation">
+                                    <img src="@item.NatoSymbolHostileAssumedImageBase64" alt="@item.GetNatoSymbol('6','1')" />
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>

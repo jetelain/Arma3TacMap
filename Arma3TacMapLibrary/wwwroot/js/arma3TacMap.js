@@ -260,13 +260,10 @@ var Arma3TacMap;
 
     function orbatMarkerTool(backend) {
         $('.orbat-btn').on('click', function () {
-            var symbol = $(this).attr('data-milsymbol');
-            if ($('#orbat-hostile-assumed').prop("checked")) {
-                symbol = $(this).attr('data-milsymbol-assumed') || symbol;
-            }
+            
             backend.addMarker({
                 type: 'mil',
-                symbol: symbol,
+                symbol: $(this).attr('data-milsymbol'),
                 config: { uniqueDesignation: $(this).attr('data-unique-designation') },
                 pos: [clickPosition.lat, clickPosition.lng]
             });

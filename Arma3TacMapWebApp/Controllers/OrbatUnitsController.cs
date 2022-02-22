@@ -67,7 +67,7 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,Position")] OrbatUnit orbatUnit)
+        public async Task<IActionResult> Create([Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,NatoSymbolHostileAssumedImageBase64,Position")] OrbatUnit orbatUnit)
         {
             orbatUnit.Orbat = await _context.Orbats.FindAsync(orbatUnit.OrbatID);
             if (orbatUnit.Orbat == null)
@@ -135,7 +135,7 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,Position,Trigram")] OrbatUnit orbatUnit)
+        public async Task<IActionResult> Edit(int id, [Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,NatoSymbolHostileAssumedImageBase64,Position,Trigram")] OrbatUnit orbatUnit)
         {
             if (id != orbatUnit.OrbatUnitID)
             {

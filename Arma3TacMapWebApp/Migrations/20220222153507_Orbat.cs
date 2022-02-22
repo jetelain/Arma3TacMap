@@ -59,6 +59,7 @@ namespace Arma3TacMapWebApp.Migrations
                     NatoSymbolHQ = table.Column<string>(type: "TEXT", nullable: true),
                     NatoSymbolFriendlyImageBase64 = table.Column<string>(type: "TEXT", nullable: true),
                     NatoSymbolHostileImageBase64 = table.Column<string>(type: "TEXT", nullable: true),
+                    NatoSymbolHostileAssumedImageBase64 = table.Column<string>(type: "TEXT", nullable: true),
                     Position = table.Column<int>(type: "INTEGER", nullable: false),
                     Trigram = table.Column<string>(type: "TEXT", maxLength: 3, nullable: true)
                 },

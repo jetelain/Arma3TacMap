@@ -1,10 +1,11 @@
 ﻿function applySymbol() {
-    applySymbolOne('3', 'NatoSymbolFriendlyImageBase64', 'PreviewFriendly');
-    applySymbolOne('6', 'NatoSymbolHostileImageBase64', 'PreviewHostile');
+    applySymbolOne('3', '0', 'NatoSymbolFriendlyImageBase64', 'PreviewFriendly');
+    applySymbolOne('6', '0', 'NatoSymbolHostileImageBase64', 'PreviewHostile');
+    applySymbolOne('6', '1', 'NatoSymbolHostileAssumedImageBase64');
 }
 
-function applySymbolOne(c, hidden, area) {
-    var symbol = '100' + c + '100';
+function applySymbolOne(c, e, hidden, area) {
+    var symbol = '100' + c + '10' + e;
     symbol += $('#NatoSymbolHQ').val() || '0';
     symbol += $('#NatoSymbolSize').val() || '00';
     symbol += $('#NatoSymbolIcon').val() || '000000';
@@ -16,13 +17,15 @@ function applySymbolOne(c, hidden, area) {
     };
     var sym = new ms.Symbol(symbol, config);
     var src = sym.asCanvas(window.devicePixelRatio).toDataURL();
-    $('#' + area).empty().append($('<img></img>')
-        .attr({
-            src: src,
-            width: sym.getSize().width,
-            height: sym.getSize().height
-        })
-    );
+    if (area) {
+        $('#' + area).empty().append($('<img></img>')
+            .attr({
+                src: src,
+                width: sym.getSize().width,
+                height: sym.getSize().height
+            })
+        );
+    }
     $('#' + hidden).val(src);
     return symbol;
 }

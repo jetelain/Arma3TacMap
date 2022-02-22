@@ -46,6 +46,9 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Hostile Symbol")]
         public string NatoSymbolHostileImageBase64 { get; set; }
 
+        [Display(Name = "Hostile Symbol")]
+        public string NatoSymbolHostileAssumedImageBase64 { get; set; }
+
         public int Position { get; set; }
 
         public string GetNatoSymbol(char c, char e = '0') => "100" + c + "10" + e +

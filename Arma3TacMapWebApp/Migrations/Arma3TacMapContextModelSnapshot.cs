@@ -60,6 +60,9 @@ namespace Arma3TacMapWebApp.Migrations
                     b.Property<string>("NatoSymbolHQ")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("NatoSymbolHostileAssumedImageBase64")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("NatoSymbolHostileImageBase64")
                         .HasColumnType("TEXT");
 

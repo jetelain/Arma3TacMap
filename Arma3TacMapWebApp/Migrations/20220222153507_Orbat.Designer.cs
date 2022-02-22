@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
-    [Migration("20220221092306_Orbat")]
+    [Migration("20220222153507_Orbat")]
     partial class Orbat
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,9 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NatoSymbolHQ")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NatoSymbolHostileAssumedImageBase64")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NatoSymbolHostileImageBase64")

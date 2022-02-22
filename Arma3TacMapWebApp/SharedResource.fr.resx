@@ -381,4 +381,10 @@
   <data name="Confirmed" xml:space="preserve">
     <value>Confirmé</value>
   </data>
+  <data name="Anticiped/Supect" xml:space="preserve">
+    <value>Anticipé/Suspecté</value>
+  </data>
+  <data name="Present" xml:space="preserve">
+    <value>Présent</value>
+  </data>
 </root>
