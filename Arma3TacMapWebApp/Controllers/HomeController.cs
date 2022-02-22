@@ -21,19 +21,21 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly MapInfosService _mapInfos;
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
+        private readonly IAuthorizationService _authorizationService;
 
-        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview)
+        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
         {
             _logger = logger;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
             _preview = preview;
+            _authorizationService = authorizationService;
         }
 
         public async Task<IActionResult> Index()
         {
             var vm = new IndexViewModel();
-            vm.Maps = await _mapInfos.GetMapsInfos();
+            vm.Maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded);
             vm.TacMaps = await _mapSvc.GetUserMaps(User, 6);
             foreach(var map in vm.TacMaps)
             {

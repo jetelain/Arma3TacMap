@@ -26,19 +26,21 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly MapInfosService _mapInfos;
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
+        private readonly IAuthorizationService _authorizationService;
 
-        public TacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview)
+        public TacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
             _preview = preview;
+            _authorizationService = authorizationService;
         }
 
         // GET: TacMaps
         public async Task<IActionResult> Index()
         {
-            var maps = await _mapInfos.GetMapsInfos();
+            var maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded);
             var list = await _mapSvc.GetUserMaps(User);
             foreach (var map in list)
             {
@@ -50,7 +52,7 @@ namespace Arma3TacMapWebApp.Controllers
         // GET: TacMaps/Create
         public async Task<IActionResult> Create(string worldName)
         {
-            ViewBag.Maps = await _mapInfos.GetMapsInfos(); 
+            ViewBag.Maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded); 
             return View(new TacMap()
             {
                 WorldName = worldName,
@@ -67,7 +69,7 @@ namespace Arma3TacMapWebApp.Controllers
                 var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label, null);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
-            ViewBag.Maps = await _mapInfos.GetMapsInfos();
+            ViewBag.Maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded);
             return View(tacMap);
         }
 

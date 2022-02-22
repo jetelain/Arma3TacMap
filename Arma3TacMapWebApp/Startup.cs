@@ -77,7 +77,9 @@ namespace Arma3TacMapWebApp
             services.AddAuthorization(options =>
             {
                 var admins = Configuration.GetSection("Admins").Get<string[]>();
-                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.ToArray()));
+                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.ToArray())); 
+                var wip = Configuration.GetSection("WorkInProgress").Get<string[]>();
+                options.AddPolicy("WorkInProgress", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.Concat(wip ?? new string[0]).ToArray()));
                 options.AddPolicy("ApiClient", policy => { policy.RequireClaim(User.IsServiceClaim, "true");  policy.AddAuthenticationSchemes("API"); });
                 options.AddPolicy("ApiAny", policy => { policy.RequireAuthenticatedUser(); policy.AddAuthenticationSchemes("API", CookieAuthenticationDefaults.AuthenticationScheme); });
                 options.AddPolicy("LoggedUser", policy => policy.RequireAssertion(ctx => !string.IsNullOrEmpty(MapService.GetSteamId(ctx.User))));
