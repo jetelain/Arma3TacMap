@@ -78,7 +78,9 @@ namespace Arma3TacMapWebApp.Controllers
                     IsReadOnly = false,
                     ReadToken = null
                 },
-                Access = access
+                Access = access,
+                Friendly = await _mapSvc.GetOrbatUnits(access.TacMap.FriendlyOrbatID),
+                Hostile = await _mapSvc.GetOrbatUnits(access.TacMap.HostileOrbatID),
             });
         }
 

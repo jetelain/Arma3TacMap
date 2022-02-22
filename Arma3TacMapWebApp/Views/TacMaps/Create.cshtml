@@ -27,6 +27,20 @@
                     <span asp-validation-for="WorldName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
+                    <label asp-for="FriendlyOrbatID" class="control-label"></label>
+                    <select asp-for="FriendlyOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                        <option value="">@SharedLocalizer["(none)"]</option>
+                    </select>
+                    <span asp-validation-for="FriendlyOrbatID" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="HostileOrbatID" class="control-label"></label>
+                    <select asp-for="HostileOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                        <option value="">@SharedLocalizer["(none)"]</option>
+                    </select>
+                    <span asp-validation-for="HostileOrbatID" class="text-danger"></span>
+                </div>
+                <div class="form-group">
                     <input type="submit" value="@SharedLocalizer["Create"]" class="btn btn-primary" />
                 </div>
             </form>

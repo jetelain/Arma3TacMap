@@ -41,7 +41,10 @@ namespace Arma3TacMapWebApp
             services.AddHttpClient();
             services.AddControllersWithViews()
                 .AddViewLocalization()
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization(options => {
+                    options.DataAnnotationLocalizerProvider = (type, factory) =>
+                        factory.Create(typeof(SharedResource));
+                });
 
             services.AddSignalR();
             services.AddScoped<IMapService<MapId>, MapService>();

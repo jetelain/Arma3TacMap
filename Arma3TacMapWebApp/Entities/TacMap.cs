@@ -37,5 +37,16 @@ namespace Arma3TacMapWebApp.Entities
         public int? ParentTacMapID { get; set; }
 
         public TacMap Parent { get; set; }
+
+
+        [Display(Name = "Friendly ORBAT")]
+        public int? FriendlyOrbatID { get; set; }
+        [Display(Name = "Friendly ORBAT")]
+        public Orbat FriendlyOrbat { get; set; }
+
+        [Display(Name = "Hostile ORBAT")]
+        public int? HostileOrbatID { get; set; }
+        [Display(Name = "Hostile ORBAT")]
+        public Orbat HostileOrbat { get; set; }
     }
 }

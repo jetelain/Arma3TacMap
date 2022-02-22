@@ -44,6 +44,81 @@
     </div>
 </div>
 
+
+@if (Model.Friendly.Any() || Model.Hostile.Any())
+{
+    <div class="modal" tabindex="-1" role="dialog" id="orbat">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="orbat-grid"></span>
+                        : @Localizer["Insert a symbol from ORBAT"]
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                    <ul class="nav nav-tabs mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">@Localizer["Friendly"]</a>
+                        </li>
+                    </ul>
+
+                    @foreach (var item in Model.Friendly)
+                    {
+                        <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('3')" data-unique-designation="@item.UniqueDesignation">
+                            <img src="@item.NatoSymbolFriendlyImageBase64" alt="@item.GetNatoSymbol('3')" />
+                        </button>
+                    }
+
+                    <ul class="nav nav-tabs mt-2 mb-2" id="orbat-eni" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="orbat-eni-0-label" data-toggle="tab" href="#orbat-eni-0" role="tab" aria-controls="orbat-eni-0" aria-selected="true">@Localizer["Hostile"] - @Localizer["Present"]</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="orbat-eni-1-label" data-toggle="tab" href="#orbat-eni-1" role="tab" aria-controls="orbat-eni-1" aria-selected="false">@Localizer["Hostile"] - @Localizer["Anticiped/Supect"]</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane show active" id="orbat-eni-0" role="tabpanel" aria-labelledby="orbat-eni-0-label">
+                            @foreach (var item in Model.Hostile)
+                            {
+                                <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('6')" data-unique-designation="@item.UniqueDesignation">
+                                    <img src="@item.NatoSymbolHostileImageBase64" alt="@item.GetNatoSymbol('6')" />
+                                </button>
+                            }
+                        </div>
+                        <div class="tab-pane" id="orbat-eni-1" role="tabpanel" aria-labelledby="orbat-eni-1-label">
+
+                            @foreach (var item in Model.Hostile)
+                            {
+                                <button class="btn btn-outline-success orbat-btn" data-milsymbol="@item.GetNatoSymbol('6','1')" data-unique-designation="@item.UniqueDesignation">
+                                    <img src="@item.NatoSymbolHostileAssumedImageBase64" alt="@item.GetNatoSymbol('6','1')" />
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    @if (Model.Access.TacMap.OwnerUserID == Model.Access.UserID)
+                    {
+                        <a asp-controller="TacMaps" asp-action="Edit" asp-route-id="@Model.Access.TacMapID" class="btn btn-secondary float-right">@Localizer["Configure ORBAT"]</a>
+                    }
+                    <button type="button" class="btn btn-primary" id="orbat-custom">@Localizer["Insert an other symbol"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
 <h1 class="h3 text-center">
     @Model.Access.TacMap.Label
     @if (Model.Access.TacMap.OwnerUserID == Model.Access.UserID)

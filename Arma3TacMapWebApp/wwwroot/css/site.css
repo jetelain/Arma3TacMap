@@ -85,3 +85,16 @@ body {
     padding: 2px 5px;
     background: #ffffff80;
 }
+
+.orbat-btn img {
+    max-height:64px;
+    max-width:128px;
+}
+.orbat-btn {
+    height: 75px;
+    width: 150px;
+    text-align: center;
+}/*
+input:checked + label.orbat-radio {
+    font-weight: bold;
+}*/

@@ -200,6 +200,12 @@ var Arma3TacMap;
         $('#milsymbol-insert').show();
         $('#milsymbol-grid').text(Arma3Map.toGrid(latlng));
     };
+
+    function insertOrbat(latlng) {
+        clickPosition = latlng;
+        $('#orbat').modal('show');
+        $('#orbat-grid').text(Arma3Map.toGrid(latlng));
+    };
     function insertBasicSymbol(latlng) {
         clickPosition = latlng;
         $('#basicsymbol').modal('show');
@@ -249,6 +255,25 @@ var Arma3TacMap;
 
         $('select').change(applySymbol);
         $('input').change(applySymbol);
+
+    }
+
+    function orbatMarkerTool(backend) {
+        $('.orbat-btn').on('click', function () {
+            
+            backend.addMarker({
+                type: 'mil',
+                symbol: $(this).attr('data-milsymbol'),
+                config: { uniqueDesignation: $(this).attr('data-unique-designation') },
+                pos: [clickPosition.lat, clickPosition.lng]
+            });
+            $('#orbat').modal('hide');
+        });
+
+        $('#orbat-custom').on('click', function () {
+            insertMilSymbol(clickPosition);
+            $('#orbat').modal('hide');
+        });
     }
 
     function basicsymbolMarkerTool(backend) {
@@ -641,11 +666,19 @@ var Arma3TacMap;
 
         measureMarkerTool(backend);
 
+        var hasOrbat = $('#orbat').length > 0;
+        if (hasOrbat) {
+            orbatMarkerTool(backend);
+        }
         map.on('click', function (e) {
             clickPosition = e.latlng;
             if (e.originalEvent.target.localName == "div") {
                 if (currentTool == 2) {
-                    insertMilSymbol(e.latlng);
+                    if (hasOrbat) {
+                        insertOrbat(e.latlng);
+                    } else {
+                        insertMilSymbol(e.latlng);
+                    }
                 }
                 else if (currentTool == 3) {
                     insertBasicSymbol(e.latlng);

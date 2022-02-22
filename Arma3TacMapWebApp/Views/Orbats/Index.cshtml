@@ -1,0 +1,100 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<SharedResource> Localizer
+@model IEnumerable<Arma3TacMapWebApp.Entities.Orbat>
+@{
+    ViewData["Title"] = @Localizer["Orders of battle"];
+    var isAdmin = (await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded;
+}
+<div class="container">
+    <h1>@Localizer["Orders of battle"]</h1>
+    <p>@Localizer["Orders of battle allows you to quickly pick-up pre-defined symbols on a tactical map. A same order of battle can be used as freindly or as hostile."]</p>
+
+    <h2>@Localizer["User Defined"]</h2>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">@Localizer["Create an order of battle"]</a>
+        @*<a asp-action="Import" class="btn btn-secondary">@Localizer["Import an order of battle"]</a>*@
+    </p>
+    <table class="table">
+        <colgroup>
+            <col style="width:50%;" />
+            <col style="width:25%;" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Owner)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(o => o.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Default))
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.OrbatID">
+                            @Html.DisplayFor(modelItem => item.Label)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Owner.UserLabel)
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.OrbatID">@Localizer["View"]</a>
+                        @if (ViewBag.UserId == item.OwnerUserID || (item.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public && isAdmin))
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.OrbatID">@Localizer["Edit"]</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.OrbatID">@Localizer["Delete"]</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>@Localizer["Public"]</h2>
+    <table class="table">
+        <colgroup>
+            <col style="width:50%;" />
+            <col style="width:25%;" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Owner)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(o => o.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public))
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.OrbatID">
+                            @Html.DisplayFor(modelItem => item.Label)
+                        </a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Owner.UserLabel)
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.OrbatID">@Localizer["View"]</a>
+                        @if (ViewBag.UserId == item.OwnerUserID || (item.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public && isAdmin))
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.OrbatID">@Localizer["Edit"]</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.OrbatID">@Localizer["Delete"]</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
