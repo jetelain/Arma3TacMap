@@ -1,15 +1,17 @@
-﻿@inject IHtmlLocalizer<SharedResource> Localizer
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IHtmlLocalizer<SharedResource> Localizer
+@inject IAuthorizationService AuthorizationService
 <!DOCTYPE html>
 <html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PLANOPS Maps</title>
-@if (!string.IsNullOrEmpty(ViewData["og:image"] as string))
-{
-    <meta property="og:title" content="@ViewData["Title"]" />
-    <meta property="og:image" content="@ViewData["og:image"]" />
-}
+    @if (!string.IsNullOrEmpty(ViewData["og:image"] as string))
+    {
+        <meta property="og:title" content="@ViewData["Title"]" />
+        <meta property="og:image" content="@ViewData["og:image"]" />
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
@@ -32,9 +34,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="TacMaps" asp-action="Index">@Localizer["Maps"]</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Orbats" asp-action="Index">@Localizer["ORBATs"]</a>
-                        </li>
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Orbats" asp-action="Index">@Localizer["ORBATs"]</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"]</a>
                         </li>
