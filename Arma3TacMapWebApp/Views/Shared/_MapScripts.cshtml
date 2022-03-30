@@ -1,0 +1,25 @@
+﻿@model Arma3TacMapWebApp.Models.IMapCommonModel
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@5.0.4/dist/browser/signalr.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/milsymbol@2.0.0/dist/milsymbol.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/milstd@0.1.6/milstd.min.js">
+</script>
+@if(Model.init == "initLiveMap")
+{
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/js/bootstrap-select.min.js">
+</script>
+}
+<script src="@Model.endpoint/js/mapUtils.js">
+</script>
+<script src="@Model.endpoint/maps/all.js">
+</script>
+<script src="/js/milstdExtra.js" asp-append-version="true">
+</script>
+<script src="/js/arma3TacMap.js" asp-append-version="true">
+</script>
+<script>
+    Arma3TacMap.@(Model.init)(@Json.Serialize(Model));
+</script>

@@ -1,6 +1,6 @@
 ﻿@model EditMapViewModel
 @inject IHtmlLocalizer<SharedResource> Localizer
-@{ 
+@{
     ViewData["Title"] = Model.Access.TacMap.Label;
     ViewData["og:image"] = Url.Action("ViewMapScreenShot", "Home", new { id = Model.Access.TacMapID, t = Model.Access.TacMap.ReadOnlyToken, size = 256 }, "https");
 }
@@ -12,4 +12,11 @@
     }
 </h1>
 
-@await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = true })
+@{await Html.RenderPartialAsync("_LiveMap", Model.InitLiveMap);}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_MapScripts", Model.InitLiveMap);}
+}
+@section Styles {
+    @{await Html.RenderPartialAsync("_MapStyles", Model.InitLiveMap);}
+}

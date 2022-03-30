@@ -2,11 +2,6 @@
   <ManifestVersion>1.0</ManifestVersion>
   <FileSystem>
     <Directory Name="wwwroot">
-      <Directory Name="css">
-        <File Name="arma3TacMap.css">
-          <ResourcePath>Arma3TacMapLibrary.wwwroot.css.arma3TacMap.css</ResourcePath>
-        </File>
-      </Directory>
       <Directory Name="img">
         <File Name="home-solid.svg">
           <ResourcePath>Arma3TacMapLibrary.wwwroot.img.home-solid.svg</ResourcePath>
@@ -213,14 +208,6 @@
         </Directory>
         <File Name="pointmap.png">
           <ResourcePath>Arma3TacMapLibrary.wwwroot.img.pointmap.png</ResourcePath>
-        </File>
-      </Directory>
-      <Directory Name="js">
-        <File Name="arma3TacMap.js">
-          <ResourcePath>Arma3TacMapLibrary.wwwroot.js.arma3TacMap.js</ResourcePath>
-        </File>
-        <File Name="milstdExtra.js">
-          <ResourcePath>Arma3TacMapLibrary.wwwroot.js.milstdExtra.js</ResourcePath>
         </File>
       </Directory>
     </Directory>

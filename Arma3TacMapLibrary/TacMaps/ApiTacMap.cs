@@ -11,6 +11,8 @@ namespace Arma3TacMapLibrary.TacMaps
         public string ReadWriteToken { get; set; }
         public string ReadWriteHref { get; set; }
         public Dictionary<int,string> PreviewHref { get; set; }
+        public string ReadOnlyFullScreenHref { get; set; }
+        public string StaticFullScreenHref { get; set; }
 
         public MapId ToMapId()
         {

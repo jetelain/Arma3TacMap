@@ -125,7 +125,7 @@ namespace Arma3TacMapWebApp.Maps
 
         private async Task<byte[]> MakeScreenshot(TacMapAccess access)
         {
-            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFull), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken }, "https");
+            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken }, "https");
             return await _screenshot.MakeScreenshotAsync(uri);
         }
     }

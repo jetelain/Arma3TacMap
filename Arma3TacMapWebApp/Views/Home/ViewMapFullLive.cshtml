@@ -1,0 +1,15 @@
+﻿@model EditMapViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{
+    Layout = "_LayoutFull";
+}
+
+@{await Html.RenderPartialAsync("_LiveMap", Model.InitLiveMap);}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_MapScripts", Model.InitLiveMap);}
+}
+
+@section Styles {
+    @{await Html.RenderPartialAsync("_MapStyles", Model.InitLiveMap);}
+}

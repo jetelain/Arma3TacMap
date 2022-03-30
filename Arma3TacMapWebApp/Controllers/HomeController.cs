@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Arma3TacMapWebApp.Models;
-using Arma3TacMapWebApp.Maps;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using Arma3TacMapWebApp.Entities;
+using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Arma3;
-using Arma3TacMapLibrary.ViewComponents;
+using Arma3TacMapLibrary.Maps;
+using Arma3TacMapWebApp.Entities;
+using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -22,14 +22,16 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
+        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
         {
             _logger = logger;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
             _preview = preview;
             _authorizationService = authorizationService;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> Index()
@@ -72,11 +74,18 @@ namespace Arma3TacMapWebApp.Controllers
             }
             return View(new EditMapViewModel()
             {
-                MapId = new MapId()
+                InitLiveMap = new LiveMapModel()
                 {
-                    TacMapID = access.TacMap.TacMapID,
-                    IsReadOnly = false,
-                    ReadToken = null
+                    endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                    hub = "/MapHub",
+                    isReadOnly = false,
+                    mapId = new MapId()
+                    {
+                        TacMapID = access.TacMap.TacMapID,
+                        IsReadOnly = false,
+                        ReadToken = null
+                    },
+                    worldName = access.TacMap.WorldName
                 },
                 Access = access,
                 Friendly = await _mapSvc.GetOrbatUnits(access.TacMap.FriendlyOrbatID),
@@ -92,27 +101,49 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
+            ViewBag.IsFullScreen = false;
             return View(new EditMapViewModel()
             {
-                MapId = new MapId()
+                Access = access,
+                InitLiveMap = new LiveMapModel()
                 {
-                    TacMapID = access.TacMap.TacMapID,
-                    IsReadOnly = true,
-                    ReadToken = t
-                },
-                Access = access
+                    endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                    hub = "/MapHub",
+                    isReadOnly = true,
+                    mapId = new MapId()
+                    {
+                        TacMapID = access.TacMap.TacMapID,
+                        IsReadOnly = true,
+                        ReadToken = t
+                    },
+                    worldName = access.TacMap.WorldName
+                }
             });
         }
 
         [Route("ViewMap/{id}/FullScreen")]
-        public async Task<IActionResult> ViewMapFull(int id, string t)
+        public async Task<IActionResult> ViewMapFullStatic(int id, string t)
         {
             var data = await _mapSvc.GetStaticMapModel(id, t);
             if (data == null)
             {
                 return Forbid();
             }
-            return View(data);
+            ViewBag.IsFullScreen = true;
+            return View(new StaticMapModel(){
+                center = data.Center,
+                endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                markers = data.Markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData)),
+                worldName = data.WorldName
+            });
+        }
+
+        [Route("ViewMap/{id}/LiveFullScreen")]
+        public async Task<IActionResult> ViewMapFullLive(int id, string t)
+        {
+            var result = await ViewMap(id, t);
+            ViewBag.IsFullScreen = true;
+            return result;
         }
 
         [Route("ViewMap/{id}/Preview/{size=512}")]

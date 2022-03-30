@@ -387,4 +387,97 @@
   <data name="Present" xml:space="preserve">
     <value>Présent</value>
   </data>
+  <data name="Additional Information" xml:space="preserve">
+    <value>Informations additionnelles</value>
+  </data>
+  <data name="Assumed Friend (blue)" xml:space="preserve">
+    <value>Présumé ami (bleu)</value>
+  </data>
+  <data name="Basic symbol" xml:space="preserve">
+    <value>Symbole basique</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="City or marker" xml:space="preserve">
+    <value>Ville ou marqueur</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="Direction (mil)" xml:space="preserve">
+    <value>Direction (mil)</value>
+  </data>
+  <data name="Friend (blue)" xml:space="preserve">
+    <value>Ami (bleu)</value>
+  </data>
+  <data name="Hostile (red)" xml:space="preserve">
+    <value>Hostile (rouge)</value>
+  </data>
+  <data name="Insert" xml:space="preserve">
+    <value>Insérer</value>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>Ligne</value>
+  </data>
+  <data name="Measure" xml:space="preserve">
+    <value>Distance</value>
+  </data>
+  <data name="NATO APP-6 (D) Symbol" xml:space="preserve">
+    <value>Symbole OTAN APP-6 (D)</value>
+  </data>
+  <data name="Neutral (green)" xml:space="preserve">
+    <value>Neutre (vert)</value>
+  </data>
+  <data name="Pending (yellow)" xml:space="preserve">
+    <value>En attente (jaune)</value>
+  </data>
+  <data name="Planned/Anticiped/Supect" xml:space="preserve">
+    <value>Prévu, anticipé, supecté</value>
+  </data>
+  <data name="Present/Damaged" xml:space="preserve">
+    <value>Présent/Endomagé</value>
+  </data>
+  <data name="Present/Destroyed" xml:space="preserve">
+    <value>Présent/Détruit</value>
+  </data>
+  <data name="Present/Full to capacity" xml:space="preserve">
+    <value>Présent/Complet</value>
+  </data>
+  <data name="Present/Fully capable" xml:space="preserve">
+    <value>Présent/Capacité complète</value>
+  </data>
+  <data name="Reinforced" xml:space="preserve">
+    <value>Renforcé</value>
+  </data>
+  <data name="Rotation (mil)" xml:space="preserve">
+    <value>Rotation (mil</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Chercher</value>
+  </data>
+  <data name="Shape" xml:space="preserve">
+    <value>Forme</value>
+  </data>
+  <data name="Standard Identity" xml:space="preserve">
+    <value>Identité</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Suspect (red)" xml:space="preserve">
+    <value>Suspect (rouge)</value>
+  </data>
+  <data name="Symbol set" xml:space="preserve">
+    <value>Jeu de symboles</value>
+  </data>
+  <data name="Unique Designation Designation" xml:space="preserve">
+    <value>Identifiant unique</value>
+  </data>
+  <data name="Unknown (yellow)" xml:space="preserve">
+    <value>Inconnu (jaune)</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
 </root>

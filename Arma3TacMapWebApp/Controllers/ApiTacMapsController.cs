@@ -87,7 +87,9 @@ namespace Arma3TacMapWebApp.Controllers
                 EventHref = access.TacMap.EventHref,
                 Markers = includeMarkers ? await _mapSvc.GetMarkers(access.TacMap.TacMapID, true) : null,
                 ReadOnlyToken = access.TacMap.ReadOnlyToken,
-                ReadOnlyHref = Url.Action(nameof(HomeController.ViewMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme)
+                ReadOnlyHref = Url.Action(nameof(HomeController.ViewMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme),
+                ReadOnlyFullScreenHref = Url.Action(nameof(HomeController.ViewMapFullLive), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme),
+                StaticFullScreenHref = Url.Action(nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken }, Request.Scheme)
             };
             if (access.CanWrite)
             {

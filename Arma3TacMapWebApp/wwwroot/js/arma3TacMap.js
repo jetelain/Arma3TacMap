@@ -864,8 +864,8 @@ var Arma3TacMap;
 
             var map = initMapArea(mapInfos, config.endpoint, config.center, config.fullScreen);
 
-            if (!config.fullScreen) {
-                setupSeach(map, mapInfos, markers);
+            if ($('#search').length) {
+                setupSearch(map, mapInfos, markers);
             }
 
             Object.getOwnPropertyNames(config.markers).forEach(function (id) {

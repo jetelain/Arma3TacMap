@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Arma3TacMapLibrary
 {
-    internal static class Arma3MapHelper
+    public static class Arma3MapHelper
     {
         public static string GetEndpoint(IConfiguration configuration)
         {

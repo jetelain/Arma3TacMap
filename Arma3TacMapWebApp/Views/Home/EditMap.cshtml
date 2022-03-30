@@ -61,7 +61,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    
+
                     <ul class="nav nav-tabs mb-2">
                         <li class="nav-item">
                             <a class="nav-link active" href="#">@Localizer["Friendly"]</a>
@@ -131,5 +131,11 @@
         <a href="@Model.Access.TacMap.EventHref.AbsoluteUri" class="btn btn-sm btn-secondary"><i class="fas fa-external-link-alt"></i> @Localizer["Return to {0}", Model.Access.TacMap.EventHref.Host]</a>
     }
 </h1>
+@{await Html.RenderPartialAsync("_LiveMap", Model.InitLiveMap);}
 
-@await Component.InvokeAsync("LiveMap", new { mapId = Model.MapId, worldName = Model.Access.TacMap.WorldName, isReadonly = false })
+@section Scripts {
+    @{await Html.RenderPartialAsync("_MapScripts", Model.InitLiveMap);}
+}
+@section Styles {
+    @{await Html.RenderPartialAsync("_MapStyles", Model.InitLiveMap);}
+}

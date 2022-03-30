@@ -98,3 +98,7 @@ body {
 input:checked + label.orbat-radio {
     font-weight: bold;
 }*/
+
+.list-group-item.active .btn {
+    border-color: white;
+}

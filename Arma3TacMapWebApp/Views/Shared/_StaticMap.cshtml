@@ -1,0 +1,40 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> Localizer
+@model Arma3TacMapWebApp.Models.StaticMapModel
+
+@if (ViewBag.IsFullScreen ?? false)
+{
+    <div class="map" id="map" style="width:100%; height:100vh; margin:0;padding:0;border:0;">
+    </div>
+}
+else
+{
+    <div class="map" id="map" style="width:100%; height:85vh; margin:0;padding:0;border:0;">
+    </div>
+}
+
+@if (ViewBag.HasSearchBox ?? false)
+{
+    <div class="modal" tabindex="-1" role="dialog" id="search">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @Localizer["Search"]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <label for="search-term" class="sr-only">@Localizer["City or marker"]</label>
+                        <input type="text" id="search-term" class="form-control" placeholder="@Localizer["City or marker"]" />
+                    </div>
+                    <ul id="search-results" style="height:50vh" class="overflow-auto list-unstyled mt-2">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

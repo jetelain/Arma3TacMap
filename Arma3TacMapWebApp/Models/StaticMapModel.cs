@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Arma3TacMapLibrary.Maps;
 
-namespace Arma3TacMapLibrary.ViewComponents
+namespace Arma3TacMapWebApp.Models
 {
-    public class StaticMapModel
+    public class StaticMapModel : IMapCommonModel
     {
-        public bool fullScreen { get; set; }
-
         public double[] center { get; set; }
 
         public Dictionary<string,MarkerData> markers { get; set; }
@@ -14,5 +12,9 @@ namespace Arma3TacMapLibrary.ViewComponents
         public string endpoint { get; set; }
 
         public string worldName { get; set; }
+
+        bool IMapCommonModel.isReadOnly => true;
+
+        string IMapCommonModel.init => "initStaticMap";
     }
 }
