@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Arma3TacMapWebApp.Maps
 {
-    public class MapService : IMapService<MapId>
+    public class MapService : IMapService
     {
         private readonly Arma3TacMapContext _db;
 

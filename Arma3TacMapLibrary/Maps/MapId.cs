@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using Arma3TacMapLibrary.Maps;
 
-namespace Arma3TacMapWebApp.Maps
+
+namespace Arma3TacMapLibrary.Maps
 {
-    public class MapId : IMapId
+    public class MapId
     {
         public int TacMapID { get; set; }
 
         public string ReadToken { get; set; }
 
         public bool IsReadOnly { get; set; }
-
-        public string GetGroup()
-        {
-            return $"TacMap-{TacMapID}";
-        }
     }
 }

@@ -4,9 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Arma3;
-using Arma3TacMapLibrary.Hubs;
-using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
+using Arma3TacMapWebApp.Hubs;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Security;
 using AspNetCore.Authentication.ApiKey;
@@ -47,7 +46,7 @@ namespace Arma3TacMapWebApp
                 });
 
             services.AddSignalR();
-            services.AddScoped<IMapService<MapId>, MapService>();
+            services.AddScoped<IMapService, MapService>();
             services.AddScoped<MapService>();
             services.AddScoped<MapInfosService>();
             services.AddScoped<MapPreviewService>();
@@ -160,7 +159,7 @@ namespace Arma3TacMapWebApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                endpoints.MapHub<MapHub<MapId>>("/MapHub").RequireCors("SignalRHub");
+                endpoints.MapHub<MapHub>("/MapHub").RequireCors("SignalRHub");
             });
         }
     }

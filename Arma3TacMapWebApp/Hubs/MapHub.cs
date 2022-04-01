@@ -1,28 +1,28 @@
 ﻿using System.Threading.Tasks;
 using Arma3TacMapLibrary.Maps;
+using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Arma3TacMapLibrary.Hubs
+namespace Arma3TacMapWebApp.Hubs
 {
-    public class MapHub<TMapId> : Hub 
-        where TMapId: IMapId
+    public class MapHub : Hub 
     {
         private const string MapIdProperty = "MapId";
         private const string PseudoUserIdProperty = "PseudoUserId";
 
-        private readonly IMapService<TMapId> _svc;
+        private readonly IMapService _svc;
 
-        public MapHub(IMapService<TMapId> service)
+        public MapHub(IMapService service)
         {
             _svc = service;
         }
 
-        public async Task Hello(TMapId mapId)
+        public async Task Hello(MapId mapId)
         {
             var userAccess = await _svc.GetInitialData(Context.User, mapId);
             if (userAccess.CanRead)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, mapId.GetGroup());
+                await Groups.AddToGroupAsync(Context.ConnectionId, GetGroup(mapId));
 
                 foreach (var marker in userAccess.InitialMarkers)
                 {
@@ -34,9 +34,9 @@ namespace Arma3TacMapLibrary.Hubs
             }
         }
 
-        private TMapId GetContextMapId()
+        private MapId GetContexMapId()
         {
-            return (TMapId)Context.Items[MapIdProperty];
+            return (MapId)Context.Items[MapIdProperty];
         }
 
         private string GetPseudoUserId()
@@ -46,7 +46,7 @@ namespace Arma3TacMapLibrary.Hubs
 
         public async Task AddMarker(MarkerData markerData)
         {
-            var mapId = GetContextMapId();
+            var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
@@ -70,7 +70,7 @@ namespace Arma3TacMapLibrary.Hubs
 
         private async Task DoUpdateMarker(int mapMarkerID, MarkerData markerData, bool notifyCaller)
         {
-            var mapId = GetContextMapId();
+            var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
@@ -84,7 +84,7 @@ namespace Arma3TacMapLibrary.Hubs
 
         public async Task RemoveMarker(int mapMarkerID)
         {
-            var mapId = GetContextMapId();
+            var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
@@ -98,50 +98,55 @@ namespace Arma3TacMapLibrary.Hubs
 
         public async Task PointMap(double[] pos)
         {
-            var mapId = GetContextMapId();
+            var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
             }
             if (await _svc.CanPointMap(Context.User, mapId))
             {
-                await Clients.Group(mapId.GetGroup()).SendAsync("PointMap", GetPseudoUserId(), pos);
+                await Clients.Group(GetGroup(mapId)).SendAsync("PointMap", GetPseudoUserId(), pos);
             }
         }
 
         public async Task EndPointMap()
         {
-            var mapId = GetContextMapId();
+            var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
             }
             if (await _svc.CanPointMap(Context.User, mapId))
             {
-                await Clients.Group(mapId.GetGroup()).SendAsync("EndPointMap", GetPseudoUserId());
+                await Clients.Group(GetGroup(mapId)).SendAsync("EndPointMap", GetPseudoUserId());
             }
         }
 
-        private async Task Notify(TMapId mapId, string method, StoredMarker marker, bool notifyCaller = true)
+        private async Task Notify(MapId mapId, string method, StoredMarker marker, bool notifyCaller = true)
         {
             if (notifyCaller)
             {
-                await Clients.Group(mapId.GetGroup()).SendAsync(method, ToJsonMarker(mapId, marker), marker.IsReadOnly);
+                await Clients.Group(GetGroup(mapId)).SendAsync(method, ToJsonMarker(mapId, marker), marker.IsReadOnly);
             }
             else
             {
-                await Clients.OthersInGroup(mapId.GetGroup()).SendAsync(method, ToJsonMarker(mapId, marker), marker.IsReadOnly);
+                await Clients.OthersInGroup(GetGroup(mapId)).SendAsync(method, ToJsonMarker(mapId, marker), marker.IsReadOnly);
             }
         }
 
-        private static Marker<TMapId> ToJsonMarker(TMapId mapId, StoredMarker marker)
+        private static Marker ToJsonMarker(MapId mapId, StoredMarker marker)
         {
-            return new Marker<TMapId>()
+            return new Marker()
             {
                 id = marker.Id,
                 mapId = mapId,
                 data = MarkerData.Deserialize(marker.MarkerData)
             };
+        }
+
+        private static string GetGroup(MapId id)
+        {
+            return $"TacMap-{id.TacMapID}";
         }
     }
 }

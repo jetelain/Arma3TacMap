@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Arma3TacMapLibrary.Maps;
 
-namespace Arma3TacMapLibrary.Maps
+namespace Arma3TacMapWebApp.Maps
 {
     public class MapUserInitialData
     {
