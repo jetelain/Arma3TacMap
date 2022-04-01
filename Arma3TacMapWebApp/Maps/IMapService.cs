@@ -15,5 +15,13 @@ namespace Arma3TacMapWebApp.Maps
         Task<MapUserInitialData> GetInitialData(ClaimsPrincipal user, MapId mapId);
 
         Task<bool> CanPointMap(ClaimsPrincipal user, MapId mapId);
+
+        Task<StoredLayer> CreateLayer(ClaimsPrincipal user, MapId mapId, string label);
+
+        Task<StoredLayer> UpdateLayer(ClaimsPrincipal user, MapId mapId, int layerId, string label);
+
+        Task<StoredLayerWithMarkers> RemoveLayer(ClaimsPrincipal user, MapId mapId, int layerId);
+
+
     }
 }

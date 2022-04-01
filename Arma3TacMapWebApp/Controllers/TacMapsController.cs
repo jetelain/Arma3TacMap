@@ -104,7 +104,7 @@ namespace Arma3TacMapWebApp.Controllers
             var tacMap = await _context.TacMaps
                 .Include(t => t.Owner)
                 .FirstOrDefaultAsync(m => m.TacMapID == id);
-            if (tacMap == null)
+            if (tacMap == null || tacMap.ParentTacMapID != null)
             {
                 return NotFound();
             }
@@ -133,7 +133,7 @@ namespace Arma3TacMapWebApp.Controllers
                 .FirstOrDefaultAsync(m => m.TacMapID == id);
 
             var user = await _mapSvc.GetUser(User);
-            if (tacMap.OwnerUserID != user.UserID)
+            if (tacMap.OwnerUserID != user.UserID || tacMap.ParentTacMapID != null)
             {
                 return Forbid();
             }
@@ -175,7 +175,7 @@ namespace Arma3TacMapWebApp.Controllers
             var tacMap = await _context.TacMaps
                 .Include(t => t.Owner)
                 .FirstOrDefaultAsync(m => m.TacMapID == id);
-            if (tacMap == null)
+            if (tacMap == null || tacMap.ParentTacMapID != null)
             {
                 return NotFound();
             }
@@ -193,7 +193,7 @@ namespace Arma3TacMapWebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var tacMap = await _context.TacMaps.FindAsync(id);
-            if (tacMap.OwnerUserID != (await _mapSvc.GetUser(User)).UserID)
+            if (tacMap.OwnerUserID != (await _mapSvc.GetUser(User)).UserID || tacMap.ParentTacMapID != null)
             {
                 return Forbid();
             }

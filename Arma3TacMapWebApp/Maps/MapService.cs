@@ -74,7 +74,7 @@ namespace Arma3TacMapWebApp.Maps
             return new MapId() { TacMapID = map.TacMapID };
         }
 
-        internal async Task<int?> CreateLayer(ClaimsPrincipal user, MapId mapId, string label)
+        public async Task<StoredLayer> CreateLayer(ClaimsPrincipal user, MapId mapId, string label)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -93,7 +93,12 @@ namespace Arma3TacMapWebApp.Maps
             };
             await _db.AddAsync(map);
             await _db.SaveChangesAsync();
-            return map.TacMapID;
+            return ToStored(map);
+        }
+
+        private static StoredLayer ToStored(TacMap map)
+        {
+            return new StoredLayer { Id = map.TacMapID, Label = map.Label };
         }
 
         internal async Task<TacMapAccess> GrantReadAccess(ClaimsPrincipal user, int id, string t)
@@ -260,6 +265,7 @@ namespace Arma3TacMapWebApp.Maps
                     {
                         CanRead = true,
                         PseudoUserId = $"user-{userAccess.UserID}",
+                        InitialLayers = await GetLayers(mapId.TacMapID),
                         InitialMarkers = await GetMarkers(mapId.TacMapID, mapId.IsReadOnly)
                     };
                 }
@@ -270,6 +276,7 @@ namespace Arma3TacMapWebApp.Maps
                 {
                     CanRead = true,
                     PseudoUserId = $"anonymous-{Guid.NewGuid()}",
+                    InitialLayers = await GetLayers(mapId.TacMapID),
                     InitialMarkers = await GetMarkers(mapId.TacMapID, mapId.IsReadOnly)
                 };
             }
@@ -287,6 +294,23 @@ namespace Arma3TacMapWebApp.Maps
                     MarkerData = m.MarkerData
                 })
                 .ToList();
+        }
+
+        internal async Task<List<StoredLayer>> GetLayers(int tacMapID)
+        {
+            return
+                (new[]
+                {
+                    new StoredLayer()
+                    {
+                        Id = tacMapID,
+                        Label = "Calque par défaut"
+                    }
+                })
+                .Concat(
+                    (await _db.TacMaps.Where(m => m.ParentTacMapID == tacMapID).ToListAsync())
+                    .Select(ToStored)
+                ).ToList();
         }
 
         public async Task<StoredMarker> RemoveMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID)
@@ -410,6 +434,43 @@ namespace Arma3TacMapWebApp.Maps
                     yield return child;
                 }
             }
+        }
+
+        public async Task<StoredLayer> UpdateLayer(ClaimsPrincipal user, MapId mapId, int layerId, string label)
+        {
+            var access = await CanWrite(user, mapId);
+            if (access == null)
+            {
+                return null;
+            }
+            var layer = await _db.TacMaps.FirstOrDefaultAsync(m => m.TacMapID == layerId && m.ParentTacMapID == access.TacMapID);
+            if (layer != null)
+            {
+                layer.Label = label;
+                _db.Update(layer);
+                await _db.SaveChangesAsync();
+                return ToStored(layer);
+            }
+            return null;
+        }
+
+        public async Task<StoredLayerWithMarkers> RemoveLayer(ClaimsPrincipal user, MapId mapId, int layerId)
+        {
+            var access = await CanWrite(user, mapId);
+            if (access == null)
+            {
+                return null;
+            }
+            var layer = await _db.TacMaps.FirstOrDefaultAsync(m => m.TacMapID == layerId && m.ParentTacMapID == access.TacMapID);
+            if (layer != null)
+            {
+                var markers = await _db.TacMapMarkers.Where(m => m.TacMapID == layer.TacMapID).ToListAsync();
+
+                _db.Remove(layer);
+                await _db.SaveChangesAsync();
+                return new StoredLayerWithMarkers { Id = layer.TacMapID, Label = layer.Label, Markers = markers.Select(ToStored).ToList() };
+            }
+            return null;
         }
     }
 }

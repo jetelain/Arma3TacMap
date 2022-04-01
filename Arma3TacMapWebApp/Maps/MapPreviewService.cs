@@ -40,7 +40,7 @@ namespace Arma3TacMapWebApp.Maps
                 throw new ArgumentException(nameof(size));
             }
 
-            var lastUpdate = await _db.TacMapMarkers.Where(m => m.TacMapID == access.TacMapID).MaxAsync(m => m.LastUpdate);
+            var lastUpdate = await _db.TacMapMarkers.Where(m => m.TacMapID == access.TacMapID || m.TacMap.ParentTacMapID == access.TacMapID).MaxAsync(m => m.LastUpdate);
             if (lastUpdate == null)
             {
                 lastUpdate = (await _db.TacMaps.FindAsync(access.TacMapID)).Created;

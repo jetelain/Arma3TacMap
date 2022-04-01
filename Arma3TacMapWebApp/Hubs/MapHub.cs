@@ -24,6 +24,10 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, GetGroup(mapId));
 
+                foreach (var layer in userAccess.InitialLayers)
+                {
+                    await Clients.Caller.SendAsync("AddOrUpdateLayer", ToJsonLayer(mapId, layer));
+                }
                 foreach (var marker in userAccess.InitialMarkers)
                 {
                     await Clients.Caller.SendAsync("AddOrUpdateMarker", ToJsonMarker(mapId, marker), marker.IsReadOnly);
@@ -42,6 +46,20 @@ namespace Arma3TacMapWebApp.Hubs
         private string GetPseudoUserId()
         {
             return (string)Context.Items[PseudoUserIdProperty];
+        }
+
+        public async Task AddLayer(LayerData layerData)
+        {
+            var mapId = GetContexMapId();
+            if (mapId == null)
+            {
+                return;
+            }
+            var layer = await _svc.CreateLayer(Context.User, mapId, layerData.label);
+            if (layer != null)
+            {
+                await Notify(mapId, "AddOrUpdateLayer", layer);
+            }
         }
 
         public async Task AddMarker(MarkerData markerData)
@@ -76,6 +94,20 @@ namespace Arma3TacMapWebApp.Hubs
         public async Task UpdateMarker(int mapMarkerID, MarkerData markerData)
         {
             await DoUpdateMarker(mapMarkerID, markerData, true, null);
+        }
+
+        public async Task UpdateLayer(int layerId, LayerData layerData)
+        {
+            var mapId = GetContexMapId();
+            if (mapId == null)
+            {
+                return;
+            }
+            var layer = await _svc.UpdateLayer(Context.User, mapId, layerId, layerData.label);
+            if (layer != null)
+            {
+                await Notify(mapId, "AddOrUpdateLayer", layer);
+            }
         }
 
         public async Task UpdateMarkerToLayer(int mapMarkerID, int? layerId, MarkerData markerData)
@@ -114,6 +146,29 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 await Notify(mapId, "RemoveMarker", marker);
             }
+        }
+
+        public async Task RemoveLayer(int layerId)
+        {
+            var mapId = GetContexMapId();
+            if (mapId == null)
+            {
+                return;
+            }
+            var layer = await _svc.RemoveLayer(Context.User, mapId, layerId);
+            if (layer != null)
+            {
+                foreach (var marker in layer.Markers)
+                {
+                    await Notify(mapId, "RemoveMarker", marker);
+                }
+                await Notify(mapId, "RemoveLayer", layer);
+            }
+        }
+
+        private async Task Notify(MapId mapId, string method, StoredLayer layer)
+        {
+            await Clients.Group(GetGroup(mapId)).SendAsync(method, ToJsonLayer(mapId, layer));
         }
 
         public async Task PointMap(double[] pos)
@@ -162,6 +217,17 @@ namespace Arma3TacMapWebApp.Hubs
                 layerId = marker.LayerId,
                 mapId = mapId,
                 data = MarkerData.Deserialize(marker.MarkerData)
+            };
+        }
+
+        private static Layer ToJsonLayer(MapId mapId, StoredLayer layer)
+        {
+            return new Layer()
+            {
+                id = layer.Id,
+                mapId = mapId,
+                data = new LayerData { label = layer.Label },
+                isDefaultLayer = layer.Id == mapId.TacMapID
             };
         }
 

@@ -53,7 +53,7 @@ namespace Arma3Event.Controllers
         }
 
         [HttpGet, HttpPost]
-        public IActionResult SignOut()
+        public new IActionResult SignOut()
         {
             // Instruct the cookies middleware to delete the local cookie created
             // when the user agent is redirected from the external identity provider

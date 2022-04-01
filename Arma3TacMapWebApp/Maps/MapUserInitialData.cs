@@ -11,6 +11,8 @@ namespace Arma3TacMapWebApp.Maps
 
         public List<StoredMarker> InitialMarkers { get; set; }
 
+        public List<StoredLayer> InitialLayers { get; set; }
+
         public static MapUserInitialData Denied = new MapUserInitialData();
     }
 }
