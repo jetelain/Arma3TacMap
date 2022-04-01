@@ -81,6 +81,7 @@ namespace Arma3TacMapWebApp.Maps
             {
                 return null;
             }
+            access.TacMap = await _db.TacMaps.FindAsync(access.TacMapID);
             var map = new TacMap()
             {
                 Created = DateTime.UtcNow,

@@ -154,7 +154,12 @@ var Arma3TacMap;
     var clickPosition = null;
     var currentLine = null;
     var currentMeasure = null;
+    var currentLayer = null;
     var colorPicker;
+
+    function getCurrentLayerId() {
+        return currentLayer ? currentLayer.id : null;
+    }
 
     function updateMarkerHandler(e) {
         var marker = e.sourceTarget;
@@ -404,7 +409,7 @@ var Arma3TacMap;
         return L.icon({ iconUrl: url, iconSize: [32, 32], iconAnchor: [16, 16] });
     }
 
-    function addOrUpdateMarker(map, markers, marker, canEdit, backend, opacity) {
+    function addOrUpdateMarker(map, markers, marker, canEdit, backend, opacity, layer) {
         var markerId = marker.id;
         var markerData = marker.data;
         var existing = markers[markerId];
@@ -420,7 +425,7 @@ var Arma3TacMap;
                 existing.setStyle({ color: color });
                 existing.options.markerData = markerData;
             } else {
-                var mapMarker = L.polyline(posList, { color: color, weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(map);
+                var mapMarker = L.polyline(posList, { color: color, weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(layer.group);
                 if (canEdit) {
                     mapMarker.on('click', updateMarkerHandler);
                 }
@@ -436,7 +441,7 @@ var Arma3TacMap;
                 computeDistanceAndShowTooltip(map, existing, posList, canEdit);
                 existing.options.markerData = markerData;
             } else {
-                var mapMarker = L.polyline(posList, { color: '#000000', weight: 1.3, dashArray: '4', interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['measure'] ?? 1.0 }).addTo(map);
+                var mapMarker = L.polyline(posList, { color: '#000000', weight: 1.3, dashArray: '4', interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['measure'] ?? 1.0 }).addTo(layer.group);
                 computeDistanceAndShowTooltip(map, mapMarker, posList, canEdit);
                 if (canEdit) {
                     mapMarker.on('click', updateMarkerHandler);
@@ -454,7 +459,7 @@ var Arma3TacMap;
             else {
                 var mapMarker =
                     L.marker(markerData.pos, { icon: icon, draggable: canEdit, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity[markerData.type] ?? 1.0 })
-                        .addTo(map);
+                        .addTo(layer.group);
                 if (canEdit) {
                     mapMarker
                         .on('click', updateMarkerHandler)
@@ -604,8 +609,14 @@ var Arma3TacMap;
                 this.connection.on("AddOrUpdateMarker", function (marker, isReadOnly) {
                     callbacks.addOrUpdateMarker(marker, isReadOnly === true);
                 });
+                this.connection.on("AddOrUpdateLayer", function (layer) {
+                    callbacks.addOrUpdateLayer(layer);
+                });
                 this.connection.on("RemoveMarker", function (marker) {
                     callbacks.removeMarker(marker);
+                });
+                this.connection.on("RemoveLayer", function (layer) {
+                    callbacks.removeLayer(layer);
                 });
                 this.connection.on("PointMap", function (id, pos) {
                     callbacks.pointMap(id, pos);
@@ -621,7 +632,7 @@ var Arma3TacMap;
                 this.connection.onclose(callbacks.connectionLost);
             },
             addMarker: function (markerData) {
-                this.connection.invoke("AddMarker", markerData);
+                this.connection.invoke("AddMarkerToLayer", getCurrentLayerId(), markerData); // XXX: Move layerId to caller ?
             },
             removeMarker: function (markerId) {
                 this.connection.invoke("RemoveMarker", markerId);
@@ -631,6 +642,15 @@ var Arma3TacMap;
             },
             moveMarker: function (markerId, markerData) {
                 this.connection.invoke("MoveMarker", markerId, markerData);
+            },
+            addLayer: function (layerData) {
+                this.connection.invoke("AddLayer", layerData);
+            },
+            updateLayer: function (layerId, layerData) {
+                this.connection.invoke("UpdateLayer", layerId, layerData);
+            },
+            removeLayer: function (layerId) {
+                this.connection.invoke("RemoveLayer", layerId);
             },
             pointMap: function (pos) {
                 this.connection.invoke("PointMap", pos);
@@ -734,6 +754,31 @@ var Arma3TacMap;
 
         selectTool(map, 0);
 
+        $('#layers-add').on('click', function () {
+            $('#layer-label').val('');
+            $('#layer-insert').show();
+            $('#layer-update').hide();
+            $('#layer').modal('show');
+            return false;
+        });
+
+        $('#layer-insert').on('click', function () {
+            backend.addLayer({ label: $('#layer-label').val() });
+            $('#layer').modal('hide');
+            return false;
+        });
+
+        $('#layer-update').on('click', function () {
+            backend.updateLayer(currentLayer.id, { label: $('#layer-label').val() });
+            $('#layer').modal('hide');
+            return false;
+        });
+
+        $('#layer-delete-confirm').on('click', function () {
+            backend.removeLayer(currentLayer.id);
+            $('#layer-delete').modal('hide');
+            return false;
+        });
 
     }
 
@@ -753,19 +798,108 @@ var Arma3TacMap;
         $('#search-term').on('keyup', function () { search(map, mapInfos, markers); });
     }
 
+    function getOrCreateLayer(map, id, layers) {
+        var layer = layers[id];
+        if (!layer) {
+            layers[id] = layer = { id: id, group: L.layerGroup().addTo(map) };
+        }
+        return layer;
+    }
 
-    function connect(map, backend, markers, pointing, canEdit, opacity) {
+    function setCurrentLayer(layer) {
+        if (currentLayer !== layer) {
+            if (currentLayer) {
+                currentLayer.listItem.removeClass('active');
+            }
+            currentLayer = layer;
+            currentLayer.listItem.addClass('active');
+        }
+    }
+
+    function setupLayerUI(map, layer) {
+        layer.listItem.on('click', function () { setCurrentLayer(layer); });
+
+        layer.listItem.find('.layers-item-display').on('click', function () {
+            var i = $(this).find('i.fas');
+            layer.isHidden = !layer.isHidden;
+            if (layer.isHidden) {
+                i.attr('class', 'fas fa-eye-slash');
+                layer.group.remove();
+            } else {
+                i.attr('class', 'fas fa-eye');
+                map.addLayer(layer.group);
+            }
+            return false;
+        });
+
+        layer.listItem.find('.layers-item-edit').on('click', function () {
+            setCurrentLayer(layer);
+            $('#layer-label').val(layer.data.label);
+            $('#layer-insert').hide();
+            $('#layer-update').show();
+            $('#layer').modal('show');
+            return false;
+        });
+
+        layer.listItem.find('.layers-item-delete').on('click', function () {
+            setCurrentLayer(layer);
+            $('#layer-delete-label').text(layer.data.label);
+            $('#layer-delete').modal('show');
+            return false;
+        });
+    }
+
+    function addOrUpdateLayer(map, layers, layerJson, layerTemplate) {
+        var layer = getOrCreateLayer(map, layerJson.id, layers);
+        layer.data = layerJson.data;
+        layer.isDefaultLayer = layerJson.isDefaultLayer;
+        if (!layer.listItem) {
+            if (!layerJson.isDefaultLayer) {
+                layer.listItem = layerTemplate.clone();
+                $('#layers-list').append(layer.listItem);
+            }
+            else {
+                layer.listItem = $('#layers-default');
+            }
+            setupLayerUI(map, layer);
+        }
+        if (!layerJson.isDefaultLayer) {
+            layer.listItem.find('.layers-item-label').text(layerJson.data.label);
+        } else if (!currentLayer) {
+            currentLayer = layer;
+        }
+    }
+
+    function connect(map, backend, markers, pointing, canEdit, opacity, layers) {
 
         var pointingIcon = new L.icon({ iconUrl: '/img/pointmap.png', iconSize: [16, 16], iconAnchor: [8, 8] });
 
+        var layerTemplate = $('#layers-template').remove();
+        layerTemplate.removeAttr('id');
+
         backend.connect({
             addOrUpdateMarker: function (marker, isReadOnly) {
-                addOrUpdateMarker(map, markers, marker, canEdit && !isReadOnly, backend, opacity);
+                addOrUpdateMarker(map, markers, marker, canEdit && !isReadOnly, backend, opacity, getOrCreateLayer(map, marker.layerId, layers));
+            },
+            addOrUpdateLayer: function (layerJson) {
+                addOrUpdateLayer(map, layers, layerJson, layerTemplate);
             },
             removeMarker: function (marker) {
                 var existing = markers[marker.id];
                 if (existing) {
                     existing.remove();
+                    delete markers[marker.id];
+                }
+            },
+            removeLayer: function (layer) {
+                var existing = layers[layer.id];
+                if (existing) {
+                    existing.group.remove();
+                    if (existing.listItem) existing.listItem.remove();
+                    delete layers[layer.id];
+                    if (existing === currentLayer) {
+                        setCurrentLayer(Object.getOwnPropertyNames(layers).map(n => layers[n])[0]);
+                    }
                 }
             },
             pointMap: function (id, pos) {
@@ -794,6 +928,25 @@ var Arma3TacMap;
         });
     }
 
+    function setupLayerToggle(map) {
+        var isLayersSliderVisible = false;
+        var layersBtn = L.control.overlayButton({
+            baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
+                isLayersSliderVisible = !isLayersSliderVisible;
+                if (isLayersSliderVisible) {
+                    $('#map-col').attr('class', 'col-8 col-xl-9');
+                    $('#layers-col').attr('class', 'col pl-2');
+                    layersBtn.setClass('btn-primary');
+                }
+                else {
+                    $('#map-col').attr('class', 'col');
+                    $('#layers-col').attr('class', 'd-none');
+                    layersBtn.setClass('btn-outline-secondary');
+                }
+            }, content: '<i class="fas fa-layer-group"></i>'
+        }).addTo(map);
+    }
+
     var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0, 'measure': 1.0 };
 
     /**
@@ -809,7 +962,7 @@ var Arma3TacMap;
         var backend = Backend.SignalR;
         var opacity = opacity ?? defaultOpacity;
         backend.create(mapId, hub);
-        connect(map, backend, markers, pointing, false, opacity);
+        connect(map, backend, markers, pointing, false, opacity, {});
 
         return {
             close: function () {
@@ -836,18 +989,21 @@ var Arma3TacMap;
 
             var map = initMapArea(mapInfos, config.endpoint);
 
+            setupLayerToggle(map);
+
             if ($('#share').length) {
                 L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
             }
 
             var markers = {};
+            var layers = {};
             var pointing = {};
             var backend = Backend.SignalR;
             backend.create(mapId, config.hub);
 
             setupSearch(map, mapInfos, markers);
 
-            connect(map, backend, markers, pointing, canEdit, defaultOpacity);
+            connect(map, backend, markers, pointing, canEdit, defaultOpacity, layers);
 
             if (canEdit) {
                 setupEditTools(map, backend);
@@ -875,3 +1031,4 @@ var Arma3TacMap;
     }
 
 })(Arma3TacMap = Arma3TacMap || {});
+

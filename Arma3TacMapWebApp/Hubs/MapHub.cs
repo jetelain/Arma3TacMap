@@ -72,7 +72,7 @@ namespace Arma3TacMapWebApp.Hubs
             await AddMarkerToLayer(markerData, mapId, null);
         }
 
-        public async Task AddMarkerToLayer(int layerId, MarkerData markerData)
+        public async Task AddMarkerToLayer(int? layerId, MarkerData markerData)
         {
             var mapId = GetContexMapId();
             if (mapId == null)
