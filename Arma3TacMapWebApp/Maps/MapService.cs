@@ -74,6 +74,28 @@ namespace Arma3TacMapWebApp.Maps
             return new MapId() { TacMapID = map.TacMapID };
         }
 
+        internal async Task<int?> CreateLayer(ClaimsPrincipal user, MapId mapId, string label)
+        {
+            var access = await CanWrite(user, mapId);
+            if (access == null)
+            {
+                return null;
+            }
+            var map = new TacMap()
+            {
+                Created = DateTime.UtcNow,
+                Label = label,
+                OwnerUserID = access.TacMap.OwnerUserID,
+                WorldName = access.TacMap.WorldName,
+                ReadWriteToken = GenerateToken(),
+                ReadOnlyToken = GenerateToken(),
+                Parent = access.TacMap
+            };
+            await _db.AddAsync(map);
+            await _db.SaveChangesAsync();
+            return map.TacMapID;
+        }
+
         internal async Task<TacMapAccess> GrantReadAccess(ClaimsPrincipal user, int id, string t)
         {
             var dbUser = await GetUser(user);
@@ -85,7 +107,7 @@ namespace Arma3TacMapWebApp.Maps
                     return access;
                 }
             }
-            var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadOnlyToken == t);
+            var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadOnlyToken == t && a.ParentTacMapID == null);
             if (map != null)
             {
                 var access = new TacMapAccess()
@@ -127,7 +149,7 @@ namespace Arma3TacMapWebApp.Maps
             }
             else
             {
-                var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadWriteToken == t);
+                var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadWriteToken == t && a.ParentTacMapID == null);
                 if (map != null)
                 {
                     access = new TacMapAccess() { CanWrite = true, TacMap = map, User = dbUser };
@@ -185,7 +207,7 @@ namespace Arma3TacMapWebApp.Maps
             return dbUser;
         }
 
-        public async Task<StoredMarker> AddMarker(ClaimsPrincipal user, MapId mapId, string markerData)
+        public async Task<StoredMarker> AddMarker(ClaimsPrincipal user, MapId mapId, int? layerId, string markerData)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -199,9 +221,21 @@ namespace Arma3TacMapWebApp.Maps
                 MarkerData = markerData,
                 LastUpdate = DateTime.UtcNow
             };
+            if (layerId != null)
+            {
+                await SetLayerId(layerId.Value, access, marker);
+            }
             await _db.AddAsync(marker);
             await _db.SaveChangesAsync();
             return ToStored(marker);
+        }
+
+        private async Task SetLayerId(int layerId, TacMapAccess access, TacMapMarker marker)
+        {
+            if (await _db.TacMaps.AnyAsync(m => m.ParentTacMapID == access.TacMapID && m.TacMapID == layerId))
+            {
+                marker.TacMapID = layerId;
+            }
         }
 
         public async Task<bool> CanPointMap(ClaimsPrincipal user, MapId mapId)
@@ -244,10 +278,11 @@ namespace Arma3TacMapWebApp.Maps
 
         internal async Task<List<StoredMarker>> GetMarkers(int tacMapID, bool isReadOnly)
         {
-            return (await _db.TacMapMarkers.Where(m => m.TacMapID == tacMapID).ToListAsync())
+            return (await _db.TacMapMarkers.Where(m => m.TacMapID == tacMapID || m.TacMap.ParentTacMapID == tacMapID).ToListAsync())
                 .Select(m => new StoredMarker()
                 {
                     Id = m.TacMapMarkerID,
+                    LayerId = m.TacMapID,
                     IsReadOnly = isReadOnly,
                     MarkerData = m.MarkerData
                 })
@@ -261,7 +296,7 @@ namespace Arma3TacMapWebApp.Maps
             {
                 return null;
             }
-            var marker = await _db.TacMapMarkers.FirstOrDefaultAsync(m => m.TacMapID == access.TacMapID && m.TacMapMarkerID == mapMarkerID);
+            var marker = await _db.TacMapMarkers.FirstOrDefaultAsync(m => (m.TacMapID == access.TacMapID || m.TacMap.ParentTacMapID == access.TacMapID) && m.TacMapMarkerID == mapMarkerID);
             if (marker != null)
             {
                 _db.Remove(marker);
@@ -276,21 +311,26 @@ namespace Arma3TacMapWebApp.Maps
             return new StoredMarker()
             {
                 Id = marker.TacMapMarkerID,
+                LayerId = marker.TacMapID,
                 IsReadOnly = false,
                 MarkerData = marker.MarkerData
             };
         }
 
-        public async Task<StoredMarker> UpdateMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID, string markerData)
+        public async Task<StoredMarker> UpdateMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID, int? layerId, string markerData)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
             {
                 return null;
             }
-            var marker = await _db.TacMapMarkers.FirstOrDefaultAsync(m => m.TacMapID == access.TacMapID && m.TacMapMarkerID == mapMarkerID);
+            var marker = await _db.TacMapMarkers.FirstOrDefaultAsync(m => (m.TacMapID == access.TacMapID || m.TacMap.ParentTacMapID == access.TacMapID) && m.TacMapMarkerID == mapMarkerID);
             if (marker != null)
             {
+                if (layerId != null && marker.TacMapID != layerId.Value)
+                {
+                    await SetLayerId(layerId.Value, access, marker);
+                }
                 marker.MarkerData = markerData;
                 marker.UserID = access.UserID;
                 marker.LastUpdate = DateTime.UtcNow;
@@ -315,7 +355,13 @@ namespace Arma3TacMapWebApp.Maps
             var dbUser = await GetOrCreateUser(user);
             if (dbUser != null)
             {
-                return await _db.TacMapAccesses.Where(m => m.UserID == dbUser.UserID).Include(t => t.TacMap).Include(t => t.TacMap.Owner).OrderByDescending(m => m.TacMap.Created).Take(maxMaps).ToListAsync();
+                return await _db.TacMapAccesses
+                    .Where(m => m.UserID == dbUser.UserID && m.TacMap.ParentTacMapID == null)
+                    .Include(t => t.TacMap)
+                    .Include(t => t.TacMap.Owner)
+                    .OrderByDescending(m => m.TacMap.Created)
+                    .Take(maxMaps)
+                    .ToListAsync();
             }
             return new List<TacMapAccess>();
         }

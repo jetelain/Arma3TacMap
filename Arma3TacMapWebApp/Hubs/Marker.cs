@@ -9,5 +9,7 @@ namespace Arma3TacMapWebApp.Hubs
         public int id { get; set; }
 
         public MarkerData data { get; set; }
+
+        public int layerId { get; set; }
     }
 }

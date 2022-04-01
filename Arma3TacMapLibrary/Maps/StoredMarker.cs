@@ -6,6 +6,8 @@ namespace Arma3TacMapLibrary.Maps
     {
         public int Id { get; set; }
 
+        public int LayerId { get; set; }
+
         public string MarkerData { get; set; }
 
         public bool IsReadOnly { get; set; }

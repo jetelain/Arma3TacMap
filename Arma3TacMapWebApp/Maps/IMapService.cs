@@ -6,9 +6,9 @@ namespace Arma3TacMapWebApp.Maps
 {
     public interface IMapService
     {
-        Task<StoredMarker> AddMarker(ClaimsPrincipal user, MapId mapId, string markerData);
+        Task<StoredMarker> AddMarker(ClaimsPrincipal user, MapId mapId, int? layerId, string markerData);
 
-        Task<StoredMarker> UpdateMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID, string markerData);
+        Task<StoredMarker> UpdateMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID, int? layerId, string markerData);
 
         Task<StoredMarker> RemoveMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID);
 

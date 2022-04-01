@@ -51,7 +51,22 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 return;
             }
-            var storedMarker = await _svc.AddMarker(Context.User, mapId, MarkerData.Serialize(markerData));
+            await AddMarkerToLayer(markerData, mapId, null);
+        }
+
+        public async Task AddMarkerToLayer(int layerId, MarkerData markerData)
+        {
+            var mapId = GetContexMapId();
+            if (mapId == null)
+            {
+                return;
+            }
+            await AddMarkerToLayer(markerData, mapId, layerId);
+        }
+
+        private async Task AddMarkerToLayer(MarkerData markerData, MapId mapId, int? layerId)
+        {
+            var storedMarker = await _svc.AddMarker(Context.User, mapId, layerId, MarkerData.Serialize(markerData));
             if (storedMarker != null)
             {
                 await Notify(mapId, "AddOrUpdateMarker", storedMarker);
@@ -60,22 +75,27 @@ namespace Arma3TacMapWebApp.Hubs
 
         public async Task UpdateMarker(int mapMarkerID, MarkerData markerData)
         {
-            await DoUpdateMarker(mapMarkerID, markerData, true);
+            await DoUpdateMarker(mapMarkerID, markerData, true, null);
+        }
+
+        public async Task UpdateMarkerToLayer(int mapMarkerID, int? layerId, MarkerData markerData)
+        {
+            await DoUpdateMarker(mapMarkerID, markerData, true, layerId);
         }
 
         public async Task MoveMarker(int mapMarkerID, MarkerData markerData)
         {
-            await DoUpdateMarker(mapMarkerID, markerData, false);
+            await DoUpdateMarker(mapMarkerID, markerData, false, null);
         }
 
-        private async Task DoUpdateMarker(int mapMarkerID, MarkerData markerData, bool notifyCaller)
+        private async Task DoUpdateMarker(int mapMarkerID, MarkerData markerData, bool notifyCaller, int? layerId)
         {
             var mapId = GetContexMapId();
             if (mapId == null)
             {
                 return;
             }
-            var marker = await _svc.UpdateMarker(Context.User, mapId, mapMarkerID, MarkerData.Serialize(markerData));
+            var marker = await _svc.UpdateMarker(Context.User, mapId, mapMarkerID, layerId, MarkerData.Serialize(markerData));
             if (marker != null)
             {
                 await Notify(mapId, "AddOrUpdateMarker", marker, notifyCaller);
@@ -139,6 +159,7 @@ namespace Arma3TacMapWebApp.Hubs
             return new Marker()
             {
                 id = marker.Id,
+                layerId = marker.LayerId,
                 mapId = mapId,
                 data = MarkerData.Deserialize(marker.MarkerData)
             };
