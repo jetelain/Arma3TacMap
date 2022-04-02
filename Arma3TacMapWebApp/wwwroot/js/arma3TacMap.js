@@ -163,6 +163,9 @@ var Arma3TacMap;
 
     function updateMarkerHandler(e) {
         var marker = e.sourceTarget;
+        if (marker.isDisabled) {
+            return;
+        }
         modalMarkerId = marker.options.markerId;
         modalMarkerData = marker.options.markerData;
 
@@ -429,7 +432,7 @@ var Arma3TacMap;
                 if (canEdit) {
                     mapMarker.on('click', updateMarkerHandler);
                 }
-                markers[markerId] = mapMarker;
+                markers[markerId] = existing = mapMarker;
             }
         }
         else if (markerData.type == 'measure') {
@@ -446,7 +449,7 @@ var Arma3TacMap;
                 if (canEdit) {
                     mapMarker.on('click', updateMarkerHandler);
                 }
-                markers[markerId] = mapMarker;
+                markers[markerId] = existing = mapMarker;
             }
         }
         else {
@@ -471,9 +474,13 @@ var Arma3TacMap;
                             backend.moveMarker(markerId, markerData);
                         });
                 }
-                markers[markerId] = mapMarker;
+                markers[markerId] = existing = mapMarker;
             }
         }
+
+
+        updateMarkerState(layer, existing);
+
     }
 
     function initMapArea(mapInfos, endpoint, center, fullScreen) {
@@ -806,18 +813,43 @@ var Arma3TacMap;
         return layer;
     }
 
-    function setCurrentLayer(layer) {
+    function updateMarkerState(layer, marker) {
+        console.info(marker);
+        if (layer === currentLayer) {
+            if (marker.dragging) marker.dragging.enable();
+            if (marker._icon) $(marker._icon).removeClass('disabled');
+            if (marker._path) $(marker._path).removeClass('disabled');
+            if (marker._tooltip) $(marker._tooltip._container).removeClass('disabled');
+            marker.isDisabled = false;
+        } else {
+            if (marker.dragging) marker.dragging.disable();
+            if (marker._icon) $(marker._icon).addClass('disabled');
+            if (marker._path) $(marker._path).addClass('disabled');
+            if (marker._tooltip) $(marker._tooltip._container).addClass('disabled');
+            marker.isDisabled = true;
+        }
+
+    }
+
+    function setCurrentLayer(layer, layers) {
         if (currentLayer !== layer) {
             if (currentLayer) {
                 currentLayer.listItem.removeClass('active');
             }
             currentLayer = layer;
             currentLayer.listItem.addClass('active');
+
+            Object.getOwnPropertyNames(layers).forEach(function (id) {
+                var other = layers[id];
+                other.group.eachLayer(function (marker) {
+                    updateMarkerState(other, marker);
+                });
+            });
         }
     }
 
-    function setupLayerUI(map, layer) {
-        layer.listItem.on('click', function () { setCurrentLayer(layer); });
+    function setupLayerUI(map, layer, layers) {
+        layer.listItem.on('click', function () { setCurrentLayer(layer, layers); });
 
         layer.listItem.find('.layers-item-display').on('click', function () {
             var i = $(this).find('i.fas');
@@ -829,11 +861,14 @@ var Arma3TacMap;
                 i.attr('class', 'fas fa-eye');
                 map.addLayer(layer.group);
             }
+            layer.group.eachLayer(function (marker) {
+                updateMarkerState(layer, marker);
+            });
             return false;
         });
 
         layer.listItem.find('.layers-item-edit').on('click', function () {
-            setCurrentLayer(layer);
+            setCurrentLayer(layer, layers);
             $('#layer-label').val(layer.data.label);
             $('#layer-insert').hide();
             $('#layer-update').show();
@@ -842,7 +877,7 @@ var Arma3TacMap;
         });
 
         layer.listItem.find('.layers-item-delete').on('click', function () {
-            setCurrentLayer(layer);
+            setCurrentLayer(layer, layers);
             $('#layer-delete-label').text(layer.data.label);
             $('#layer-delete').modal('show');
             return false;
@@ -861,7 +896,7 @@ var Arma3TacMap;
             else {
                 layer.listItem = $('#layers-default');
             }
-            setupLayerUI(map, layer);
+            setupLayerUI(map, layer, layers);
         }
         if (!layerJson.isDefaultLayer) {
             layer.listItem.find('.layers-item-label').text(layerJson.data.label);
@@ -898,7 +933,7 @@ var Arma3TacMap;
                     if (existing.listItem) existing.listItem.remove();
                     delete layers[layer.id];
                     if (existing === currentLayer) {
-                        setCurrentLayer(Object.getOwnPropertyNames(layers).map(n => layers[n])[0]);
+                        setCurrentLayer(Object.getOwnPropertyNames(layers).map(n => layers[n])[0], layers);
                     }
                 }
             },
@@ -934,8 +969,8 @@ var Arma3TacMap;
             baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
                 isLayersSliderVisible = !isLayersSliderVisible;
                 if (isLayersSliderVisible) {
-                    $('#map-col').attr('class', 'col-8 col-xl-9');
-                    $('#layers-col').attr('class', 'col pl-2');
+                    $('#map-col').attr('class', 'col');
+                    $('#layers-col').attr('class', 'col tacmap-sidebar pl-2');
                     layersBtn.setClass('btn-primary');
                 }
                 else {

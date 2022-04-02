@@ -102,3 +102,17 @@
 .btn-outline-secondary {
     background-color: rgba(255, 255, 255, 0.25);
 }
+
+.leaflet-interactive.disabled {
+    cursor: inherit;
+}
+
+.leaflet-clickable.disabled {
+    cursor: inherit;
+}
+
+.tacmap-sidebar {
+    flex: 0 0 300px;
+    background: #eee;
+    border-left: 2px solid #ccc;
+}

@@ -480,4 +480,22 @@
   <data name="Update" xml:space="preserve">
     <value>Modifier</value>
   </data>
+  <data name="Are you sure you want to detele this layer ?" xml:space="preserve">
+    <value>Êtes vous sûre de vouloir supprimer ce calque ?</value>
+  </data>
+  <data name="Base layer" xml:space="preserve">
+    <value>Calque de base</value>
+  </data>
+  <data name="Connexion has been lost with server." xml:space="preserve">
+    <value>La connection a été perdue avec le serveur.</value>
+  </data>
+  <data name="Layer" xml:space="preserve">
+    <value>Calque</value>
+  </data>
+  <data name="Layers" xml:space="preserve">
+    <value>Calques</value>
+  </data>
+  <data name="This action cannot be undone, all layer markers will be permantly lost." xml:space="preserve">
+    <value>Cette action ne peut pas être annulée, tous les marqueurs du calque seront définitivement perdus.</value>
+  </data>
 </root>
