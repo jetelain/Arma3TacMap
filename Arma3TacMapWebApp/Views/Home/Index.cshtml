@@ -4,6 +4,19 @@
     ViewData["Title"] = "PLANOPS Maps";
 }
 <div class="container">
+    <div class="alert alert-info" role="alert">
+        <h2 class="alert-heading h5">New features</h2>
+
+        <p><span class="btn btn-sm btn-outline-secondary"><i class="fas fa-layer-group"></i></span> 
+        You can now use multiple layers on a single map. It can be useful for differents times of a single mission.
+        Icon is available at the top right.</p>
+
+        <p>This required some major changes, some issues may appear.<br />Please open an issue report on 
+        <a href="https://github.com/jetelain/Arma3TacMap/issues">GitHub</a>, or contact me on 
+        <a href="">Discord</a> (look for GrueArbre), or on 
+        <a href="https://steamcommunity.com/profiles/76561198081226363/">Steam</a> to get them fixed.</p>
+    </div>
+
     <div class="row">
 
         <div class="col-md-6">
@@ -51,7 +64,7 @@
                                             {
                                                 <br /> @Localizer["shared by {0}", @map.TacMap.Owner.UserLabel]
                                             }
-                                            </span>
+                                        </span>
                                     </h5>
                                     <a asp-action="@action" asp-route-id="@map.TacMapID" class="btn btn-sm btn-outline-primary">@Localizer["Display"]</a>
                                     @if (map.TacMap.OwnerUserID == map.UserID)
@@ -69,3 +82,7 @@
     </div>
 
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
+}
