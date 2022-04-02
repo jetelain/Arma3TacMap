@@ -29,8 +29,6 @@
     <p>@Localizer["By default map is user specific, an administrator can share the map with all users using the chat command <code>#tacmap global</code>."]</p>
     <p>@Localizer["On your connected mobile device, click on menu icon <i class=\"fas fa-bars\"></i>, then on \"Load from {0}\", and then select map.", "maps.plan-ops.fr"]</p>
 
-
-
     <h2 class="mt-5">@Localizer["Export to Image"]</h2>
     <p>@Localizer["Images can be used on a web page, a document, or can be used as a texture in Arma 3."]</p>
     <ul>
@@ -65,4 +63,18 @@
             </form>
         </div>
     </div>
+
+    <h2 class="mt-5">@Localizer["Embedded in a Web page"]</h2>
+    <p>Display a real-time full featured map on your web site.</p>
+    @{
+        var embedded = Url.Action("ViewMapFullLive", "Home", new { id = Model.Access.TacMapID, t = Model.TacMap.ReadOnlyToken }, "https");
+    }
+    @*<h3>Code</h3>*@
+    <code>
+        &lt;iframe src="@embedded" style="width:100%;height:80vh;border:0;" /&gt;
+    </code>
+
+    @*<h3>Preview</h3>
+    <iframe src="@embedded" style="width:100%;height:80vh;border:0;" />*@
+
 </div>
