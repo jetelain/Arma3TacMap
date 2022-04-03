@@ -1,0 +1,52 @@
+﻿@model Arma3TacMapWebApp.Models.ExportLayersViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = Localizer["Export Layers"];
+}
+@section Styles {
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
+}
+
+<div class="container">
+    <h1 class="text-center">@Model.TacMap.Label</h1>
+    <p class="text-center">
+        <a class="btn btn-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        @if (Model.TacMap.OwnerUserID == Model.Access.UserID)
+        {
+            <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Edit"]</a>
+        }
+    </p>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" asp-action="Export" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Export to Arma3"]</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" asp-action="ExportLayers" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Export Layers to GeoJSON"]</a>
+        </li>
+    </ul>
+
+    <h2 class="mt-3">@Localizer["Export Layers"]</h2>
+    <p>@Localizer["Select layers to export:"]</p>
+    <form asp-action="ExportLayers">
+        <ul class="list-group mb-2">
+            @foreach (var layer in Model.Layers)
+            {
+                <li class="list-group-item">
+                    <label class="m-0 p-0">
+                        <input type="checkbox" name="TacMapIDs" value="@layer.TacMapID" id="check_@layer.TacMapID" />
+                        @if (layer == Model.TacMap)
+                        {
+                            <span>@Localizer["Base layer"]</span>
+                        }
+                        else
+                        {
+                            <span>@layer.Label</span>
+                        }
+                    </label>
+                </li>
+            }
+        </ul>
+        <button class="btn btn-primary">@Localizer["Export to GeoJSON"]</button>
+    </form>
+</div>

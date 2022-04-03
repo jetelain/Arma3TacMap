@@ -45,7 +45,8 @@ namespace Arma3TacMapWebApp.Controllers
                     center = (x != null && y != null) ? new double[] { y.Value, x.Value } : null,
                     endpoint = Arma3MapHelper.GetEndpoint(_configuration),
                     markers = new Dictionary<string, Arma3TacMapLibrary.Maps.MarkerData>(),
-                    worldName = map.worldName
+                    worldName = map.worldName,
+                    fullScreen = false
                 }
             });
         }

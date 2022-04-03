@@ -1,0 +1,40 @@
+﻿@model Arma3TacMapWebApp.Models.ImportLayerViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = Localizer["Import a Layer"];
+}
+@section Styles {
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
+}
+
+<div class="container">
+    <h1 class="text-center">@Model.TacMap.Label</h1>
+    <p class="text-center">
+        <a class="btn btn-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        @if (Model.TacMap.OwnerUserID == Model.Access.UserID)
+        {
+            <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Edit"]</a>
+        }
+    </p>
+
+    <h2 class="mt-5">@Localizer["Import a layer from a GeoJSON file"]</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="ImportLayer" asp-route-id="@Model.TacMap.TacMapID" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Label" class="control-label"></label>
+                    <input asp-for="Label" class="form-control" />
+                    <span asp-validation-for="Label" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label for="geoJson" class="control-label">@Localizer["GeoJSON File"]</label>
+                    <input type="file" class="form-control form-control-file" id="geoJson" name="geoJson" accept=".geojson,.json" />
+                </div>
+                <input type="submit" value="@Localizer["Import"]" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+
+</div>

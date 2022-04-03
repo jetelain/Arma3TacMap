@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="5.0.0" />
     <PackageReference Include="AspNetCore.Authentication.ApiKey" Version="5.1.0" />
+    <PackageReference Include="GeoJSON" Version="2.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.14" />

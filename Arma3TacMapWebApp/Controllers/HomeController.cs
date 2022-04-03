@@ -134,7 +134,8 @@ namespace Arma3TacMapWebApp.Controllers
                 center = data.Center,
                 endpoint = Arma3MapHelper.GetEndpoint(_configuration),
                 markers = data.Markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData)),
-                worldName = data.WorldName
+                worldName = data.WorldName,
+                fullScreen = true
             });
         }
 

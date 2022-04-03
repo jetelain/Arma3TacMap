@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
+using BAMCIS.GeoJSON;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -254,6 +259,171 @@ namespace Arma3TacMapWebApp.Controllers
                 Script = MapExporter.GetSqf(await _mapSvc.GetMarkers(id, true))
             });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportLayers(int id)
+        {
+            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (mapAccess == null)
+            {
+                return Forbid();
+            }
+
+            return View(new ExportLayersViewModel()
+            {
+                TacMap = mapAccess.TacMap,
+                Access = mapAccess,
+                Layers = new[] { mapAccess.TacMap }.Concat(await _context.TacMaps.Where(m => m.ParentTacMapID == mapAccess.TacMap.TacMapID).ToListAsync()).ToList()
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportLayers(int id, int[] tacMapIds)
+        {
+            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (mapAccess == null)
+            {
+                return Forbid();
+            }
+
+            GeoJsonConfig.IgnorePositionValidation();
+
+            var map = await _mapSvc.GetInitialData(User, new MapId() { TacMapID = id });
+
+            var features = new List<Feature>();
+            var exported = new List<int>();
+            foreach(var layer in map.InitialLayers)
+            {
+                if (tacMapIds.Contains(layer.Id))
+                {
+                    exported.Add(layer.Id);
+                    foreach(var marker in map.InitialMarkers.Where(m => m.LayerId == layer.Id))
+                    {
+                        var data = MarkerData.Deserialize(marker.MarkerData);
+                        Geometry geometry = null;
+
+                        switch(data.type)
+                        {
+                            case "basic":
+                            case "mil":
+                                geometry = new BAMCIS.GeoJSON.Point(new Position(data.pos[1], data.pos[0])); 
+                                break;
+                            case "line":
+                            case "measure":
+                                geometry = new LineString(ToLine(data.pos));
+                                break;
+                        }
+
+                        if (geometry != null)
+                        {
+                            features.Add(new Feature(geometry, new Dictionary<string, dynamic>() {
+                                { "tacmap:type", data.type },
+                                { "tacmap:symbol", data.symbol },
+                                { "tacmap:config", data.config }
+                            }));
+                        }
+                    }
+                }
+            }
+
+            var export = new FeatureCollection(features);
+            return File(Encoding.UTF8.GetBytes(export.ToJson()), "application/vnd.geo+json", "layers-" + string.Join(",", exported) + ".geojson");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ImportLayer(int id)
+        {
+            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (mapAccess == null)
+            {
+                return Forbid();
+            }
+            return View(new ImportLayerViewModel() { TacMap = mapAccess.TacMap, Access = mapAccess });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportLayer(int id, [Bind("Label")] ImportLayerViewModel vm, IFormFile geoJson)
+        {
+            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            if (mapAccess == null)
+            {
+                return Forbid();
+            }
+            vm.TacMap = mapAccess.TacMap;
+            vm.Access = mapAccess;
+
+            FeatureCollection collection = null;
+            GeoJsonConfig.IgnorePositionValidation();
+            try
+            {
+                using (var reader = new StreamReader(geoJson.OpenReadStream()))
+                {
+                    collection = FeatureCollection.FromJson(reader.ReadToEnd());
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("geoJson", "Invalid file");
+            }
+            if (collection != null)
+            {
+                var mapId = new MapId() { TacMapID = mapAccess.TacMapID };
+                var layer = await _mapSvc.CreateLayer(User, mapId, vm.Label);
+                foreach(var feature in collection.Features)
+                {
+                    if ( feature.Properties.TryGetValue("tacmap:type", out var type) &&
+                        feature.Properties.TryGetValue("tacmap:symbol", out var symbol) &&
+                        feature.Properties.TryGetValue("tacmap:config", out var config))
+                    {
+                        var markerData = new MarkerData();
+                        markerData.type = Convert.ToString(type);
+                        markerData.symbol = Convert.ToString(symbol);
+                        markerData.config = ConvertToDict(config);
+                        markerData.pos = ConvertToPos(feature.Geometry);
+                        await _mapSvc.AddMarker(User, mapId, layer.Id, MarkerData.Serialize(markerData));
+                    }
+                }
+                return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id }, "showLayers");
+            }
+            return View(vm);
+        }
+
+        private double[] ConvertToPos(Geometry geometry)
+        {
+            var point = geometry as BAMCIS.GeoJSON.Point;
+            if (point != null)
+            {
+                return new[] { point.Coordinates.Latitude, point.Coordinates.Longitude };
+            }
+            var line = geometry as BAMCIS.GeoJSON.LineString;
+            if (line != null)
+            {
+                return line.Coordinates.SelectMany(c => new[] { c.Latitude, c.Longitude }).ToArray();
+            }
+            return new double[0];
+        }
+
+        private Dictionary<string, string> ConvertToDict(dynamic config)
+        {
+            var dictionary = new Dictionary<string, string>();
+            foreach (PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties(config))
+            {
+                dictionary.Add(propertyDescriptor.Name, Convert.ToString(propertyDescriptor.GetValue(config)));
+            }
+            return dictionary;
+        }
+
+        private IEnumerable<Position> ToLine(double[] pos)
+        {
+            for (int i = 0; i < pos.Length; i += 2)
+            {
+                var x = pos[i + 1];
+                var y = pos[i];
+                yield return new Position(x, y);
+            }
+        }
+
         private bool TacMapExists(int id)
         {
             return _context.TacMaps.Any(e => e.TacMapID == id);

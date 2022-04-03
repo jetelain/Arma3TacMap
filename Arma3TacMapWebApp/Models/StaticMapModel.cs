@@ -13,6 +13,8 @@ namespace Arma3TacMapWebApp.Models
 
         public string worldName { get; set; }
 
+        public bool fullScreen { get; set; }
+
         bool IMapCommonModel.isReadOnly => true;
 
         string IMapCommonModel.init => "initStaticMap";

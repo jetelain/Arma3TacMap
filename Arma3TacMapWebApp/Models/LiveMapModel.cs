@@ -1,4 +1,6 @@
-﻿namespace Arma3TacMapWebApp.Models
+﻿using Arma3TacMapLibrary.Maps;
+
+namespace Arma3TacMapWebApp.Models
 {
     public class LiveMapModel : IMapCommonModel
     {
@@ -6,7 +8,7 @@
 
         public string endpoint { get; set; }
 
-        public object mapId { get; set; }
+        public MapId mapId { get; set; }
 
         public string worldName { get; set; }
 

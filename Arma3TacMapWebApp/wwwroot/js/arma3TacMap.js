@@ -677,9 +677,9 @@ var Arma3TacMap;
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 0); }, content: '<i class="far fa-hand-paper"></i>' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 1); }, content: '<i class="far fa-hand-pointer"></i>' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 2); }, content: '<img height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAzCAYAAADfP/VGAAACTElEQVRoge3ZsUsCcRTA8TdZaurZmJG2RtASURBI0BRELVG0BBFYi0tDkQSOQf0BTTW1FU01tQhBtNSWi8NFFNSc82soT9PTu/N+7/d+d+fwQLg70C8f7n73EwAg0hvbAxEAwN5Yjt4Sqz+WQC2VDvwkhkYwFI2ZxwrHk8aB1MQUbl7eY1HHQM7q6RVqw5lfPHGtNZaWSmPu5glHZ+aMaNn8IfsXlzkHL984uZ4zfv/44hrmSxXzWLWL5veOAqesUVM4kcSl4zMs6oiFcrVzrKKOgVFmpmn38d04bitWEJS109Q4jmL5UZmVJlex/KTMjiYhsbyszIkmYbG8qKxZ0/LJue1rhcTygrJuNZHEUlmZG02ksVRSJkITeSwVlInSJC0WhzLRmqTGkqmMQhNLLEpllJrYYlEoo9bEHkuEMlmalIjlRplMTUrFcqKMQ5Nysewo49KkbCwzZbM7+6yalI5lpgwAsC8aY9GkfKzmexP3O6aysczuTarsZCgTy+pJp8JOhhKxnDzpOJWxxup23cSljC2WiHWTbGXSY4lehctUJjUW5SpchjIpsWS901ErI4/F8U5HpYwsFvcOAYUyklgq7BBQKBMai1sTtTJhsf5p0gbZdwgolLmOpaomCmWuYnlBk0hlXcXymiZRyhzH8rImt8psx/KLJjfKbMXyo6ZulHWM5XdN7Wb79tlUWdtYQdJkV9nGxV1rrFB0wDhpbGEF86UKFsrVQM7W9QNmprPN/zTVY/XGcl5rsXQA+AKAt7/PvanPBwB8AoD+A4WfYoYlQx+dAAAAAElFTkSuQmCC" />' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map),
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map), // maybe ⬤ ?
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '↔' }).addTo(map)
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '<i class="fas fa-ruler"></i>' }).addTo(map)
         ];
 
         colorPicker = createColorPicker();
@@ -964,22 +964,28 @@ var Arma3TacMap;
     }
 
     function setupLayerToggle(map) {
-        var isLayersSliderVisible = false;
+        var isLayersToolboxVisible = false;
         var layersBtn = L.control.overlayButton({
             baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
-                isLayersSliderVisible = !isLayersSliderVisible;
-                if (isLayersSliderVisible) {
-                    $('#map-col').attr('class', 'col');
+                isLayersToolboxVisible = !isLayersToolboxVisible;
+                if (isLayersToolboxVisible) {
                     $('#layers-col').attr('class', 'col tacmap-sidebar pl-2');
                     layersBtn.setClass('btn-primary');
+                    history.replaceState({}, '', '#showLayers');
                 }
                 else {
-                    $('#map-col').attr('class', 'col');
                     $('#layers-col').attr('class', 'd-none');
                     layersBtn.setClass('btn-outline-secondary');
+                    history.replaceState({}, '', '#');
                 }
             }, content: '<i class="fas fa-layer-group"></i>'
         }).addTo(map);
+
+        if (location.hash.indexOf('showLayers') != -1) {
+            isLayersToolboxVisible = true;
+            $('#layers-col').attr('class', 'col tacmap-sidebar pl-2');
+            layersBtn.setClass('btn-primary');
+        }
     }
 
     var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0, 'measure': 1.0 };
@@ -1059,8 +1065,9 @@ var Arma3TacMap;
                 setupSearch(map, mapInfos, markers);
             }
 
+            var uniqueLayer = { id: -1, group: L.layerGroup().addTo(map) };
             Object.getOwnPropertyNames(config.markers).forEach(function (id) {
-                addOrUpdateMarker(map, markers, { id: id, data: config.markers[id] }, false, null, defaultOpacity);
+                addOrUpdateMarker(map, markers, { id: id, data: config.markers[id] }, false, null, defaultOpacity, uniqueLayer);
             });
         });
     }

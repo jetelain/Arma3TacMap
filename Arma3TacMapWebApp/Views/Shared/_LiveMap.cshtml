@@ -25,10 +25,11 @@
         
 @if (!Model.isReadOnly)
 {
-        <p>
-            <a class="btn btn-outline-primary" href="#" id="layers-add"><i class="fas fa-plus"></i> @Localizer["Create"]</a>
-            @*<a class="btn btn-sm btn-outline-secondary" href="#"><i class="fas fa-file-import"></i> Importer</a>*@
-        </p>
+    <p>
+        <a class="btn btn-outline-primary" href="#" id="layers-add"><i class="fas fa-plus"></i> @Localizer["Create"]</a>
+        <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ImportLayer" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-import"></i> @Localizer["Import"]</a>
+        <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ExportLayers" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-export"></i> @Localizer["Export"]</a>
+    </p>
 }
         <div class="list-group" id="layers-list">
             <div class="list-group-item list-group-item-action d-flex justify-content-between active" id="layers-default">

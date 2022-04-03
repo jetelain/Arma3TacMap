@@ -99,9 +99,14 @@
     vertical-align: middle;
     /*text-shadow: 1px 1px 2px white;*/
 }
-.btn-outline-secondary {
-    background-color: rgba(255, 255, 255, 0.25);
+.map .btn-outline-secondary {
+    background-color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0px 0px 4px #fff;
 }
+
+    .map .btn-outline-secondary:hover {
+        text-shadow: none;
+    }
 
 .leaflet-interactive.disabled {
     cursor: inherit;
