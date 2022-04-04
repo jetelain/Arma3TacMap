@@ -522,4 +522,55 @@
   <data name="Import a layer from a GeoJSON file" xml:space="preserve">
     <value>Importer un calque depuis un fichier GeoJSON</value>
   </data>
+  <data name="Area with sector: 4 points required" xml:space="preserve">
+    <value>Zone avec secteur: 4 points requis</value>
+  </data>
+  <data name="Choose mission" xml:space="preserve">
+    <value>Sélectionner la mission</value>
+  </data>
+  <data name="French Army" xml:space="preserve">
+    <value>Armée Française</value>
+  </data>
+  <data name="Mission set" xml:space="preserve">
+    <value>Liste de mission</value>
+  </data>
+  <data name="Movement: 2 points required" xml:space="preserve">
+    <value>Mouvement: 2 points requis</value>
+  </data>
+  <data name="Single point: 1 point required" xml:space="preserve">
+    <value>Point unique: 1 point requis</value>
+  </data>
+  <data name="to cover" xml:space="preserve">
+    <value>Couvrir</value>
+  </data>
+  <data name="to defend" xml:space="preserve">
+    <value>Défendre</value>
+  </data>
+  <data name="to destroy" xml:space="preserve">
+    <value>Détruire</value>
+  </data>
+  <data name="to make and identify contact" xml:space="preserve">
+    <value>Prendre et précisier le contact</value>
+  </data>
+  <data name="to recce" xml:space="preserve">
+    <value>Reconnaître</value>
+  </data>
+  <data name="to scout" xml:space="preserve">
+    <value>Eclairer</value>
+  </data>
+  <data name="to seize" xml:space="preserve">
+    <value>S'emparer de</value>
+  </data>
+  <data name="to support" xml:space="preserve">
+    <value>Appuyer (par le mouvement)</value>
+  </data>
+  <data name="to support by fire" xml:space="preserve">
+    <value>Appuyer (par le feu)</value>
+  </data>
+  <data name="to survey" xml:space="preserve">
+    <value>Surveiller</value>
+  </data>
+  <data name="●● Section" xml:space="preserve">
+    <value>●● Groupe</value>
+  </data>
 </root>

@@ -155,6 +155,8 @@ var Arma3TacMap;
     var currentLine = null;
     var currentMeasure = null;
     var currentLayer = null;
+    var currentMission = null;
+    var missionSelection = null;
     var colorPicker;
 
     function getCurrentLayerId() {
@@ -373,6 +375,319 @@ var Arma3TacMap;
         }
     }
 
+    function normalVector(a, b) {
+        var dx = b[0] - a[0];
+        var dy = b[1] - a[1];
+        var l = Math.sqrt((dx * dx) + (dy * dy));
+        return [dx / l, dy / l];
+    }
+
+    function simpleArrow(a, b, arrowScale, n) {
+        if ( !n ) n = normalVector(a, b);
+        var x1 = [n[0] * -0.7071068 + n[1] * 0.7071068, n[0] * -0.7071068 + n[1] * -0.7071068];  // +3/4 PI
+        var x2 = [n[0] * -0.7071068 + n[1] * -0.7071068, n[0] * 0.70710682 + n[1] * -0.7071068]; // -3/4 PI
+        return [
+            [a, b],
+            [b, [b[0] + (x1[0] * arrowScale), b[1] + (x1[1] * arrowScale)]],
+            [b, [b[0] + (x2[0] * arrowScale), b[1] + (x2[1] * arrowScale)]]
+        ];
+    }
+
+    function brokenArrow(a, b, arrowScale) {
+        var c = [(b[0] + a[0]) / 2, (b[1] + a[1]) / 2];
+        var n = normalVector(a, b);
+        var x3 = [n[0] * 0.9238795 + n[1] * 0.3826835, n[0] * -0.3826835 + n[1] * 0.9238795];   // +1/8 PI
+        var x4 = [n[0] * -0.9238795 + n[1] * -0.3826835, n[0] * 0.3826835 + n[1] * -0.9238795]; // -1/8 PI
+        var c1 = [c[0] + (x3[0] * arrowScale * 2), c[1] + (x3[1] * arrowScale * 2)];
+        var c2 = [c[0] + (x4[0] * arrowScale * 2), c[1] + (x4[1] * arrowScale * 2)];
+        return [
+            [a, c1],
+            [c1, c2]
+        ].concat(simpleArrow(c2, b, arrowScale, n));
+    }
+
+    function innerBox(a, b, scale) {
+        var n = normalVector(a, b);
+        n = [n[0] * scale, n[1] * scale];
+        var p1 = [a[0] + n[0] - n[1], a[1] + n[1] + n[0]];
+        var p4 = [a[0] + n[0] + n[1], a[1] + n[1] - n[0]];
+        var p2 = [b[0] - n[0] - n[1], b[1] - n[1] + n[0]];
+        var p3 = [b[0] - n[0] + n[1], b[1] - n[1] - n[0]];
+        return [
+            [p1, p2, p3, p4, p1]
+        ];
+    }
+    function upperLabels(a, b, scale) {
+        var n = normalVector(a, b);
+        var x2 = [n[0] * 0.7071068 + n[1] * 0.7071068, n[0] * -0.7071068 + n[1] * 0.7071068]; // 1/4 TI
+        var x1 = [n[0] * -0.7071068 + n[1] * 0.7071068, n[0] * -0.70710682 + n[1] * -0.7071068]; // 3/4 PI
+        return [[a[0] + (x1[0] * scale * 2), a[1] + (x1[1] * scale * 2)],
+                [b[0] + (x2[0] * scale * 2), b[1] + (x2[1] * scale * 2)]];
+    }
+
+    function centerLabelForBroken(a, b, scale, lines) {
+        var n = normalVector(a, b);
+        var p = lines[0][1];
+        return [[p[0] + (n[1] * scale), p[1] + (n[0] * scale)]];
+    }
+
+    function centerLabelForRegular(a, b, scale, lines) {
+        var c = [(b[0] + a[0]) / 2, (b[1] + a[1]) / 2];
+        var n = normalVector(a, b);
+        return [[c[0] + (n[1] * scale),c[1] + (n[0] * scale)]];
+    }
+
+    function curvedLine(a, b, clipDistance) {
+        var dx = b[0] - a[0];
+        var dy = b[1] - a[1];
+        var distance = Math.sqrt((dx * dx) + (dy * dy));
+        var vectM45 = [(dx / distance) * 0.7071068 + (dy / distance) * -0.7071068, (dx / distance) * 0.7071068 + (dy / distance) * 0.7071068];
+        var radius = distance / Math.sqrt(2);
+        var center = [a[0] + (vectM45[0] * radius), a[1] + (vectM45[1] * radius)];
+        var baseAngle = Math.atan2(dy, dx) + (5 * Math.PI / 4);
+        var line = [];
+        var clip = clipDistance * clipDistance;
+        for (var angle = 0; angle <= Math.PI / 2; angle += Math.PI / 40) {
+            var p = [center[0] + (Math.cos(angle + baseAngle) * radius), center[1] + (Math.sin(angle + baseAngle) * radius)];
+            var px = p[0] - a[0];
+            var py = p[1] - a[1];
+            var pdistsq = px * px + py * py;
+            if (pdistsq >= clip) {
+                if (line.length == 0) {
+                    line.push([a[0] + (px / Math.sqrt(pdistsq) * clipDistance),a[1] + (py / Math.sqrt(pdistsq) * clipDistance)]);
+                }
+                line.push(p);
+            }
+        }
+        return line;
+    }
+
+    var missionsDefiniton = {
+        toSurvey: {
+            points: 4,
+            generate:
+                function (points, scale) {
+                    return innerBox(points[0], points[1], scale / 3)
+                        .concat(
+                            brokenArrow(points[0], points[2], scale / 3),
+                            brokenArrow(points[1], points[3], scale / 3));;
+                },
+            labels: ['S', 'S'],
+            generateLabels:
+                function (points, scale) {
+                    return upperLabels(points[0], points[1], scale / 2);
+                },
+        },
+        toCover: {
+            points: 4,
+            generate:
+                function (points, scale) {
+                    return innerBox(points[0], points[1], scale / 3)
+                        .concat(
+                            brokenArrow(points[0], points[2], scale / 3),
+                            brokenArrow(points[1], points[3], scale / 3));;
+                },
+            labels: ['C', 'C'],
+            generateLabels:
+                function (points, scale) {
+                    return upperLabels(points[0], points[1], scale / 2);
+                },
+        },
+        toSupportByFire: {
+            points: 4,
+            generate:
+                function (points, scale) {
+                    var n = normalVector(points[0], points[1]);
+                    var x2 = [n[0] * 0.7071068 + n[1] * 0.7071068, n[0] * -0.7071068 + n[1] * 0.7071068]; // 1/4 TI
+                    var x1 = [n[0] * -0.7071068 + n[1] * 0.7071068, n[0] * -0.70710682 + n[1] * -0.7071068]; // 3/4 PI
+                    var xa = [points[0][0] + (x1[0] * scale * 2), points[0][1] + (x1[1] * scale * 2)];
+                    var xb = [points[1][0] + (x2[0] * scale * 2), points[1][1] + (x2[1] * scale * 2)];
+                    return [
+                        [points[0], points[1]],
+                        [xa, points[0]],
+                        [xb, points[1]]]
+                        .concat(
+                            simpleArrow(points[0], points[2], scale),
+                            simpleArrow(points[1], points[3], scale));
+                },
+        },
+        toRecce: {
+            points: 2,
+            generate:
+                function (points, scale) {
+                    return brokenArrow(points[0], points[1], scale);
+                },
+            labels: ['RECO'],
+            generateLabels:
+                function (points, scale, lines) {
+                    return centerLabelForBroken(points[0], points[1], scale / 2, lines);
+                },
+        },
+        toScout: {
+            points: 2,
+            generate:
+                function (points, scale) {
+                    return brokenArrow(points[0], points[1], scale);
+                },
+            labels: ['ECL'],
+            generateLabels:
+                function (points, scale, lines) {
+                    return centerLabelForBroken(points[0], points[1], scale / 2, lines);
+                },
+        },
+        toSeize: {
+            points: 2,
+            generate:
+                function (points, scale) {
+                    var a = points[0];
+                    var b = points[1];
+                    // Circle around start position
+                    var circle = [];
+                    for (var angle = 0; angle <= 2 * Math.PI; angle += Math.PI / 20) {
+                        circle.push([a[0] + (Math.cos(angle) * scale * 2), a[1] + (Math.sin(angle) * scale * 2)]);
+                    }
+                    // Curved line from start to target
+                    var line = curvedLine(a, b, scale * 2);
+
+                    // Arrow to target (last segment of curved line)
+                    if (line.length > 2) {
+                        var arrow = simpleArrow(line[line.length - 2], line[line.length - 1], scale);
+                        arrow.splice(0, 1);
+                        return [circle, line, arrow];
+                    }
+                    return [circle];
+                },
+        },
+        toSupport: {
+            points: 2,
+            generate: /* Simple arrow */
+                function (points, scale) {
+                    return simpleArrow(points[0], points[1], scale);
+                },
+            labels: ['APP'],
+            generateLabels:
+                function (points, scale) {
+                    return centerLabelForRegular(points[0], points[1], scale / 2);
+                },
+        },
+        toMakeAndIdentifyContact: {
+            points: 2,
+            generate:
+                function () {
+                    return [];
+                },
+        },
+        toDestroy: {
+            points: 1,
+            generate:
+                function () {
+                    return [];
+                },
+        },
+        toDefend: {
+            points: 1,
+            generate:
+                function () {
+                    return [];
+                },
+        }
+    };
+
+    function generateMission(mission, points, size) {
+        var def = missionsDefiniton[mission];
+        if (def) {
+            var result = { labels: def.labels};
+            var sizeMeters = 1000;
+            switch (size) {
+                case '12': sizeMeters = 25; break;
+                case '13': sizeMeters = 50; break;
+                case '14': sizeMeters = 250; break;
+            }
+            if (def.points > 1 && points.length < 2) {
+                result.lines = points;
+                if (def.labels) {
+                    result.labelsPoints = [points[0], points[0]]; // we have up to 2 labels
+                }
+                return result;
+            }
+            if (def.points == 4 && points.length < 4) {
+                points = points.slice();
+                var n = normalVector(points[0], points[1]);
+                var x1 = [n[0] * -0.7071068 + n[1] * -0.7071068, n[0] * 0.7071068 + n[1] * -0.7071068]; // -3/4 PI
+                var x2 = [n[0] * 0.7071068 + n[1] * -0.7071068, n[0] * 0.70710682 + n[1] * 0.7071068]; // -1/4 PI
+                if (points.length < 3) {
+                    points.push([points[0][0] + (x1[0] * sizeMeters * 2), points[0][1] + (x1[1] * sizeMeters * 2)]);
+                }
+                points.push([points[1][0] + (x2[0] * sizeMeters * 2), points[1][1] + (x2[1] * sizeMeters * 2)]);
+            }
+            result.lines = def.generate(points, sizeMeters);
+            if (def.labels) {
+                result.labelsPoints = def.generateLabels(points, sizeMeters, result.lines);
+            }
+            return result;
+        }
+        return {lines:[]};
+    }
+
+    function missionLabels(marker, result, target) {
+        if (!marker.labels) {
+            marker.labels = result.labels.map(function (label, i) {
+                return L.marker(result.labelsPoints[i], {
+                    icon: new L.DivIcon({
+                        className: 'mission-text',
+                        html: $('<div></div>').text(label).html(),
+                        iconAnchor: [8, 8],
+                        iconSize: [16, 16]
+                    })
+                }).addTo(target);
+            });
+            marker.on('remove', function (ev) {
+                ev.target.labels.forEach(function (l) { l.remove(); });
+            });
+        } else {
+            for (var i = 0; i < result.labelsPoints.length; ++i) {
+                marker.labels[i].setLatLng(result.labelsPoints[i]);
+            }
+        }
+    }
+
+    function insertMission(latlng, map, backend) {
+
+        if (!missionSelection) {
+            $('#mission-selector').modal('show');
+            return;
+        }
+        if (!missionSelection.points) {
+            missionSelection.points = [[latlng.lat, latlng.lng]];
+        } else {
+            missionSelection.points.push([latlng.lat, latlng.lng]);
+        }
+        if (missionsDefiniton[missionSelection.mission].points == missionSelection.points.length) {
+            if (currentMission) {
+                currentMission.remove();
+                currentMission = null;
+            }
+            backend.addMarker({
+                type: 'mission',
+                symbol: missionSelection.mission,
+                config: { size: missionSelection.size },
+                pos: missionSelection.points.flat()
+            });
+            missionSelection = null;
+        } else {
+            var result = generateMission(missionSelection.mission, missionSelection.points, missionSelection.size);
+            if (!currentMission) {
+                currentMission = L.polyline(result.lines, { color: '#000', weight: 3, interactive: false }).addTo(map);
+            } else {
+                currentMission.setLatLngs(result.lines);
+            }
+            if (result.labels) {
+                missionLabels(currentMission, result, map);
+            }
+        }
+    }
+
+
     function generateIcon(markerData) {
 
         if (markerData.type == 'mil') {
@@ -450,6 +765,23 @@ var Arma3TacMap;
                     mapMarker.on('click', updateMarkerHandler);
                 }
                 markers[markerId] = existing = mapMarker;
+            }
+        }
+        else if (markerData.type == 'mission') {
+            var points = [];
+            for (var i = 0; i < markerData.pos.length; i += 2) {
+                points.push([markerData.pos[i], markerData.pos[i + 1]]);
+            }
+            var result = generateMission(markerData.symbol, points, markerData.config['size'] || '13');
+            if (existing) {
+                existing.setLatLngs(result.lines);
+                existing.options.markerData = markerData;
+            } else {
+                var mapMarker = L.polyline(result.lines, { color: '#000000', weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(layer.group);
+                markers[markerId] = existing = mapMarker;
+            }
+            if (result.labels) {
+                missionLabels(existing, result, layer.group);
             }
         }
         else {
@@ -530,6 +862,11 @@ var Arma3TacMap;
         } else {
             map.dragging.enable();
         }
+
+        if (currentTool == 6) {
+            missionSelection = null;
+            $('#mission-selector').modal('show');
+        }
     };
 
     function createColorPicker() {
@@ -597,8 +934,6 @@ var Arma3TacMap;
             entry.find('a').text(resultData.name).on('click', function () { $('#search').modal('hide'); map.setView(resultData.latLng, mapInfos.maxZoom); return false; });
             results.append(entry);
         });
-
-        console.log(resultEntries);
     }
 
     var Backend =
@@ -679,7 +1014,8 @@ var Arma3TacMap;
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 2); }, content: '<img height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAzCAYAAADfP/VGAAACTElEQVRoge3ZsUsCcRTA8TdZaurZmJG2RtASURBI0BRELVG0BBFYi0tDkQSOQf0BTTW1FU01tQhBtNSWi8NFFNSc82soT9PTu/N+7/d+d+fwQLg70C8f7n73EwAg0hvbAxEAwN5Yjt4Sqz+WQC2VDvwkhkYwFI2ZxwrHk8aB1MQUbl7eY1HHQM7q6RVqw5lfPHGtNZaWSmPu5glHZ+aMaNn8IfsXlzkHL984uZ4zfv/44hrmSxXzWLWL5veOAqesUVM4kcSl4zMs6oiFcrVzrKKOgVFmpmn38d04bitWEJS109Q4jmL5UZmVJlex/KTMjiYhsbyszIkmYbG8qKxZ0/LJue1rhcTygrJuNZHEUlmZG02ksVRSJkITeSwVlInSJC0WhzLRmqTGkqmMQhNLLEpllJrYYlEoo9bEHkuEMlmalIjlRplMTUrFcqKMQ5Nysewo49KkbCwzZbM7+6yalI5lpgwAsC8aY9GkfKzmexP3O6aysczuTarsZCgTy+pJp8JOhhKxnDzpOJWxxup23cSljC2WiHWTbGXSY4lehctUJjUW5SpchjIpsWS901ErI4/F8U5HpYwsFvcOAYUyklgq7BBQKBMai1sTtTJhsf5p0gbZdwgolLmOpaomCmWuYnlBk0hlXcXymiZRyhzH8rImt8psx/KLJjfKbMXyo6ZulHWM5XdN7Wb79tlUWdtYQdJkV9nGxV1rrFB0wDhpbGEF86UKFsrVQM7W9QNmprPN/zTVY/XGcl5rsXQA+AKAt7/PvanPBwB8AoD+A4WfYoYlQx+dAAAAAElFTkSuQmCC" />' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map), // maybe ⬤ ?
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '<i class="fas fa-ruler"></i>' }).addTo(map)
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '<i class="fas fa-ruler"></i>' }).addTo(map),
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 6); }, content: 'Mission' }).addTo(map)
         ];
 
         colorPicker = createColorPicker();
@@ -716,6 +1052,9 @@ var Arma3TacMap;
                 else if (currentTool == 5) {
                     insertMeasure(e.latlng, map, backend);
                 }
+                else if (currentTool == 6) {
+                    insertMission(e.latlng, map, backend);
+                }
             }
         });
 
@@ -729,6 +1068,15 @@ var Arma3TacMap;
                 var data = currentLine.getLatLngs();
                 data[data.length - 1] = [e.latlng.lat, e.latlng.lng];
                 currentLine.setLatLngs(data);
+            }
+            if (currentMission) {
+                var points = missionSelection.points.slice();
+                points.push([e.latlng.lat, e.latlng.lng]);
+                var result = generateMission(missionSelection.mission,points,missionSelection.size);
+                currentMission.setLatLngs(result.lines);
+                if (result.labels) {
+                    missionLabels(currentMission, result, null);
+                }
             }
             if (currentMeasure) {
                 var posList = currentMeasure.getLatLngs();
@@ -787,6 +1135,15 @@ var Arma3TacMap;
             return false;
         });
 
+        $('.mission-btn').on('click', function () {
+            missionSelection = {
+                mission: $(this).attr('data-mission'),
+                size: $('#mission-selector-size').val()
+            };
+            $('#mission-selector').modal('hide');
+            return false;
+        });
+
     }
 
     function computeDistanceAndShowTooltip(map, line, posList, interactive) {
@@ -814,7 +1171,6 @@ var Arma3TacMap;
     }
 
     function updateMarkerState(layer, marker) {
-        console.info(marker);
         if (layer === currentLayer) {
             if (marker.dragging) marker.dragging.enable();
             if (marker._icon) $(marker._icon).removeClass('disabled');
@@ -938,7 +1294,6 @@ var Arma3TacMap;
                 }
             },
             pointMap: function (id, pos) {
-                console.log("PointMap", id, pos);
                 var existing = pointing[id];
                 if (existing) {
                     existing.setLatLng(pos);

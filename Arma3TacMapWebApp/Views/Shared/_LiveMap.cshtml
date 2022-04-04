@@ -22,15 +22,15 @@
     </div>
     <div class="d-none" id="layers-col">
         <h3>@Localizer["Layers"]</h3>
-        
-@if (!Model.isReadOnly)
-{
-    <p>
-        <a class="btn btn-outline-primary" href="#" id="layers-add"><i class="fas fa-plus"></i> @Localizer["Create"]</a>
-        <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ImportLayer" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-import"></i> @Localizer["Import"]</a>
-        <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ExportLayers" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-export"></i> @Localizer["Export"]</a>
-    </p>
-}
+
+        @if (!Model.isReadOnly)
+        {
+            <p>
+                <a class="btn btn-outline-primary" href="#" id="layers-add"><i class="fas fa-plus"></i> @Localizer["Create"]</a>
+                <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ImportLayer" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-import"></i> @Localizer["Import"]</a>
+                <a class="btn btn-outline-secondary" asp-controller="TacMaps" asp-action="ExportLayers" asp-route-id="@Model.mapId.TacMapID"><i class="fas fa-file-export"></i> @Localizer["Export"]</a>
+            </p>
+        }
         <div class="list-group" id="layers-list">
             <div class="list-group-item list-group-item-action d-flex justify-content-between active" id="layers-default">
                 <div>
@@ -364,6 +364,78 @@
         </div>
     </div>
 
+
+    <div class="modal" tabindex="-1" role="dialog" id="mission-selector">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @Localizer["Choose mission"]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="mission-selector-set" class="control-label">@Localizer["Mission set"]</label>
+                            <select id="mission-selector-set" class="form-control">
+                                <option value="FR">@Localizer["French Army"]</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="mission-selector-size" class="control-label">@Localizer["Echelon"]</label>
+                            <select id="mission-selector-size" class="form-control">
+                                @*<option value="12">@Localizer["● Squad"]</option>*@
+                                <option value="13">@Localizer["●● Section"]</option>
+                                @*<option value="14">@Localizer["●●● Platoon/Detachment"]</option>*@
+                            </select>
+                        </div>
+                    </div>
+                    <hr />
+                    <div id="mission-selector-list">
+                        <h6>@Localizer["Area with sector: 4 points required"]</h6>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toSurvey">
+                            @Localizer["to survey"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toCover">
+                            @Localizer["to cover"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toSupportByFire">
+                            @Localizer["to support by fire"]
+                        </button>
+                        <h6>@Localizer["Movement: 2 points required"]</h6>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toRecce">
+                            @Localizer["to recce"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toScout">
+                            @Localizer["to scout"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toSeize">
+                            @Localizer["to seize"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toSupport">
+                            @Localizer["to support"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toMakeAndIdentifyContact">
+                            @Localizer["to make and identify contact"]
+                        </button>
+                        <h6>@Localizer["Single point: 1 point required"]</h6>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toDestroy">
+                            @Localizer["to destroy"]
+                        </button>
+                        <button class="btn btn-outline-success mission-btn mb-2" data-mission="toDefend">
+                            @Localizer["to defend"]
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 <div class="modal" tabindex="-1" role="dialog" id="search">
