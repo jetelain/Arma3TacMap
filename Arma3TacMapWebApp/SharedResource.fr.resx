@@ -528,8 +528,8 @@
   <data name="Choose mission" xml:space="preserve">
     <value>Sélectionner la mission</value>
   </data>
-  <data name="French Army" xml:space="preserve">
-    <value>Armée Française</value>
+  <data name="France - Infantry" xml:space="preserve">
+    <value>France - Infanterie</value>
   </data>
   <data name="Mission set" xml:space="preserve">
     <value>Liste de mission</value>

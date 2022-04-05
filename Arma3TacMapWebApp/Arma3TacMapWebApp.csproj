@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Arma3TacMapLibrary\Arma3TacMapLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\missions\" />
+  </ItemGroup>
+
 </Project>

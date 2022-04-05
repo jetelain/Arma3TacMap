@@ -312,6 +312,9 @@ namespace Arma3TacMapWebApp.Controllers
                             case "measure":
                                 geometry = new LineString(ToLine(data.pos));
                                 break;
+                            case "mission":
+                                geometry = new MultiPoint(ToLine(data.pos));
+                                break;
                         }
 
                         if (geometry != null)
@@ -396,10 +399,15 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return new[] { point.Coordinates.Latitude, point.Coordinates.Longitude };
             }
-            var line = geometry as BAMCIS.GeoJSON.LineString;
+            var line = geometry as LineString;
             if (line != null)
             {
                 return line.Coordinates.SelectMany(c => new[] { c.Latitude, c.Longitude }).ToArray();
+            }
+            var multi = geometry as MultiPoint;
+            if (multi != null)
+            {
+                return multi.Coordinates.SelectMany(c => new[] { c.Latitude, c.Longitude }).ToArray();
             }
             return new double[0];
         }
