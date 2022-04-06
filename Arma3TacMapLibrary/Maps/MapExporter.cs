@@ -7,6 +7,9 @@ namespace Arma3TacMapLibrary.Maps
 {
     public static class MapExporter
     {
+
+        private static readonly Lazy<MilMission> milMission = new Lazy<MilMission>(() => new MilMission(), true);
+
         public static string GetSqf(IEnumerable<StoredMarker> list)
         {
             return @"private _data = " + GetData(list) + @";
@@ -51,7 +54,7 @@ gtd_map_allMetisMarkers = [];
 
 {
   _x params ['_id', '_x', '_y', '_sideid', '_dashed', '_icon', '_mod1', '_mod2', '_size', '_designation'];
-  private _marker = [[_x,_y], 0, true, [_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation] call mts_markers_fnc_createMarker;
+  private _marker = [[_x,_y], 0, true, [[_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation]] call mts_markers_fnc_createMarker;
   gtd_map_allMetisMarkers pushBack _marker;
 } forEach _metis;
 
@@ -96,8 +99,57 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 {
                     metisMarkers.Add(GetMilAsMetis(marker.Id, data));
                 }
+                else if (data.type == "mission")
+                {
+                    polyMarkers.AddRange(GetMissionLines(marker.Id, data));
+                }
             }
             return ArmaSerializer.ToSimpleArrayString(new[] { iconMarkers, polyMarkers, metisMarkers });
+        }
+
+        private static double[][] ToLeafletPoints(double[] pos)
+        {
+            var points = new List<double[]>();
+            for (int i = 0; i < pos.Length; i += 2)
+            {
+                points.Add(new [] { pos[i], pos[i + 1] });
+            }
+            return points.ToArray();
+        }
+
+        private static IEnumerable<List<object>> GetMissionLines(int id, MarkerData data)
+        {
+            var lines = new List<List<object>>();
+            var color = Get(data.config, "color", "ColorBlack");
+            var size = Get(data.config, "size", "13");
+            var scale = 1000d;
+            switch (size)
+            {
+                case "12": scale = 25; break;
+                case "13": scale = 50; break;
+                case "14": scale = 250; break;
+            }
+            var mil = milMission.Value;
+            var result = mil.RenderMission(data.symbol, ToLeafletPoints(data.pos), scale);
+            if (result != null)
+            {
+                var index = 0;
+                foreach (var line in result.Lines)
+                {
+                    var points = new List<double>();
+                    foreach (var point in line)
+                    {
+                        points.Add(Math.Round(point[1], 2));
+                        points.Add(Math.Round(point[0], 2));
+                    }
+                    lines.Add(new List<object>() {
+                        id + "." + index,
+                        points,
+                        color});
+                    index++;
+                }
+            }
+            return lines;
         }
 
         private static List<object> GetMilAsMetis(int id, MarkerData data)

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Julien ETELAIN</Authors>
     <Product>Arma3TacMap</Product>
     <RepositoryUrl>https://github.com/jetelain/Arma3TacMap</RepositoryUrl>
@@ -89,6 +89,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\Arma3TacMapWebApp\wwwroot\js\milMissions.js" />
     <EmbeddedResource Include="wwwroot\img\home-solid.svg" />
     <EmbeddedResource Include="wwwroot\img\markers\flag_aaf.png" />
     <EmbeddedResource Include="wwwroot\img\markers\flag_altis.png" />
@@ -168,6 +169,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Jint" Version="3.0.0-beta-2037" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.9" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
