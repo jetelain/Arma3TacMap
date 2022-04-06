@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Arma3TacMapLibrary.Arma3;
 
@@ -62,21 +63,25 @@ publicVariable 'gtd_map_allMarkers';
 publicVariable 'gtd_map_allMetisMarkers';";
         }
 
-        public static string GetMarkerData(int id, MarkerData data)
+        public static IEnumerable<string> GetMarkerData(int id, MarkerData data)
         {
             if (data.type == "basic")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "icon", GetBasic(id, data) });
+                return new[] { ArmaSerializer.ToSimpleArrayString(new object[] { "icon", GetBasic(id, data) }) };
             }
             if (data.type == "line")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "poly", GetLine(id, data) });
+                return new[] { ArmaSerializer.ToSimpleArrayString(new object[] { "poly", GetLine(id, data) }) };
             }
             if (data.type == "mil")
             {
-                return ArmaSerializer.ToSimpleArrayString(new object[] { "mtis", GetMilAsMetis(id, data) });
+                return new[] { ArmaSerializer.ToSimpleArrayString(new object[] { "mtis", GetMilAsMetis(id, data) }) };
             }
-            return "[]";
+            if ( data.type == "mission")
+            {
+                return GetMissionLines(id, data).Select(line => ArmaSerializer.ToSimpleArrayString(new object[] { "poly", line })).ToList();
+            }
+            return Enumerable.Empty<string>();
         }
 
         public static string GetData(IEnumerable<StoredMarker> markers)
