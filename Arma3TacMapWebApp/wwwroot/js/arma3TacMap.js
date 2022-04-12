@@ -150,6 +150,7 @@ var Arma3TacMap;
     var basicColors = { "ColorBlack": "000000", "ColorGrey": "7F7F7F", "ColorRed": "E50000", "ColorBrown": "7F3F00", "ColorOrange": "D86600", "ColorYellow": "D8D800", "ColorKhaki": "7F9966", "ColorGreen": "00CC00", "ColorBlue": "0000FF", "ColorPink": "FF4C66", "ColorWhite": "FFFFFF", "ColorUNKNOWN": "B29900", "colorBLUFOR": "004C99", "colorOPFOR": "7F0000", "colorIndependent": "007F00", "colorCivilian": "66007F" };
 
     var modalMarkerId;
+    var modalMarker;
     var modalMarkerData;
     var clickPosition = null;
     var currentLine = null;
@@ -159,17 +160,90 @@ var Arma3TacMap;
     var missionSelection = null;
     var colorPicker;
 
+    var pointEditMarkers = [];
+
     function getCurrentLayerId() {
         return currentLayer ? currentLayer.id : null;
     }
 
-    function updateMarkerHandler(e) {
+    function previewMakerPointUpdate(marker, posList, map) {
+        var markerData = marker.options.markerData;
+        if (markerData.type == 'line') {
+            marker.setLatLngs(posList);
+        }
+        else if (markerData.type == 'measure') {
+            marker.setLatLngs(posList);
+            computeDistanceAndShowTooltip(map, marker, posList, true);
+        }
+        else if (markerData.type == 'mission') {
+            var result = generateMission(markerData.symbol, posList, markerData.config.size || '13');
+            marker.setLatLngs(result.lines);
+            if (result.labelsPoints) {
+                for (var i = 0; i < result.labelsPoints.length; ++i) {
+                    marker.labels[i].setLatLng(result.labelsPoints[i]);
+                }
+            }
+        }
+        else {
+            marker.setLatLng(posList[0]);
+        }
+    }
+
+    function saveMarkerPointsUpdate(marker, posList, backend) {
+        var markerData = marker.options.markerData;
+        markerData.pos = posList.flat();
+        backend.moveMarker(marker.options.markerId, markerData);
+    }
+
+    function editMarkerPoints(marker, map, backend) {
+        clearpointEditMakers();
+        var posList = posToPoints(marker.options.markerData.pos);
+        var icon = new L.DivIcon({
+            className: 'edit-marker',
+            html: '',
+            iconAnchor: [8, 8],
+            iconSize: [16, 16]
+        });
+        for (var i = 0; i < posList.length; ++i) {
+            pointEditMarkers.push(
+                L.marker(posList[i], { icon: icon, draggable: true, interactive: true, zIndexOffset: 1000, pointIndex: i })
+                    .addTo(map)
+                    .on('drag', function (e) {
+                        var latlng = e.target.getLatLng();
+                        posList[e.target.options.pointIndex] = [latlng.lat, latlng.lng];
+                        previewMakerPointUpdate(marker, posList, map);
+                    })
+                    .on('dragend', function (e) {
+                        saveMarkerPointsUpdate(marker, posList, backend);
+                    })
+            );
+        }
+    }
+
+    function clearpointEditMakers() {
+        if (pointEditMarkers.length > 0) {
+            pointEditMarkers.forEach(m => m.remove());
+        }
+        pointEditMarkers = [];
+    }
+
+    function updateMarkerHandler(e, map, backend) {
+        clearpointEditMakers();
+
         var marker = e.sourceTarget;
         if (marker.isDisabled) {
+            e.mapCanHandle = true;
+            map.fire('click', e);
             return;
         }
+        modalMarker = marker;
         modalMarkerId = marker.options.markerId;
         modalMarkerData = marker.options.markerData;
+
+        if (e.originalEvent.altKey) {
+            editMarkerPoints(marker, map, backend);
+            return;
+        }
 
         if (modalMarkerData.type == 'mil') {
             setSymbol(modalMarkerData.symbol, modalMarkerData.config);
@@ -478,7 +552,8 @@ var Arma3TacMap;
                     }),
                     interactive: marker.options.interactive
                 }).addTo(target).on('click', function (ev) {
-                    marker.fire('click', { sourceTarget: marker, latlng: ev.latlng });
+                    ev.sourceTarget = marker;
+                    marker.fire('click', ev);
                 });
             });
             marker.on('remove', function (ev) {
@@ -519,7 +594,7 @@ var Arma3TacMap;
             var result = generateMission(missionSelection.mission, missionSelection.points, missionSelection.size);
             if (!currentMission) {
                 var color = '#' + (basicColors[missionSelection.color] || '000000');
-                currentMission = L.polyline(result.lines, { color: color, weight: 3, interactive: false }).addTo(map);
+                currentMission = L.polyline(result.lines, { smoothFactor: 0.5, color: color, weight: 3, interactive: false }).addTo(map);
             } else {
                 currentMission.setLatLngs(result.lines);
             }
@@ -569,16 +644,21 @@ var Arma3TacMap;
         return L.icon({ iconUrl: url, iconSize: [32, 32], iconAnchor: [16, 16] });
     }
 
+    function posToPoints(pos) {
+        var points = [];
+        for (var i = 0; i < pos.length; i += 2) {
+            points.push([pos[i], pos[i + 1]]);
+        }
+        return points;
+    }
+
     function addOrUpdateMarker(map, markers, marker, canEdit, backend, opacity, layer) {
         var markerId = marker.id;
         var markerData = marker.data;
         var existing = markers[markerId];
 
         if (markerData.type == 'line') {
-            var posList = [];
-            for (var i = 0; i < markerData.pos.length; i += 2) {
-                posList.push([markerData.pos[i], markerData.pos[i + 1]]);
-            }
+            var posList = posToPoints(markerData.pos);
             var color = '#' + (basicColors[markerData.config.color] || '000000');
             if (existing) {
                 existing.setLatLngs(posList);
@@ -587,15 +667,13 @@ var Arma3TacMap;
             } else {
                 var mapMarker = L.polyline(posList, { color: color, weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(layer.group);
                 if (canEdit) {
-                    mapMarker.on('click', updateMarkerHandler);
+                    mapMarker.on('click', e => updateMarkerHandler(e,map,backend));
                 }
                 markers[markerId] = existing = mapMarker;
             }
         }
         else if (markerData.type == 'measure') {
-            var posList = [[markerData.pos[0], markerData.pos[1]],
-            [markerData.pos[2], markerData.pos[3]]];
-
+            var posList = posToPoints(markerData.pos);
             if (existing) {
                 existing.setLatLngs(posList);
                 computeDistanceAndShowTooltip(map, existing, posList, canEdit);
@@ -604,27 +682,24 @@ var Arma3TacMap;
                 var mapMarker = L.polyline(posList, { color: '#000000', weight: 1.3, dashArray: '4', interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['measure'] ?? 1.0 }).addTo(layer.group);
                 computeDistanceAndShowTooltip(map, mapMarker, posList, canEdit);
                 if (canEdit) {
-                    mapMarker.on('click', updateMarkerHandler);
+                    mapMarker.on('click', e => updateMarkerHandler(e, map, backend));
                 }
                 markers[markerId] = existing = mapMarker;
             }
         }
         else if (markerData.type == 'mission') {
-            var points = [];
-            for (var i = 0; i < markerData.pos.length; i += 2) {
-                points.push([markerData.pos[i], markerData.pos[i + 1]]);
-            }
+            var posList = posToPoints(markerData.pos);
             var color = '#' + (basicColors[markerData.config.color] || '000000');
-            var result = generateMission(markerData.symbol, points, markerData.config.size || '13');
+            var result = generateMission(markerData.symbol, posList, markerData.config.size || '13');
             if (existing) {
                 existing.setLatLngs(result.lines);
                 existing.setStyle({ color: color });
                 existing.options.markerData = markerData;
             } else {
-                var mapMarker = L.polyline(result.lines, { color: color, weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(layer.group);
+                var mapMarker = L.polyline(result.lines, { smoothFactor: 0.5, color: color, weight: 3, interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['line'] ?? 1.0 }).addTo(layer.group);
                 markers[markerId] = existing = mapMarker;
                 if (canEdit) {
-                    mapMarker.on('click', updateMarkerHandler);
+                    mapMarker.on('click', e => updateMarkerHandler(e, map, backend));
                 }
             }
             if (result.labels) {
@@ -644,7 +719,7 @@ var Arma3TacMap;
                         .addTo(layer.group);
                 if (canEdit) {
                     mapMarker
-                        .on('click', updateMarkerHandler)
+                        .on('click', e => updateMarkerHandler(e, map, backend))
                         .on('dragend', function (e) {
                             var marker = e.target;
                             var markerId = marker.options.markerId;
@@ -881,7 +956,8 @@ var Arma3TacMap;
         }
         map.on('click', function (e) {
             clickPosition = e.latlng;
-            if (e.originalEvent.target.localName == "div") {
+            if (e.originalEvent.target.localName == "div" || e.mapCanHandle) {
+                clearpointEditMakers();
                 if (currentTool == 2) {
                     if (hasOrbat) {
                         insertOrbat(e.latlng);
@@ -893,7 +969,7 @@ var Arma3TacMap;
                     insertBasicSymbol(e.latlng);
                 }
                 else if (currentTool == 4) {
-                    insertLine(e.latlng, map, e.originalEvent.ctrlKey, backend);
+                    insertLine(e.latlng, map, e.originalEvent.ctrlKey || e.originalEvent.shiftKey, backend);
                 }
                 else if (currentTool == 5) {
                     insertMeasure(e.latlng, map, backend);
@@ -949,9 +1025,20 @@ var Arma3TacMap;
                 currentMeasure.remove();
                 currentMeasure = null;
             }
+            if (currentLine) {
+                var data = currentLine.getLatLngs().slice(0, -1);
+                if (data.length > 1) {
+                    currentLine.setLatLngs(data);
+                } else {
+                    currentLine.remove();
+                    currentLine = null;
+                }
+            }
         });
 
         $('select').selectpicker();
+
+        $('.modal-edit-points').on('click', _ => editMarkerPoints(modalMarker, map, backend));
 
         selectTool(map, 0);
     }

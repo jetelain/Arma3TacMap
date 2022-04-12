@@ -135,3 +135,9 @@
     max-width: 120px;
     max-height: 60px;
 }
+
+.edit-marker {
+    border: 2px solid blue;
+    background: white;
+    cursor: move !important;
+}

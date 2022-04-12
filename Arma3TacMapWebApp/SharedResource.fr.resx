@@ -573,4 +573,7 @@
   <data name="●● Section" xml:space="preserve">
     <value>●● Groupe</value>
   </data>
+  <data name="Edit points" xml:space="preserve">
+    <value>Modifier les points</value>
+  </data>
 </root>
