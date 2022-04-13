@@ -159,6 +159,7 @@ var Arma3TacMap;
     var currentMission = null;
     var missionSelection = null;
     var colorPicker;
+    var lockAllButton;
 
     var pointEditMarkers = [];
 
@@ -742,8 +743,9 @@ var Arma3TacMap;
             minZoom: mapInfos.minZoom,
             maxZoom: mapInfos.maxZoom,
             crs: mapInfos.CRS,
-            zoomSnap: fullScreen ? 0.01 : 1,
-            zoomControl: !fullScreen
+            zoomSnap: fullScreen ? 0.01 : 0.5,
+            zoomControl: !fullScreen,
+            zoomDelta: 0.5
         });
         L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
             attribution: mapInfos.attribution,
@@ -1053,7 +1055,6 @@ var Arma3TacMap;
         line.bindTooltip(formatedDistance, { direction: 'center', permanent: true, interactive: interactive, opacity: 0.8 });
     }
 
-
     function setupSearch(map, mapInfos, markers) {
         L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#search').modal('show'); search(map, mapInfos, markers); }, content: '<i class="fas fa-search"></i>' }).addTo(map);
         $('#search-term').on('keyup', function () { search(map, mapInfos, markers); });
@@ -1063,12 +1064,13 @@ var Arma3TacMap;
         var layer = layers[id];
         if (!layer) {
             layers[id] = layer = { id: id, group: L.layerGroup().addTo(map) };
+            updateLockAllState(layers);
         }
         return layer;
     }
 
     function updateMarkerState(layer, marker) {
-        if (layer === currentLayer) {
+        if (layer === currentLayer && !layer.isLocked) {
             if (marker.dragging) marker.dragging.enable();
             if (marker._icon) $(marker._icon).removeClass('disabled');
             if (marker._path) $(marker._path).removeClass('disabled');
@@ -1081,7 +1083,31 @@ var Arma3TacMap;
             if (marker._tooltip) $(marker._tooltip._container).addClass('disabled');
             marker.isDisabled = true;
         }
+    }
 
+    function updateLayerState(layer) {
+        layer.group.eachLayer(function (marker) {
+            updateMarkerState(layer, marker);
+        });
+    }
+
+    function updateAllLayersState(layers) {
+        Object.getOwnPropertyNames(layers).forEach(function (id) {
+            updateLayerState(layers[id]);
+        });
+    }
+
+    function updateLockAllState(layers) {
+        if (lockAllButton) {
+            var allLocked = Object.getOwnPropertyNames(layers).every(id => layers[id].isLocked);
+            if (allLocked) {
+                lockAllButton.setClass('btn-primary');
+                lockAllButton.j().find('i.fas').attr('class', 'fas fa-lock');
+            } else {
+                lockAllButton.setClass('btn-outline-secondary');
+                lockAllButton.j().find('i.fas').attr('class', 'fas fa-lock-open');
+            }
+        }
     }
 
     function setCurrentLayer(layer, layers) {
@@ -1091,13 +1117,7 @@ var Arma3TacMap;
             }
             currentLayer = layer;
             currentLayer.listItem.addClass('active');
-
-            Object.getOwnPropertyNames(layers).forEach(function (id) {
-                var other = layers[id];
-                other.group.eachLayer(function (marker) {
-                    updateMarkerState(other, marker);
-                });
-            });
+            updateAllLayersState(layers);
         }
     }
 
@@ -1117,6 +1137,19 @@ var Arma3TacMap;
             layer.group.eachLayer(function (marker) {
                 updateMarkerState(layer, marker);
             });
+            return false;
+        });
+
+        layer.listItem.find('.layers-item-lock').on('click', function () {
+            var i = $(this).find('i.fas');
+            layer.isLocked = !layer.isLocked;
+            if (layer.isLocked) {
+                i.attr('class', 'fas fa-lock');
+            } else {
+                i.attr('class', 'fas fa-lock-open');
+            }
+            updateLayerState(layer);
+            updateLockAllState(layers);
             return false;
         });
 
@@ -1188,6 +1221,7 @@ var Arma3TacMap;
                     if (existing === currentLayer) {
                         setCurrentLayer(Object.getOwnPropertyNames(layers).map(n => layers[n])[0], layers);
                     }
+                    updateLockAllState(layers);
                 }
             },
             pointMap: function (id, pos) {
@@ -1240,6 +1274,23 @@ var Arma3TacMap;
         }
     }
 
+    function setupLockAll(map, layers) {
+        lockAllButton = L.control.overlayButton({
+            baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
+                var layersList = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+                var allWasLocked = layersList.every(l => l.isLocked);
+                layersList.forEach(l => { l.isLocked = !allWasLocked; });
+                updateAllLayersState(layers);
+                updateLockAllState(layers);
+                if (!allWasLocked) {
+                    $('.layers-item-lock i.fas').attr('class', 'fas fa-lock');
+                } else {
+                    $('.layers-item-lock i.fas').attr('class', 'fas fa-lock-open');
+                }
+            }, content: '<i class="fas fa-lock-open"></i>'
+        }).addTo(map);
+    }
+
     var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0, 'measure': 1.0 };
 
     /**
@@ -1284,16 +1335,18 @@ var Arma3TacMap;
 
             setupLayerToggle(map);
 
-            if ($('#share').length) {
-                L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
-            }
-
             var markers = {};
             var layers = {};
             var pointing = {};
             var backend = Backend.SignalR;
+
+            setupLockAll(map,layers);
+
             backend.create(mapId, config.hub);
 
+            if ($('#share').length) {
+                L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
+            }
             setupSearch(map, mapInfos, markers);
 
             connect(map, backend, markers, pointing, canEdit, defaultOpacity, layers);
