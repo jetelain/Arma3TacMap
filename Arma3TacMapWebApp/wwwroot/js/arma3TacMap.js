@@ -3,6 +3,8 @@
 var Arma3TacMap;
 (function (Arma3TacMap) {
 
+    var intl = new Intl.NumberFormat();
+
     function applySymbolSet() {
         var id = '0003';
         var symbolset = $('#set').val();
@@ -1045,10 +1047,20 @@ var Arma3TacMap;
         selectTool(map, 0);
     }
 
+    function getHeading(p1, p2) {
+        var dx = p2.lat - p1.lat;
+        var dy = p2.lng - p1.lng;
+        var heading = Math.round(Math.atan2(dy, dx) * 3200 / Math.PI);
+        if (heading < 0) {
+            heading = 6400 + heading;
+        }
+        return heading;
+    }
+
     function computeDistanceAndShowTooltip(map, line, posList, interactive) {
         var distance = map.distance(posList[0], posList[1]).toFixed();
-        var formatedDistance = new Intl.NumberFormat().format(distance) + ' m';
-
+        var heading = getHeading(L.latLng(posList[0]), L.latLng(posList[1]));
+        var formatedDistance = '<i class="fas fa-arrows-alt-h"></i> ' + intl.format(distance) + ' m<br/><i class="fas fa-compass"></i> ' + intl.format(heading) + ' mil';
         if (line.getTooltip()) {
             line.unbindTooltip();
         }
