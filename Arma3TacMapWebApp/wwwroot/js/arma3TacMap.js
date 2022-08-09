@@ -1221,6 +1221,7 @@ var Arma3TacMap;
                 var existing = markers[marker.id];
                 if (existing) {
                     existing.remove();
+                    existing.removeFrom(getOrCreateLayer(map, marker.layerId, layers).group);
                     delete markers[marker.id];
                 }
             },
