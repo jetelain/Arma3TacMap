@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Arma3TacMapWebApp.Controllers
 {
-    [Authorize(Policy = "Admin")]
-    //[Authorize(Policy = "LoggedUser")]
+    [Authorize(Policy = "LoggedUser")]
     public class OrbatUnitsController : Controller
     {
         private readonly Arma3TacMapContext _context;
