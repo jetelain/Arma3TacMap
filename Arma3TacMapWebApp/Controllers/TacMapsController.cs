@@ -244,9 +244,10 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
 
+        [HttpGet]
         public async Task<IActionResult> Export(int id)
         {
-            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            var mapAccess = await _mapSvc.GrantReadAccess(User, id, null);
             if (mapAccess == null)
             {
                 return Forbid();
@@ -256,14 +257,34 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 TacMap = mapAccess.TacMap,
                 Access = mapAccess,
+                Layers = new[] { mapAccess.TacMap }.Concat(await _context.TacMaps.Where(m => m.ParentTacMapID == mapAccess.TacMap.TacMapID).ToListAsync()).ToList(),
                 Script = MapExporter.GetSqf(await _mapSvc.GetMarkers(id, true))
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Export(int id, int[] tacMapIds)
+        {
+            var mapAccess = await _mapSvc.GrantReadAccess(User, id, null);
+            if (mapAccess == null)
+            {
+                return Forbid();
+            }
+
+            return View(new ExportViewModel()
+            {
+                TacMap = mapAccess.TacMap,
+                Access = mapAccess,
+                Layers = new[] { mapAccess.TacMap }.Concat(await _context.TacMaps.Where(m => m.ParentTacMapID == mapAccess.TacMap.TacMapID).ToListAsync()).ToList(),
+                Script = MapExporter.GetSqf((await _mapSvc.GetMarkers(id, true)).Where(m => tacMapIds.Contains(m.LayerId))),
+                IsPartialExport = true
             });
         }
 
         [HttpGet]
         public async Task<IActionResult> ExportLayers(int id)
         {
-            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            var mapAccess = await _mapSvc.GrantReadAccess(User, id, null);
             if (mapAccess == null)
             {
                 return Forbid();
@@ -280,7 +301,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportLayers(int id, int[] tacMapIds)
         {
-            var mapAccess = await _mapSvc.GrantWriteAccess(User, id, null);
+            var mapAccess = await _mapSvc.GrantReadAccess(User, id, null);
             if (mapAccess == null)
             {
                 return Forbid();
@@ -288,7 +309,7 @@ namespace Arma3TacMapWebApp.Controllers
 
             GeoJsonConfig.IgnorePositionValidation();
 
-            var map = await _mapSvc.GetInitialData(User, new MapId() { TacMapID = id });
+            var map = await _mapSvc.GetInitialData(User, new MapId() { TacMapID = id, IsReadOnly = true });
 
             var features = new List<Feature>();
             var exported = new List<int>();

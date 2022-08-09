@@ -74,7 +74,7 @@ namespace Arma3TacMapWebApp.Maps
             return (await _pdb.TacMapPreviews.AsNoTracking().FirstAsync(p => p.TacMapID == access.TacMapID && p.Size == size)).Data;
         }
 
-        private byte[] ToJpeg(Image<Rgba32> image, int size)
+        private byte[] ToJpeg(Image image, int size)
         {
             using(var ms = new MemoryStream())
             {
@@ -83,7 +83,7 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private Image ToSize(Image<Rgba32> image, int size)
+        private Image ToSize(Image image, int size)
         {
             if (image.Width != size)
             {
@@ -92,7 +92,7 @@ namespace Arma3TacMapWebApp.Maps
             return image;
         }
 
-        private byte[] ToPng(Image<Rgba32> image, int size)
+        private byte[] ToPng(Image image, int size)
         {
             using (var ms = new MemoryStream())
             {

@@ -368,7 +368,7 @@ namespace Arma3TacMapWebApp.Maps
         internal static string GenerateToken()
         {
             var random = new byte[32];
-            using (var rng = new RNGCryptoServiceProvider())
+            using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(random);
             }

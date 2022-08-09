@@ -10,7 +10,14 @@
 <div class="container">
     <h1 class="text-center">@Model.TacMap.Label</h1>
     <p class="text-center">
-        <a class="btn btn-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        @if (Model.Access.CanWrite)
+        {
+            <a class="btn btn-primary" asp-controller="Home" asp-action="EditMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-controller="Home" asp-action="ViewMap" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Display map"]</a>
+        }
         @if (Model.TacMap.OwnerUserID == Model.Access.UserID)
         {
             <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model.TacMap.TacMapID">@Localizer["Edit"]</a>

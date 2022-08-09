@@ -1,4 +1,5 @@
-﻿using Arma3TacMapWebApp.Entities;
+﻿using System.Collections.Generic;
+using Arma3TacMapWebApp.Entities;
 
 namespace Arma3TacMapWebApp.Models
 {
@@ -11,5 +12,7 @@ namespace Arma3TacMapWebApp.Models
         public TacMap TacMap { get; set; }
         public string Script { get; internal set; }
         public TacMapAccess Access { get; internal set; }
+        public List<TacMap> Layers { get; internal set; }
+        public bool IsPartialExport { get; internal set; }
     }
 }
