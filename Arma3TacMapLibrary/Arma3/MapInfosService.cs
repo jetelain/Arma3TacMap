@@ -25,16 +25,6 @@ namespace Arma3TacMapLibrary.Arma3
             _endpoint = Arma3MapHelper.GetEndpoint(configuration);
         }
 
-        public async Task<List<MapInfos>> GetMapsInfosFilter(bool includeWorkInProgressMaps)
-        {
-            var value = await GetMapsInfos();
-            if ( !includeWorkInProgressMaps)
-            {
-                value = value.Where(m => m.worldName != "gossi").ToList();
-            }
-            return value;
-        }
-
         public async Task<List<MapInfos>> GetMapsInfos()
         {
             List<MapInfos> value;

@@ -28,7 +28,7 @@ namespace Arma3TacMapWebApp.Controllers
         [Route("Atlas")]
         public async Task<IActionResult> Index()
         {
-            return View(await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded));
+            return View(await _mapInfos.GetMapsInfos());
         }
 
         [Route("Atlas/{id}")]

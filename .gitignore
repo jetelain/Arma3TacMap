@@ -352,3 +352,5 @@ MigrationBackup/
 *.Development.json
 *.db
 /Arma3TacMapWebApp/wwwroot/help/legal.html
+*.db-shm
+*.db-wal

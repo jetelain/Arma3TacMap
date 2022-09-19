@@ -37,7 +37,7 @@ namespace Arma3TacMapWebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var vm = new IndexViewModel();
-            vm.Maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded);
+            vm.Maps = await _mapInfos.GetMapsInfos();
             vm.TacMaps = await _mapSvc.GetUserMaps(User, 6);
             foreach(var map in vm.TacMaps)
             {

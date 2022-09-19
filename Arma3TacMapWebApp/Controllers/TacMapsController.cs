@@ -44,7 +44,7 @@ namespace Arma3TacMapWebApp.Controllers
         // GET: TacMaps
         public async Task<IActionResult> Index()
         {
-            var maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded);
+            var maps = await _mapInfos.GetMapsInfos();
             var list = await _mapSvc.GetUserMaps(User);
             foreach (var map in list)
             {
@@ -58,7 +58,7 @@ namespace Arma3TacMapWebApp.Controllers
         {
             var user = await _mapSvc.GetUser(User);
             await PrepareOrbatDropdown(user);
-            ViewBag.Maps = await _mapInfos.GetMapsInfosFilter((await _authorizationService.AuthorizeAsync(User, "WorkInProgress")).Succeeded); 
+            ViewBag.Maps = await _mapInfos.GetMapsInfos(); 
             return View(new TacMap()
             {
                 WorldName = worldName,
