@@ -13,7 +13,18 @@
     }
 
     <a asp-controller="TacMaps" asp-action="Create" asp-route-worldName="@Model.MapInfos.worldName" class="btn btn-sm btn-outline-secondary">@Localizer["Create tactical map"]</a>
-
+    
+    @if (Model.HasTopo)
+    {
+        @if (Model.InitStaticMap.view == "topo")
+        {
+            <a asp-action="Details" asp-route-id="@Model.MapInfos.worldName" class="btn btn-sm btn-secondary">@Localizer["Topographic Map"] <span class="badge badge-light">BETA</span></a>
+        }
+        else
+        {
+            <a asp-action="Details" asp-route-id="@Model.MapInfos.worldName"asp-route-view="topo" class="btn btn-sm btn-outline-secondary">@Localizer["Topographic Map"] <span class="badge badge-dark">BETA</span></a>
+        }
+    }
 </h1>
 
 @{await Html.RenderPartialAsync("_StaticMap", Model.InitStaticMap);}

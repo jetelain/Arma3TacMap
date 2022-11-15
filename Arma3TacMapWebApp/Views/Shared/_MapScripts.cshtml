@@ -1,5 +1,5 @@
 ﻿@model Arma3TacMapWebApp.Models.IMapCommonModel
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.1/dist/leaflet.min.js">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@5.0.4/dist/browser/signalr.min.js">
 </script>
@@ -16,6 +16,13 @@
 </script>
 <script src="@Model.endpoint/maps/all.js">
 </script>
+@if (Model.view == "topo")
+{
+    <script src="@Model.endpoint/topo/all.js">
+    </script>
+    <script src="//mrdoob.github.io/stats.js/build/stats.min.js" onload="var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) });">
+    </script>
+}
 <script src="/js/milstdExtra.js" asp-append-version="true">
 </script>
 <script src="/js/milMissions.js" asp-append-version="true">

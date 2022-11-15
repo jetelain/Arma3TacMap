@@ -9,6 +9,17 @@
     @if (Model.Access.TacMap.EventHref != null)
     {
         <a href="@Model.Access.TacMap.EventHref.AbsoluteUri" class="btn btn-sm btn-secondary"><i class="fas fa-external-link-alt"></i> @Localizer["Return to {0}", Model.Access.TacMap.EventHref.Host]</a>
+    }        
+    @if (Model.HasTopo)
+    {
+        @if (Model.InitLiveMap.view == "topo")
+        {
+            <a asp-action="ViewMap" asp-route-id="@Model.Access.TacMapID" asp-route-t="@Model.Access.TacMap.ReadOnlyToken" class="btn btn-sm btn-secondary">@Localizer["Topographic Map"] <span class="badge badge-light">BETA</span></a>
+        }
+        else
+        {
+            <a asp-action="ViewMap" asp-route-id="@Model.Access.TacMapID" asp-route-t="@Model.Access.TacMap.ReadOnlyToken" asp-route-view="topo" class="btn btn-sm btn-outline-secondary">@Localizer["Topographic Map"] <span class="badge badge-dark">BETA</span></a>
+        }
     }
 </h1>
 

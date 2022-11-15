@@ -30,6 +30,16 @@
             </p>
         }
         <div class="list-group" id="layers-list">
+            <div class="list-group-item list-group-item-action d-flex justify-content-between" id="layers-background">
+                <div>
+                    @Localizer["Base map"]
+                </div>
+                <div>
+                    <span class="mr-1" id="bg-opacity">100 %</span>
+                    <a href="#" class="btn btn-sm btn-secondary layers-item-display" id="bg-opacity-minus"><i class="fas fa-minus"></i></a>
+                    <a href="#" class="btn btn-sm btn-secondary layers-item-display" id="bg-opacity-plus"><i class="fas fa-plus"></i></a>
+                </div>
+            </div>
             <div class="list-group-item list-group-item-action d-flex justify-content-between active" id="layers-default">
                 <div>
                     @Localizer["Base layer"]

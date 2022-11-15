@@ -14,6 +14,8 @@ namespace Arma3TacMapWebApp.Models
 
         public bool isReadOnly { get; set; }
 
+        public string view { get; set; }
+
         string IMapCommonModel.init => "initLiveMap";
     }
 }

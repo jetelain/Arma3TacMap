@@ -65,7 +65,7 @@ namespace Arma3TacMapWebApp.Controllers
 
         [Route("EditMap/{id}")]
         [Authorize(Policy = "LoggedUser")]
-        public async Task<IActionResult> EditMap(int id, string t)
+        public async Task<IActionResult> EditMap(int id, string t, string view)
         {
             TacMapAccess access = await _mapSvc.GrantWriteAccess(User, id, t); 
             if (access == null)
@@ -85,16 +85,17 @@ namespace Arma3TacMapWebApp.Controllers
                         IsReadOnly = false,
                         ReadToken = null
                     },
-                    worldName = access.TacMap.WorldName
+                    worldName = access.TacMap.WorldName,
+                    view = view
                 },
                 Access = access,
                 Friendly = await _mapSvc.GetOrbatUnits(access.TacMap.FriendlyOrbatID),
-                Hostile = await _mapSvc.GetOrbatUnits(access.TacMap.HostileOrbatID),
+                Hostile = await _mapSvc.GetOrbatUnits(access.TacMap.HostileOrbatID)
             });
         }
 
         [Route("ViewMap/{id}")]
-        public async Task<IActionResult> ViewMap(int id, string t)
+        public async Task<IActionResult> ViewMap(int id, string t, string view)
         {
             var access = await _mapSvc.GrantReadAccess(User, id, t);
             if (access == null)
@@ -116,7 +117,8 @@ namespace Arma3TacMapWebApp.Controllers
                         IsReadOnly = true,
                         ReadToken = t
                     },
-                    worldName = access.TacMap.WorldName
+                    worldName = access.TacMap.WorldName,
+                    view = view
                 }
             });
         }
@@ -142,7 +144,7 @@ namespace Arma3TacMapWebApp.Controllers
         [Route("ViewMap/{id}/LiveFullScreen")]
         public async Task<IActionResult> ViewMapFullLive(int id, string t)
         {
-            var result = await ViewMap(id, t);
+            var result = await ViewMap(id, t, null);
             ViewBag.IsFullScreen = true;
             return result;
         }

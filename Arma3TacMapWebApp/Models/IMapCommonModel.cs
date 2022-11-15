@@ -8,5 +8,6 @@
 
         bool isReadOnly { get; }
         string init { get; }
+        string view { get; }
     }
 }

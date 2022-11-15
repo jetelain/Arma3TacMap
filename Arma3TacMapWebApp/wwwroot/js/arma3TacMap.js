@@ -740,20 +740,35 @@ var Arma3TacMap;
 
     }
 
+    function isFastSvg() {
+        // Only Chrome and Safari are fast enough to animate SVG tiles
+        return (window.chrome && window.navigator.vendor == "Google Inc.") || navigator.vendor.indexOf("pple") != -1;
+    }
+
+    function changeOpacity(tileLayer, delta) {
+        var current = tileLayer.options.opacity ?? 1;
+        var opacity = Math.min(Math.max(0, current + delta), 1);
+        tileLayer.setOpacity(opacity);
+        $('#bg-opacity').text(Math.round(opacity * 100) + ' %');
+    }
+
     function initMapArea(mapInfos, endpoint, center, fullScreen) {
         var map = L.map('map', {
             minZoom: mapInfos.minZoom,
-            maxZoom: mapInfos.maxZoom,
+            maxZoom: mapInfos.maxZoom +1 ,
             crs: mapInfos.CRS,
-            zoomSnap: fullScreen ? 0.01 : 0.5,
+            zoomSnap: fullScreen ? 0.01 : 0.2,
             zoomControl: !fullScreen,
-            zoomDelta: 0.5
+            zoomDelta: 0.2,
+            zoomAnimation: !mapInfos.isSVG || isFastSvg()
         });
-        L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
-            attribution: mapInfos.attribution,
-            tileSize: mapInfos.tileSize
-        })
-            .on('load', function (event) { arma3TacMapLoaded = true })
+
+        var tileLayer = L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
+                attribution: mapInfos.attribution,
+                tileSize: mapInfos.tileSize,
+                maxNativeZoom: mapInfos.maxZoom
+            })
+            .on('load', function () { arma3TacMapLoaded = true })
             .addTo(map);
 
         if (fullScreen) {
@@ -763,11 +778,28 @@ var Arma3TacMap;
         } else {
             map.setView(mapInfos.center, mapInfos.defaultZoom);
         }
-        L.latlngGraticule({ zoomInterval: [{ start: 0, end: 10, interval: 1000 }] }).addTo(map);
+
+        var graticuleZooms = [];
+        if (mapInfos.maxZoom > 4) {
+            graticuleZooms.push({ start: 0, end: mapInfos.maxZoom - 4, interval: 10000 });
+            graticuleZooms.push({ start: mapInfos.maxZoom - 4, end: 10, interval: 1000 });
+        } else {
+            graticuleZooms.push({ start: 0, end: 10, interval: 1000 });
+        }
+        L.latlngGraticule(
+            {
+                color: mapInfos.isSVG ? '#0071D6' : '#444',
+                zoomInterval: graticuleZooms
+            }).addTo(map);
+
         if (!fullScreen) {
             L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
             L.control.gridMousePosition().addTo(map);
         }
+
+        $('#bg-opacity-minus').on('click', function () { changeOpacity(tileLayer, -0.1); });
+        $('#bg-opacity-plus').on('click', function () { changeOpacity(tileLayer, +0.1); });
+
         return map;
     }
 
@@ -1335,14 +1367,33 @@ var Arma3TacMap;
     };
 
 
+    function getMapInfos(config) {
+        var worldName = config.worldName;
+        var view = config.view;
+
+        if (view == 'topo' && Arma3Map.TopoMaps) {
+            var topo = Arma3Map.TopoMaps[worldName];
+            if (topo) {
+                topo.CRS = MGRS_CRS(topo.crsFactor.x, topo.crsFactor.y, topo.tileSize);
+                topo.center = [topo.center.y, topo.center.x];
+                topo.defaultZoom = 1;
+                topo.attribution = topo.credits;
+                topo.cities = topo.cities || [];
+                topo.tilePattern = '/topo/' + topo.worldName + '/' + topo.tilePattern;
+                topo.isSVG = true;
+                console.log(topo);
+                return topo;
+            }
+        }
+        return Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
+    }
+
     Arma3TacMap.initLiveMap = function (config) {
         $(function () {
-            var worldName = config.worldName;
             var mapId = config.mapId;
             var canEdit = !config.isReadOnly;
 
-
-            var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
+            var mapInfos = getMapInfos(config);
 
             var map = initMapArea(mapInfos, config.endpoint);
 
@@ -1373,8 +1424,7 @@ var Arma3TacMap;
 
     Arma3TacMap.initStaticMap = function (config) {
         $(function () {
-            var worldName = config.worldName;
-            var mapInfos = Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
+            var mapInfos = getMapInfos(config);
             var markers = {};
 
             var map = initMapArea(mapInfos, config.endpoint, config.center, config.fullScreen);

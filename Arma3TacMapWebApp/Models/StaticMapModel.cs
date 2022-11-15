@@ -15,6 +15,8 @@ namespace Arma3TacMapWebApp.Models
 
         public bool fullScreen { get; set; }
 
+        public string view { get; set; }
+
         bool IMapCommonModel.isReadOnly => true;
 
         string IMapCommonModel.init => "initStaticMap";

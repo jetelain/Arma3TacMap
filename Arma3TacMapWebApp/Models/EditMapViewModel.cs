@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 
@@ -13,5 +14,7 @@ namespace Arma3TacMapWebApp.Models
         public List<OrbatUnit> Hostile { get; internal set; }
 
         public LiveMapModel InitLiveMap { get; set; }
+
+        public bool HasTopo => new[] { "xcam_taunus", "gossi", "gtd_taunus", "altis" }.Contains(Access.TacMap.WorldName);
     }
 }

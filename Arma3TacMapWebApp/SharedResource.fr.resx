@@ -576,4 +576,10 @@
   <data name="Edit points" xml:space="preserve">
     <value>Modifier les points</value>
   </data>
+  <data name="Topographic Map" xml:space="preserve">
+    <value>Carte topographique</value>
+  </data>
+  <data name="Base map" xml:space="preserve">
+    <value>Fond de carte</value>
+  </data>
 </root>

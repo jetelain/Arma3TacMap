@@ -32,7 +32,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [Route("Atlas/{id}")]
-        public async Task<IActionResult> Details(string id, double? x, double? y)
+        public async Task<IActionResult> Details(string id, double? x, double? y, string view)
         {
             var map = (await _mapInfos.GetMapsInfos()).FirstOrDefault(map => map.worldName == id);
             ViewBag.IsFullScreen = false;
@@ -46,7 +46,8 @@ namespace Arma3TacMapWebApp.Controllers
                     endpoint = Arma3MapHelper.GetEndpoint(_configuration),
                     markers = new Dictionary<string, Arma3TacMapLibrary.Maps.MarkerData>(),
                     worldName = map.worldName,
-                    fullScreen = false
+                    fullScreen = false,
+                    view = view
                 }
             });
         }
