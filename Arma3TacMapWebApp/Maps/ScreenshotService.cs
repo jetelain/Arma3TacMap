@@ -15,7 +15,7 @@ namespace Arma3TacMapWebApp.Maps
     {
         private readonly string chromePath;
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
-        private Task<Browser> browserTask;
+        private Task<IBrowser> browserTask;
 
         public ScreenshotService(IConfiguration config, IHostApplicationLifetime lifetime)
         {
@@ -47,7 +47,7 @@ namespace Arma3TacMapWebApp.Maps
             return bytes;
         }
 
-        private async Task<Browser> GetBrowser()
+        private async Task<IBrowser> GetBrowser()
         {
             if (browserTask == null)
             {
@@ -67,7 +67,7 @@ namespace Arma3TacMapWebApp.Maps
             return await browserTask;
         }
 
-        private async Task<Browser> GetBrowserTask()
+        private async Task<IBrowser> GetBrowserTask()
         {
             return await Puppeteer.LaunchAsync(new LaunchOptions
             {
