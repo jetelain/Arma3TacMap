@@ -679,11 +679,11 @@ var Arma3TacMap;
             var posList = posToPoints(markerData.pos);
             if (existing) {
                 existing.setLatLngs(posList);
-                computeDistanceAndShowTooltip(map, existing, posList, canEdit);
+                computeDistanceAndShowTooltip(map, existing, posList, canEdit, markerId, markerData);
                 existing.options.markerData = markerData;
             } else {
                 var mapMarker = L.polyline(posList, { color: '#000000', weight: 1.3, dashArray: '4', interactive: canEdit, markerId: markerId, markerData: markerData, opacity: opacity['measure'] ?? 1.0 }).addTo(layer.group);
-                computeDistanceAndShowTooltip(map, mapMarker, posList, canEdit);
+                computeDistanceAndShowTooltip(map, mapMarker, posList, canEdit, markerId, markerData);
                 if (canEdit) {
                     mapMarker.on('click', e => updateMarkerHandler(e, map, backend));
                 }
@@ -1089,14 +1089,14 @@ var Arma3TacMap;
         return heading;
     }
 
-    function computeDistanceAndShowTooltip(map, line, posList, interactive) {
+    function computeDistanceAndShowTooltip(map, line, posList, interactive, markerId, markerData) {
         var distance = map.distance(posList[0], posList[1]).toFixed();
         var heading = getHeading(L.latLng(posList[0]), L.latLng(posList[1]));
         var formatedDistance = '<i class="fas fa-arrows-alt-h"></i> ' + intl.format(distance) + ' m<br/><i class="fas fa-compass"></i> ' + intl.format(heading) + ' mil';
         if (line.getTooltip()) {
             line.unbindTooltip();
         }
-        line.bindTooltip(formatedDistance, { direction: 'center', permanent: true, interactive: interactive, opacity: 0.8 });
+        line.bindTooltip(formatedDistance, { direction: 'center', permanent: true, interactive: interactive, opacity: 0.8, markerId: markerId, markerData: markerData });
     }
 
     function setupSearch(map, mapInfos, markers) {
