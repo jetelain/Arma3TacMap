@@ -142,7 +142,7 @@ namespace Arma3TacMapLibrary.Arma3
             while ((i = str.Peek()) != -1)
             {
                 char c = (char)i;
-                if (char.IsDigit(c) || c == '.' || c == '-')
+                if (char.IsDigit(c) || c == '.' || c == '-' || c == 'e')
                 {
                     str.Read();
                     sb.Append(c);
@@ -158,6 +158,11 @@ namespace Arma3TacMapLibrary.Arma3
         public static int[] ParseIntegerArray(string str)
         {
             return ParseMixedArray(str).Cast<double?>().Select(n => (int)n).ToArray();
+        }
+
+        public static double[] ParseDoubleArray(string str)
+        {
+            return ParseMixedArray(str).Cast<double?>().Select(n => (double)n).ToArray();
         }
 
         public static object[] ParseMixedArray(string str)
