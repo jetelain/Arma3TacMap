@@ -233,12 +233,13 @@ var Arma3TacMap;
     function updateMarkerHandler(e, map, backend) {
         clearpointEditMakers();
 
-        var marker = e.sourceTarget;
+        var marker = e.target;
         if (marker.isDisabled) {
             e.mapCanHandle = true;
             map.fire('click', e);
             return;
         }
+
         modalMarker = marker;
         modalMarkerId = marker.options.markerId;
         modalMarkerData = marker.options.markerData;
@@ -247,6 +248,9 @@ var Arma3TacMap;
             editMarkerPoints(marker, map, backend);
             return;
         }
+
+        $('select.layers-dropdown').val('' + marker.options.markerLayer.id);
+        $('select.layers-dropdown').selectpicker('refresh');
 
         if (modalMarkerData.type == 'mil') {
             setSymbol(modalMarkerData.symbol, modalMarkerData.config);
@@ -289,6 +293,9 @@ var Arma3TacMap;
         $('#milsymbol-update').hide();
         $('#milsymbol-insert').show();
         $('#milsymbol-grid').text(Arma3Map.toGrid(latlng));
+
+        $('#milsymbol-layer').val('' + getCurrentLayerId());
+        $('#milsymbol-layer').selectpicker('refresh');
     };
 
     function insertOrbat(latlng) {
@@ -303,6 +310,9 @@ var Arma3TacMap;
         $('#basicsymbol-update').hide();
         $('#basicsymbol-insert').show();
         $('#basicsymbol-grid').text(Arma3Map.toGrid(latlng));
+
+        $('#basicsymbol-layer').val('' + getCurrentLayerId());
+        $('#basicsymbol-layer').selectpicker('refresh');
     };
 
     function milsymbolMarkerTool(backend) {
@@ -311,7 +321,7 @@ var Arma3TacMap;
             var symbol = getSymbol();
             var symbolConfig = getSymbolConfig();
 
-            backend.addMarker({
+            backend.addMarker(Number($('#milsymbol-layer').val()), {
                 type: 'mil',
                 symbol: symbol,
                 config: symbolConfig,
@@ -329,7 +339,7 @@ var Arma3TacMap;
         $('#milsymbol-update').on('click', function () {
             modalMarkerData.symbol = getSymbol();
             modalMarkerData.config = getSymbolConfig();
-            backend.updateMarker(modalMarkerId, modalMarkerData);
+            backend.updateMarkerToLayer(modalMarkerId, Number($('#milsymbol-layer').val()), modalMarkerData);
             $('#milsymbol').modal('hide');
         });
 
@@ -351,7 +361,7 @@ var Arma3TacMap;
     function orbatMarkerTool(backend) {
         $('.orbat-btn').on('click', function () {
             
-            backend.addMarker({
+            backend.addMarker(getCurrentLayerId(), {
                 type: 'mil',
                 symbol: $(this).attr('data-milsymbol'),
                 config: { uniqueDesignation: $(this).attr('data-unique-designation') },
@@ -369,7 +379,7 @@ var Arma3TacMap;
     function basicsymbolMarkerTool(backend) {
 
         $('#basicsymbol-insert').on('click', function () {
-            backend.addMarker({
+            backend.addMarker(Number($('#basicsymbol-layer').val()), {
                 type: 'basic',
                 symbol: $('#basic-type').val(),
                 config: { color: $('#basic-color').val(), label: $('#basic-label').val(), dir: $('#basic-dir').val() },
@@ -386,7 +396,7 @@ var Arma3TacMap;
         $('#basicsymbol-update').on('click', function () {
             modalMarkerData.symbol = $('#basic-type').val();
             modalMarkerData.config = { color: $('#basic-color').val(), label: $('#basic-label').val(), dir: $('#basic-dir').val() };
-            backend.updateMarker(modalMarkerId, modalMarkerData);
+            backend.updateMarkerToLayer(modalMarkerId, Number($('#basicsymbol-layer').val()), modalMarkerData);
             $('#basicsymbol').modal('hide');
         });
     }
@@ -400,7 +410,7 @@ var Arma3TacMap;
 
         $('#line-update').on('click', function () {
             modalMarkerData.config = { color: $('#line-color').val() };
-            backend.updateMarker(modalMarkerId, modalMarkerData);
+            backend.updateMarkerToLayer(modalMarkerId, Number($('#line-layer').val()), modalMarkerData);
             $('#line').modal('hide');
         });
     }
@@ -422,7 +432,7 @@ var Arma3TacMap;
 
         $('#mission-edit-update').on('click', function () {
             modalMarkerData.config.color = $('#mission-edit-color').val();
-            backend.updateMarker(modalMarkerId, modalMarkerData);
+            backend.updateMarkerToLayer(modalMarkerId, Number($('#mission-layer').val()), modalMarkerData);
             $('#mission-edit').modal('hide');
         });
 
@@ -487,7 +497,7 @@ var Arma3TacMap;
             data[data.length - 1] = point;
             currentLine.remove();
             currentLine = null;
-            backend.addMarker({
+            backend.addMarker(getCurrentLayerId(), {
                 type: 'line',
                 symbol: 'line',
                 config: { color: colorPicker.val() },
@@ -505,7 +515,7 @@ var Arma3TacMap;
             var data = currentMeasure.getLatLngs();
             currentMeasure.remove();
             currentMeasure = null;
-            backend.addMarker({
+            backend.addMarker(getCurrentLayerId(), {
                 type: 'measure',
                 symbol: 'measure',
                 config: {},
@@ -556,6 +566,7 @@ var Arma3TacMap;
                     interactive: marker.options.interactive
                 }).addTo(target).on('click', function (ev) {
                     ev.sourceTarget = marker;
+                    ev.target = marker;
                     marker.fire('click', ev);
                 });
             });
@@ -585,7 +596,7 @@ var Arma3TacMap;
                 currentMission.remove();
                 currentMission = null;
             }
-            backend.addMarker({
+            backend.addMarker(getCurrentLayerId(), {
                 type: 'mission',
                 symbol: missionSelection.mission,
                 config: { size: missionSelection.size, color: missionSelection.color },
@@ -735,6 +746,14 @@ var Arma3TacMap;
             }
         }
 
+        if (existing.options.markerLayer != layer) {
+            
+            if (existing.options.markerLayer) {
+                existing.removeFrom(existing.options.markerLayer.group);
+                existing.addTo(layer.group);
+            }
+            existing.options.markerLayer = layer;
+        }
 
         updateMarkerState(layer, existing);
 
@@ -931,14 +950,14 @@ var Arma3TacMap;
                     }).catch(callbacks.connectionLost);
                 this.connection.onclose(callbacks.connectionLost);
             },
-            addMarker: function (markerData) {
-                this.connection.invoke("AddMarkerToLayer", getCurrentLayerId(), markerData); // XXX: Move layerId to caller ?
+            addMarker: function (layerId, markerData) {
+                this.connection.invoke("AddMarkerToLayer", layerId, markerData);
             },
             removeMarker: function (markerId) {
                 this.connection.invoke("RemoveMarker", markerId);
             },
-            updateMarker: function (markerId, markerData) {
-                this.connection.invoke("UpdateMarker", markerId, markerData);
+            updateMarkerToLayer: function (markerId, layerId, markerData) {
+                this.connection.invoke("UpdateMarkerToLayer", markerId, layerId, markerData);
             },
             moveMarker: function (markerId, markerData) {
                 this.connection.invoke("MoveMarker", markerId, markerData);
@@ -992,7 +1011,7 @@ var Arma3TacMap;
         }
         map.on('click', function (e) {
             clickPosition = e.latlng;
-            if (e.originalEvent.target.localName == "div" || e.mapCanHandle) {
+            if ((e.originalEvent.target.localName == "div" && !e.originalEvent.target.classList.contains("leaflet-tooltip")) || e.mapCanHandle) {
                 clearpointEditMakers();
                 if (currentTool == 2) {
                     if (hasOrbat) {
@@ -1222,6 +1241,7 @@ var Arma3TacMap;
             if (!layerJson.isDefaultLayer) {
                 layer.listItem = layerTemplate.clone();
                 $('#layers-list').append(layer.listItem);
+                $('select.layers-dropdown').append($('<option />').attr('value', '' + layerJson.id));
             }
             else {
                 layer.listItem = $('#layers-default');
@@ -1230,6 +1250,8 @@ var Arma3TacMap;
         }
         if (!layerJson.isDefaultLayer) {
             layer.listItem.find('.layers-item-label').text(layerJson.data.label);
+            $('select.layers-dropdown option[value=' + layerJson.id + ']').text(layerJson.data.label);
+            $('select.layers-dropdown').selectpicker('refresh');
         } else if (!currentLayer) {
             currentLayer = layer;
         }
@@ -1381,7 +1403,6 @@ var Arma3TacMap;
                 topo.cities = topo.cities || [];
                 topo.tilePattern = '/topo/' + topo.worldName + '/' + topo.tilePattern;
                 topo.isSVG = true;
-                console.log(topo);
                 return topo;
             }
         }

@@ -264,8 +264,15 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="milsymbol-layer" class="control-label">@Localizer["Layer"]</label>
+                            <select class="layers-dropdown form-control" id="milsymbol-layer">
+                                <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-
 
             </div>
             <div class="modal-footer">
@@ -285,7 +292,7 @@
             <div class="modal-header">
                 <h5 class="modal-title">
                     <span id="basicsymbol-grid"></span>
-                    : @Localizer["Basic symbole"]
+                    : @Localizer["Basic symbol"]
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -324,7 +331,18 @@
                             <input type="text" id="basic-label" class="form-control" />
                         </div>
                     </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="basicsymbol-layer" class="control-label">@Localizer["Layer"]</label>
+                            <select class="layers-dropdown form-control" id="basicsymbol-layer">
+                                <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
+                            </select>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger mr-5" id="basicsymbol-delete">@Localizer["Delete"]</button>
@@ -360,9 +378,16 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="line-layer" class="control-label">@Localizer["Layer"]</label>
+                            <select class="layers-dropdown form-control" id="line-layer">
+                                <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <button type="button" class="btn btn-outline-secondary modal-edit-points" data-dismiss="modal"><i class="fas fa-pen"></i> @Localizer["Edit points"]</button>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger mr-5" id="line-delete">@Localizer["Delete"]</button>
@@ -559,6 +584,14 @@
                             {
                                 <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
                             }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mission-layer" class="control-label">@Localizer["Layer"]</label>
+                        <select class="layers-dropdown form-control" id="mission-layer">
+                            <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
                         </select>
                     </div>
                 </div>

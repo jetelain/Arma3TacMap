@@ -238,7 +238,7 @@ namespace Arma3TacMapWebApp.Maps
 
         private async Task SetLayerId(int layerId, TacMapAccess access, TacMapMarker marker)
         {
-            if (await _db.TacMaps.AnyAsync(m => m.ParentTacMapID == access.TacMapID && m.TacMapID == layerId))
+            if (access.TacMapID == layerId || await _db.TacMaps.AnyAsync(m => m.ParentTacMapID == access.TacMapID && m.TacMapID == layerId))
             {
                 marker.TacMapID = layerId;
             }
