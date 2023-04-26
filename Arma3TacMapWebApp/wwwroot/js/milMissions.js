@@ -57,7 +57,7 @@
         return [[c[0] + (n[1] * scale), c[1] + (n[0] * scale)]];
     }
 
-    function curvedLine(a, b, clipDistance) {
+    function curvedLineL(a, b, clipDistance) {
         var dx = b[0] - a[0];
         var dy = b[1] - a[1];
         var distance = Math.sqrt((dx * dx) + (dy * dy));
@@ -68,6 +68,31 @@
         var line = [];
         var clip = clipDistance * clipDistance;
         for (var angle = 0; angle <= Math.PI / 2; angle += Math.PI / 40) {
+            var p = [center[0] + (Math.cos(angle + baseAngle) * radius), center[1] + (Math.sin(angle + baseAngle) * radius)];
+            var px = p[0] - a[0];
+            var py = p[1] - a[1];
+            var pdistsq = px * px + py * py;
+            if (pdistsq >= clip) {
+                if (line.length == 0) {
+                    line.push([a[0] + (px / Math.sqrt(pdistsq) * clipDistance), a[1] + (py / Math.sqrt(pdistsq) * clipDistance)]);
+                }
+                line.push(p);
+            }
+        }
+        return line;
+    }
+
+    function curvedLineR(a, b, clipDistance) {
+        var dx = b[0] - a[0];
+        var dy = b[1] - a[1];
+        var distance = Math.sqrt((dx * dx) + (dy * dy));
+        var vectM45 = [(dx / distance) * 0.7071068 + (dy / distance) * 0.7071068, (dx / distance) * -0.7071068 + (dy / distance) * 0.7071068]; // +1/4 PI
+        var radius = distance / Math.sqrt(2);
+        var center = [a[0] + (vectM45[0] * radius), a[1] + (vectM45[1] * radius)];
+        var baseAngle = Math.atan2(dy, dx) + (1 * Math.PI / 4);
+        var line = [];
+        var clip = clipDistance * clipDistance;
+        for (var angle = Math.PI / 2; angle >= 0; angle -= Math.PI / 40) {
             var p = [center[0] + (Math.cos(angle + baseAngle) * radius), center[1] + (Math.sin(angle + baseAngle) * radius)];
             var px = p[0] - a[0];
             var py = p[1] - a[1];
@@ -163,7 +188,30 @@
                         circle.push([a[0] + (Math.cos(angle) * scale * 2), a[1] + (Math.sin(angle) * scale * 2)]);
                     }
                     // Curved line from start to target
-                    var line = curvedLine(a, b, scale * 2);
+                    var line = curvedLineL(a, b, scale * 2);
+
+                    // Arrow to target (last segment of curved line)
+                    if (line.length > 2) {
+                        var arrow = simpleArrow(line[line.length - 2], line[line.length - 1], scale);
+                        arrow.splice(0, 1);
+                        return [circle, line].concat(arrow);
+                    }
+                    return [circle];
+                },
+        },
+        toSeizeR: {
+            points: 2,
+            generate:
+                function (points, scale) {
+                    var a = points[0];
+                    var b = points[1];
+                    // Circle around start position
+                    var circle = [];
+                    for (var angle = 0; angle <= 2 * Math.PI; angle += Math.PI / 20) {
+                        circle.push([a[0] + (Math.cos(angle) * scale * 2), a[1] + (Math.sin(angle) * scale * 2)]);
+                    }
+                    // Curved line from start to target
+                    var line = curvedLineR(a, b, scale * 2);
 
                     // Arrow to target (last segment of curved line)
                     if (line.length > 2) {

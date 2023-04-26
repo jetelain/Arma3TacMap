@@ -428,7 +428,7 @@ namespace Arma3TacMapWebApp.Maps
             var childLevel = level + 1;
             foreach (var unit in units.Where(u => u.ParentOrbatUnitID == parentID).OrderBy(u => u.Position))
             {
-                unit.RelativeLevel = 0;
+                unit.RelativeLevel = childLevel;
                 yield return unit;
                 foreach (var child in SortAndSetLevel(unit.OrbatUnitID, units.Where(u => u.ParentOrbatUnitID != parentID), childLevel))
                 {
