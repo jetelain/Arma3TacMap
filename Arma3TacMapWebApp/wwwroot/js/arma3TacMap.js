@@ -76,6 +76,35 @@ var Arma3TacMap;
         return symbol;
     }
 
+    // Keep up to date with Arma3TacMapLibrary.Maps.MapExporter
+    var metisSupported = {
+        entity: ["121100", "121102", "121103", "121104", "121105", "120500", "120600", "121000", "150600", "120501"],
+        modifier1: ["98"],
+        modifier2: ["51"],
+        size: ["11", "12", "13", "14", "15", "16", "17", "18", "21", "22", "23", "24"],
+        status: ["1"]
+    };
+
+    function getMetisCompatible(wanted, supported, fallback) {
+        if (supported.includes(wanted)) {
+            return wanted;
+        }
+        return fallback;
+    }
+
+    function getSymbolMetisCompatible() {
+        var symbol = '100';
+        symbol += $('#id2').val() || '0';
+        symbol += '10';
+        symbol += getMetisCompatible($('#status').val() || '0', metisSupported.status, '0');
+        symbol += '0';
+        symbol += getMetisCompatible($('#size').val() || '00', metisSupported.size, '00');
+        symbol += getMetisCompatible($('#icon').val() || '000000', metisSupported.entity, '000000');
+        symbol += getMetisCompatible($('#mod1').val() || '00', metisSupported.modifier1, '00');
+        symbol += getMetisCompatible($('#mod2').val() || '00', metisSupported.modifier2, '00');
+        return symbol;
+    }
+
     function addDegreesToConfig(config, name) {
         var value = $('#' + name).val();
         if (value !== '') {
@@ -146,6 +175,18 @@ var Arma3TacMap;
             })
         );
 
+        var symMetis = new ms.Symbol(getSymbolMetisCompatible(), {
+            size: 40,
+            uniqueDesignation: config.uniqueDesignation
+        });
+        $('#symbolPreviewMetis').empty();
+        $('#symbolPreviewMetis').append($('<img></img>')
+            .attr({
+                src: symMetis.asCanvas(window.devicePixelRatio).toDataURL(),
+                width: symMetis.getSize().width,
+                height: symMetis.getSize().height
+            })
+        );
         return symbol;
     }
 
