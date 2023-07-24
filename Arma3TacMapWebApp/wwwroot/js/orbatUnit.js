@@ -35,6 +35,8 @@ $(function () {
     var id = '0003';
     var symbolset = '10';
 
+    ms.setStandard("APP6"); // We always use APP6 edition D
+
     $('#NatoSymbolSize').empty();
     $.each(echelonMobilityTowedarray(symbolset), function (name, value) {
         var sym = new ms.Symbol(id + symbolset + '00' + value.code + '0000000000', { size: 16 });

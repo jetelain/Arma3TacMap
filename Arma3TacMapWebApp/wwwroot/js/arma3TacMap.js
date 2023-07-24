@@ -3,6 +3,8 @@
 var Arma3TacMap;
 (function (Arma3TacMap) {
 
+    ms.setStandard("APP6"); // We always use APP6 edition D
+
     var intl = new Intl.NumberFormat();
 
     function applySymbolSet() {
