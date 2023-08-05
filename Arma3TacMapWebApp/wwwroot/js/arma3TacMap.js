@@ -80,7 +80,7 @@ var Arma3TacMap;
 
     // Keep up to date with Arma3TacMapLibrary.Maps.MapExporter
     var metisSupported = {
-        entity: ["121100", "121102", "121103", "121104", "121105", "120500", "120600", "121000", "150600", "120501"],
+        entity: ["121100", "121102", "121103", "121104", "121105", "120500", "120600", "121000", "150600", "120501", "111000"],
         modifier1: ["98"],
         modifier2: ["51"],
         size: ["11", "12", "13", "14", "15", "16", "17", "18", "21", "22", "23", "24"],
@@ -98,7 +98,7 @@ var Arma3TacMap;
         var symbol = '100';
         symbol += $('#id2').val() || '0';
         symbol += '10';
-        symbol += getMetisCompatible($('#status').val() || '0', metisSupported.status, '0');
+        symbol += getMetisCompatible($('#status').val() || '0', $('#id2').val() != "4" ? metisSupported.status : [], '0');
         symbol += '0';
         symbol += getMetisCompatible($('#size').val() || '00', metisSupported.size, '00');
         symbol += getMetisCompatible($('#icon').val() || '000000', metisSupported.entity, '000000');

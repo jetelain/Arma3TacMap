@@ -256,12 +256,17 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 case "121000": return 37; // Combined Arms
                 case "150600": return 0; // Intercept
                 case "120501": return 22; // Intercept
+                case "111000": return 28; // Signal
             }
             return 0;
         } 
 
         private static bool ToDashed(char i, char v)
         {
+            if (i == '4')
+            {
+                return false; // Unsupported
+            }
             return v == '1' || i == '5' || i == '2';
         }
 
