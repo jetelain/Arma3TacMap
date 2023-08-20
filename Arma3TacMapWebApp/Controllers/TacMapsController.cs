@@ -486,11 +486,26 @@ namespace Arma3TacMapWebApp.Controllers
             if (ModelState.IsValid)
             {
                 var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, cloneInfos.Label, null, tacMap.TacMap.FriendlyOrbatID, tacMap.TacMap.HostileOrbatID);
-                foreach(var marker in await _mapSvc.GetMarkers(tacMap.TacMapID, true))
+
+                var layerMapping = new Dictionary<int, int>
+                {
+                    { tacMap.TacMapID, clone.TacMapID }
+                };
+
+                foreach (var layer in await _mapSvc.GetLayers(tacMap.TacMapID))
+                {
+                    if (layer.Id != tacMap.TacMapID)
+                    {
+                        var clonedLayer = await _mapSvc.CreateLayer(User, clone, layer.Label);
+                        layerMapping.Add(layer.Id, clonedLayer.Id);
+                    }
+                }
+                
+                foreach (var marker in await _mapSvc.GetMarkers(tacMap.TacMapID, true))
                 {
                     await _context.AddAsync(new TacMapMarker()
                     {
-                        TacMapID = clone.TacMapID,
+                        TacMapID = layerMapping[marker.LayerId],
                         UserID = tacMap.UserID,
                         MarkerData = marker.MarkerData,
                         LastUpdate = DateTime.UtcNow
