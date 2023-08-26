@@ -149,7 +149,6 @@ var Arma3TacMap;
         $('#additionalInformation').val(config.additionalInformation || '');
         $('#reinforcedReduced').val(config.reinforcedReduced || '');
         $('#direction').val(config.direction !== undefined ? (Number(config.direction) * 6400 / 360) : '');
-
         applySymbol();
 
         $('select').selectpicker('render');
@@ -297,6 +296,7 @@ var Arma3TacMap;
 
         if (modalMarkerData.type == 'mil') {
             setSymbol(modalMarkerData.symbol, modalMarkerData.config);
+            $('#milsymbol-scale').val((modalMarkerData.scale ?? 1) * 100);
             $('#milsymbol').modal('show');
             $('#milsymbol-delete').show();
             $('#milsymbol-update').show();
@@ -308,6 +308,7 @@ var Arma3TacMap;
             $('#basic-color').val(modalMarkerData.config.color);
             $('#basic-dir').val(modalMarkerData.config.dir);
             $('#basic-label').val(modalMarkerData.config.label);
+            $('#basic-scale').val((modalMarkerData.scale ?? 1) * 100);
             $('select').selectpicker('render');
 
             $('#basicsymbol').modal('show');
@@ -368,6 +369,7 @@ var Arma3TacMap;
                 type: 'mil',
                 symbol: symbol,
                 config: symbolConfig,
+                scale: Number($('#milsymbol-scale').val()) / 100,
                 pos: [clickPosition.lat, clickPosition.lng]
             });
 
@@ -382,6 +384,7 @@ var Arma3TacMap;
         $('#milsymbol-update').on('click', function () {
             modalMarkerData.symbol = getSymbol();
             modalMarkerData.config = getSymbolConfig();
+            modalMarkerData.scale = Number($('#milsymbol-scale').val()) / 100;
             backend.updateMarkerToLayer(modalMarkerId, Number($('#milsymbol-layer').val()), modalMarkerData);
             $('#milsymbol').modal('hide');
         });
@@ -426,6 +429,7 @@ var Arma3TacMap;
                 type: 'basic',
                 symbol: $('#basic-type').val(),
                 config: { color: $('#basic-color').val(), label: $('#basic-label').val(), dir: $('#basic-dir').val() },
+                scale: Number($('#basic-scale').val()) / 100,
                 pos: [clickPosition.lat, clickPosition.lng]
             });
             $('#basicsymbol').modal('hide');
@@ -439,6 +443,7 @@ var Arma3TacMap;
         $('#basicsymbol-update').on('click', function () {
             modalMarkerData.symbol = $('#basic-type').val();
             modalMarkerData.config = { color: $('#basic-color').val(), label: $('#basic-label').val(), dir: $('#basic-dir').val() };
+            modalMarkerData.scale = Number($('#basic-scale').val()) / 100;
             backend.updateMarkerToLayer(modalMarkerId, Number($('#basicsymbol-layer').val()), modalMarkerData);
             $('#basicsymbol').modal('hide');
         });
@@ -664,8 +669,12 @@ var Arma3TacMap;
 
     function generateIcon(markerData) {
 
+        var size = 32;
+        if (markerData.scale) {
+            size = Number(markerData.scale) * size;
+        }
         if (markerData.type == 'mil') {
-            var symbolConfig = $.extend({ size: 32 }, markerData.config);
+            var symbolConfig = $.extend({ size: size }, markerData.config);
             var sym = new ms.Symbol(markerData.symbol, symbolConfig);
             return L.icon({
                 iconUrl: sym.asCanvas(window.devicePixelRatio).toDataURL(),
@@ -678,7 +687,7 @@ var Arma3TacMap;
 
         if ((markerData.config.label && markerData.config.label.length > 0) || markerData.config.dir) {
 
-            var img = $('<img src="' + url + '" width="32" height="32" />');
+            var img = $('<img src="' + url + '" width="' + size + '" height="' + size + '" />');
             if (markerData.config.dir) {
                 img.css('transform', 'rotate(' + (Number(markerData.config.dir) * 360 / 6400) + 'deg)')
             }
@@ -694,11 +703,11 @@ var Arma3TacMap;
             return new L.DivIcon({
                 className: 'text-marker',
                 html: iconHtml,
-                iconAnchor: [16, 16]
+                iconAnchor: [size / 2, size/2]
             });
         }
 
-        return L.icon({ iconUrl: url, iconSize: [32, 32], iconAnchor: [16, 16] });
+        return L.icon({ iconUrl: url, iconSize: [size, size], iconAnchor: [size / 2, size/2] });
     }
 
     function posToPoints(pos) {

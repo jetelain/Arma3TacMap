@@ -340,11 +340,16 @@ namespace Arma3TacMapWebApp.Controllers
 
                         if (geometry != null)
                         {
-                            features.Add(new Feature(geometry, new Dictionary<string, dynamic>() {
+                            var properties = new Dictionary<string, dynamic>() {
                                 { "tacmap:type", data.type },
                                 { "tacmap:symbol", data.symbol },
                                 { "tacmap:config", data.config }
-                            }));
+                            };
+                            if ( data.scale != null && data.scale != 1)
+                            {
+                                properties.Add("tacmap:scale", data.scale.Value);
+                            }
+                            features.Add(new Feature(geometry, properties));
                         }
                     }
                 }
@@ -405,6 +410,10 @@ namespace Arma3TacMapWebApp.Controllers
                         markerData.symbol = Convert.ToString(symbol);
                         markerData.config = ConvertToDict(config);
                         markerData.pos = ConvertToPos(feature.Geometry);
+                        if (feature.Properties.TryGetValue("tacmap:scale", out var scale))
+                        {
+                            markerData.scale = Convert.ToDouble(scale);
+                        }
                         await _mapSvc.AddMarker(User, mapId, layer.Id, MarkerData.Serialize(markerData));
                     }
                 }

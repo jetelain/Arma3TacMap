@@ -43,19 +43,20 @@ gtd_map_allMetisMarkers = [];
 } forEach _poly;
 
 {
-  _x params ['_id', '_x', '_y', '_icon', '_color', '_text', '_rotate'];
+  _x params ['_id', '_x', '_y', '_icon', '_color', '_text', '_rotate',['_scale',1]];
   private _marker = createMarker [ format ['_USER_DEFINED #0/planops%1/0', _id], [_x, _y]];
   _marker setMarkerShape 'ICON';
   _marker setMarkerDir _rotate;
   _marker setMarkerColor _color; 
   _marker setMarkerText _text;
   _marker setMarkerType _icon;
+  _marker setMarkerSize [_scale,_scale];
   gtd_map_allMarkers pushBack _marker;
 } forEach _icons;
 
 {
-  _x params ['_id', '_x', '_y', '_sideid', '_dashed', '_icon', '_mod1', '_mod2', '_size', '_designation'];
-  private _marker = [[_x,_y], 0, true, [[_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation]] call mts_markers_fnc_createMarker;
+  _x params ['_id', '_x', '_y', '_sideid', '_dashed', '_icon', '_mod1', '_mod2', '_size', '_designation',['_scale',1]];
+  private _marker = [[_x,_y], 0, true, [[_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation], _scale * 1.3] call mts_markers_fnc_createMarker;
   gtd_map_allMetisMarkers pushBack _marker;
 } forEach _metis;
 
@@ -170,7 +171,8 @@ publicVariable 'gtd_map_allMetisMarkers';";
                         ToMod1(data.symbol.Substring(16, 2)),
                         ToMod2(data.symbol.Substring(18, 2)),
                         ToSize(data.symbol.Substring(8, 2)),
-                        Get(data.config, "uniqueDesignation", null) ?? Get(data.config, "higherFormation", null) ?? ""
+                        Get(data.config, "uniqueDesignation", null) ?? Get(data.config, "higherFormation", null) ?? "",
+                        data.scale ?? 1d
                     };
         }
 
@@ -201,7 +203,8 @@ publicVariable 'gtd_map_allMetisMarkers';";
                         data.symbol,
                         Get(data.config, "color", "ColorBlack"),
                         Get(data.config, "label", ""),
-                        !string.IsNullOrEmpty(dir) ? (double.Parse(dir) * 360d / 6400d) : 0d };
+                        !string.IsNullOrEmpty(dir) ? (double.Parse(dir) * 360d / 6400d) : 0d,
+                        data.scale ?? 1d };
         }
 
         private static int ToSize(string v)

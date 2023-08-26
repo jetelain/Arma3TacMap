@@ -265,13 +265,17 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
+                            <label for="milsymbol-scale" class="control-label">@Localizer["Scale"]</label>
+                            <input type="number" id="milsymbol-scale" class="form-control" min="10" max="1000" />
+                        </div>
+                        <div class="form-group col-md-5">
                             <label for="milsymbol-layer" class="control-label">@Localizer["Layer"]</label>
                             <select class="layers-dropdown form-control" id="milsymbol-layer">
                                 <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-6 mb-0">
+                        <div class="form-group col-md-5 mb-0">
                             <p>@Localizer["Export to Metis Marker Preview"]</p>
                             <p id="symbolPreviewMetis" class="mb-0 text-center"></p>
                         </div>
@@ -337,7 +341,11 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group col-md-3">
+                            <label for="basic-scale" class="control-label">@Localizer["Scale"]</label>
+                            <input type="number" id="basic-scale" class="form-control" min="10" max="1000" />
+                        </div>
+                        <div class="form-group col-md-9">
                             <label for="basicsymbol-layer" class="control-label">@Localizer["Layer"]</label>
                             <select class="layers-dropdown form-control" id="basicsymbol-layer">
                                 <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
