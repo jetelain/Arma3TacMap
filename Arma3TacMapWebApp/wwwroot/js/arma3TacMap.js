@@ -716,6 +716,9 @@ var Arma3TacMap;
         $('#note-grid').text(Arma3Map.toGrid(latlng));
         $('#note-dialog').modal('show');
 
+        $('#note-layer').val('' + getCurrentLayerId());
+        $('#note-layer').selectpicker('refresh');
+
         initNoteEditor('');
     }
 
