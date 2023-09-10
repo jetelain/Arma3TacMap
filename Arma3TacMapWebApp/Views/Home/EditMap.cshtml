@@ -622,8 +622,57 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="note-dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span id="note-grid"></span>
+                    : @Localizer["Sticky note"]
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <textarea type="text" id="note-content" rows="10"></textarea>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="note-position" class="control-label">@Localizer["Position"]</label>
+                            <select id="note-position" class="form-control">
+                                <option value="center" selected="selected">@Localizer["Center"]</option>
+                                <option value="right">@Localizer["Right"]</option>
+                                <option value="left">@Localizer["Left"]</option>
+                                <option value="bottom">@Localizer["Bottom"]</option>
+                                <option value="top">@Localizer["Top"]</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="note-layer" class="control-label">@Localizer["Layer"]</label>
+                            <select class="layers-dropdown form-control" id="note-layer">
+                                <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger mr-5" id="note-delete">@Localizer["Delete"]</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                <button type="button" class="btn btn-success" id="note-insert">@Localizer["Insert"]</button>
+                <button type="button" class="btn btn-success" id="note-update">@Localizer["Update"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_MapScripts", Model.InitLiveMap);}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/5.10.7/tinymce.min.js" referrerpolicy="origin"></script>
 }
 @section Styles {
     @{await Html.RenderPartialAsync("_MapStyles", Model.InitLiveMap);}

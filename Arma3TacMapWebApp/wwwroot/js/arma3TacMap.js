@@ -204,6 +204,7 @@ var Arma3TacMap;
     var missionSelection = null;
     var colorPicker;
     var lockAllButton;
+    var noteEditor = null;
 
     var pointEditMarkers = [];
 
@@ -327,6 +328,19 @@ var Arma3TacMap;
             $('#mission-edit-color').val(modalMarkerData.config.color);
             $('select').selectpicker('render');
             $('#mission-edit').modal('show');
+
+        } else if (modalMarkerData.type == 'note') {
+
+            initNoteEditor(modalMarkerData.config.content);
+
+            $('#note-position').val(modalMarkerData.config.position);
+            $('select').selectpicker('render');
+
+            $('#note-dialog').modal('show');
+            $('#note-delete').show();
+            $('#note-update').show();
+            $('#note-insert').hide();
+            $('#note-grid').text(Arma3Map.toGrid(e.latlng));
         }
     };
     function insertMilSymbol(latlng) {
@@ -501,6 +515,35 @@ var Arma3TacMap;
         });
     }
 
+    function noteTool(map, backend) {
+        $('#note-insert').on('click', function () {
+
+            backend.addMarker(Number($('#note-layer').val()), {
+                type: 'note',
+                config: { content: noteEditor.getContent(), position: $('#note-position').val() },
+                pos: [clickPosition.lat, clickPosition.lng]
+            });
+            $('#note-dialog').modal('hide');
+        });
+
+        $('#note-delete').on('click', function () {
+            backend.removeMarker(modalMarkerId);
+            $('#note-dialog').modal('hide');
+        });
+
+        $('#note-update').on('click', function () {
+            modalMarkerData.config = { content: noteEditor.getContent(), position: $('#note-position').val() };
+            backend.updateMarkerToLayer(modalMarkerId, Number($('#note-layer').val()), modalMarkerData);
+            $('#note-dialog').modal('hide');
+        });
+
+        $(document).on('focusin', function (e) {
+            if ($(e.target).closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tam-assetmanager-root").length) {
+                e.stopImmediatePropagation();
+            }
+        });
+    }
+
     function layersModal(backend) {
 
         $('#layers-add').on('click', function () {
@@ -666,6 +709,35 @@ var Arma3TacMap;
         }
     }
 
+    function insertNote(latlng, map, backend) {
+        $('#note-delete').hide();
+        $('#note-update').hide();
+        $('#note-insert').show();
+        $('#note-grid').text(Arma3Map.toGrid(latlng));
+        $('#note-dialog').modal('show');
+
+        initNoteEditor('');
+    }
+
+    function initNoteEditor(data) {
+        if (!noteEditor) {
+            tinymce.init({
+                selector: '#note-content',
+                plugins: 'image fullscreen autolink link',
+                content_css: '/lib/bootstrap/dist/css/bootstrap.min.css,/css/site.css,/css/arma3TacMap.css',
+                toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | image link | fullscreen',
+                height: "350",
+                image_dimensions: false,
+                init_instance_callback: function (editor) {
+                    editor.setContent(data);
+                    noteEditor = editor;
+                }
+            });
+        }
+        else {
+            noteEditor.setContent(data);
+        }
+    }
 
     function generateIcon(markerData) {
 
@@ -770,6 +842,22 @@ var Arma3TacMap;
             }
             if (result.labels) {
                 missionLabels(existing, result, layer.group);
+            }
+        }
+        else if (markerData.type == 'note') {
+            if (existing) {
+                existing.setLatLng(markerData.pos);
+                existing.setContent( markerData.config.content);
+                existing.options.direction = markerData.config.position;
+                existing.options.markerData = markerData;
+                existing.update();
+            } else {
+                var options = { content: markerData.config.content, direction: markerData.config.position, permanent: true, interactive: true, markerId: markerId, markerData: markerData, className: 'stickyNote' };
+                var mapMarker = L.tooltip(markerData.pos, options).addTo(layer.group);
+                if (canEdit) {
+                    mapMarker.on('click', e => updateMarkerHandler(e, map, backend));
+                }
+                markers[markerId] = existing = mapMarker;
             }
         }
         else {
@@ -1044,7 +1132,8 @@ var Arma3TacMap;
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map), // maybe ⬤ ?
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map),
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '<i class="fas fa-ruler"></i>' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 6); }, content: '<i class="fas fa-plus-circle"></i>' }).addTo(map)
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 6); }, content: '<i class="fas fa-plus-circle"></i>' }).addTo(map),
+            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 7); }, content: '<i class="fas fa-sticky-note"></i>' }).addTo(map),
         ];
 
         colorPicker = createColorPicker();
@@ -1055,6 +1144,7 @@ var Arma3TacMap;
         lineMarkerTool(backend);
         measureMarkerTool(backend);
         missionTool(map, backend);
+        noteTool(map, backend);
         layersModal(backend);
 
         var hasOrbat = $('#orbat').length > 0;
@@ -1083,6 +1173,9 @@ var Arma3TacMap;
                 }
                 else if (currentTool == 6) {
                     insertMission(e.latlng, map, backend);
+                }
+                else if (currentTool == 7) {
+                    insertNote(e.latlng, map, backend);
                 }
             }
         });

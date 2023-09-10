@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -169,6 +169,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2037" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.12" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />

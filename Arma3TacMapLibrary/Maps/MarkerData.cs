@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
+using Ganss.Xss;
 
 namespace Arma3TacMapLibrary.Maps
 {
@@ -17,6 +18,19 @@ namespace Arma3TacMapLibrary.Maps
 
         public static string Serialize(MarkerData data)
         {
+            if (data.type == "note")
+            {
+                if (data.config.TryGetValue("content", out var content))
+                {
+                    if (content.Length > 50000)
+                    {
+                        content = content.Substring(0, 50000);
+                    }
+                    var san = new HtmlSanitizer();
+                    data.config["content"] = san.Sanitize(content);
+                }
+                data.config.Remove("html");
+            }
             return JsonSerializer.Serialize<MarkerData>(data, new JsonSerializerOptions() { IgnoreNullValues = true });
         }
 

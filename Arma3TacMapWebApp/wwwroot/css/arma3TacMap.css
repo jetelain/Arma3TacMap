@@ -141,3 +141,28 @@
     background: white;
     cursor: move !important;
 }
+
+.mce-content-body p, .leaflet-tooltip.stickyNote p {
+    margin: 0;
+}
+ .mce-content-body img, .leaflet-tooltip.stickyNote img {
+    max-width: 336px;
+}
+
+.leaflet-tooltip.stickyNote {
+    white-space: normal;
+    width: 350px;
+}
+
+.mce-content-body {
+    margin-right: auto;
+    margin-left: auto;
+    border-left: 2px #CCC dashed;
+    border-right: 2px #CCC dashed;
+    padding-right: 10px;
+    padding-left: 10px;
+    width: 358px;
+    font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+}
