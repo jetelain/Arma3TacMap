@@ -14,5 +14,6 @@ namespace Arma3TacMapWebApp.Models
         public TacMapAccess Access { get; internal set; }
         public List<TacMap> Layers { get; internal set; }
         public bool IsPartialExport { get; internal set; }
+        public int Channel { get; internal set; }
     }
 }

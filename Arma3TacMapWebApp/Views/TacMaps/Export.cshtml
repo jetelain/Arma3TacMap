@@ -66,6 +66,16 @@
                         </li>
                     }
                 </ul>
+                <div class="form-group">
+                    <label for="channel">@Localizer["Channel"]</label>
+                    <select class="form-control" name="channel" asp-for="Channel">
+                        <option value="0">@Localizer["Global channel"]</option>
+                        <option value="1">@Localizer["Side channel"]</option>
+                        <option value="2">@Localizer["Command channel"]</option>
+                        <option value="3">@Localizer["Group channel"]</option>
+                        <option value="4">@Localizer["Vehicle channel"]</option>
+                    </select>
+                </div>
                 <button class="btn btn-primary">@Localizer["Export to Arma3"]</button>
             </form>
         }

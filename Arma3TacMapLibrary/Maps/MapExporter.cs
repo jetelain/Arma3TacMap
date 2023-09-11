@@ -11,7 +11,7 @@ namespace Arma3TacMapLibrary.Maps
 
         private static readonly Lazy<MilMission> milMission = new Lazy<MilMission>(() => new MilMission(), true);
 
-        public static string GetSqf(IEnumerable<StoredMarker> list)
+        public static string GetSqf(IEnumerable<StoredMarker> list, int channel = 0)
         {
             return @"private _data = " + GetData(list) + @";
 
@@ -35,7 +35,7 @@ gtd_map_allMetisMarkers = [];
 {
   _x params ['_id', '_points', '_color'];
   _points params ['_x', '_y'];
-  private _marker = createMarker [ format ['_USER_DEFINED #0/planops%1/0', _id], [_x, _y]];
+  private _marker = createMarker [ format ['_USER_DEFINED #%1/planops%2/" + channel + @"', clientOwner, _id], [_x, _y], " + channel + @"];
   _marker setMarkerShape 'polyline';
   _marker setMarkerPolyline _points;
   _marker setMarkerColor _color; 
@@ -44,7 +44,7 @@ gtd_map_allMetisMarkers = [];
 
 {
   _x params ['_id', '_x', '_y', '_icon', '_color', '_text', '_rotate',['_scale',1]];
-  private _marker = createMarker [ format ['_USER_DEFINED #0/planops%1/0', _id], [_x, _y]];
+  private _marker = createMarker [ format ['_USER_DEFINED #%1/planops%2/" + channel + @"', clientOwner, _id], [_x, _y], " + channel + @"];
   _marker setMarkerShape 'ICON';
   _marker setMarkerDir _rotate;
   _marker setMarkerColor _color; 
@@ -56,7 +56,7 @@ gtd_map_allMetisMarkers = [];
 
 {
   _x params ['_id', '_x', '_y', '_sideid', '_dashed', '_icon', '_mod1', '_mod2', '_size', '_designation',['_scale',1]];
-  private _marker = [[_x,_y], 0, true, [[_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation], _scale * 1.3] call mts_markers_fnc_createMarker;
+  private _marker = [[_x,_y], " + channel + @", true, [[_sideid, _dashed], [_icon, _mod1, _mod2], [_size, false, false], [], _designation], _scale * 1.3] call mts_markers_fnc_createMarker;
   gtd_map_allMetisMarkers pushBack _marker;
 } forEach _metis;
 

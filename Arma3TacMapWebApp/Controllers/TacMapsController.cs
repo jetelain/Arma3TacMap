@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
@@ -263,7 +264,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Export(int id, int[] tacMapIds)
+        public async Task<IActionResult> Export(int id, int[] tacMapIds, int channel = 0)
         {
             var mapAccess = await _mapSvc.GrantReadAccess(User, id, null);
             if (mapAccess == null)
@@ -276,8 +277,9 @@ namespace Arma3TacMapWebApp.Controllers
                 TacMap = mapAccess.TacMap,
                 Access = mapAccess,
                 Layers = new[] { mapAccess.TacMap }.Concat(await _context.TacMaps.Where(m => m.ParentTacMapID == mapAccess.TacMap.TacMapID).ToListAsync()).ToList(),
-                Script = MapExporter.GetSqf((await _mapSvc.GetMarkers(id, true)).Where(m => tacMapIds.Contains(m.LayerId))),
-                IsPartialExport = true
+                Script = MapExporter.GetSqf((await _mapSvc.GetMarkers(id, true)).Where(m => tacMapIds.Contains(m.LayerId)), channel),
+                IsPartialExport = true,
+                Channel = channel
             });
         }
 
