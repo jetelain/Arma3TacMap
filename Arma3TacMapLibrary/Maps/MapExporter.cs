@@ -92,7 +92,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
             var metisMarkers = new List<List<object>>();
             foreach (var marker in markers)
             {
-                var data = JsonSerializer.Deserialize<MarkerData>(marker.MarkerData);
+                var data = MarkerData.Deserialize(marker.MarkerData);
                 if (data.type == "basic")
                 {
                     iconMarkers.Add(GetBasic(marker.Id, data));

@@ -31,12 +31,21 @@ namespace Arma3TacMapLibrary.Maps
                 }
                 data.config.Remove("html");
             }
+            if (data.scale == 0)
+            {
+                data.scale = null;
+            }
             return JsonSerializer.Serialize<MarkerData>(data, new JsonSerializerOptions() { IgnoreNullValues = true });
         }
 
         public static MarkerData Deserialize(string data)
         {
-            return JsonSerializer.Deserialize<MarkerData>(data, new JsonSerializerOptions() { IgnoreNullValues = true });
+            var markerdata = JsonSerializer.Deserialize<MarkerData>(data, new JsonSerializerOptions() { IgnoreNullValues = true });
+            if (markerdata.scale == 0)
+            {
+                markerdata.scale = null;
+            }
+            return markerdata;
         }
     }
 }
