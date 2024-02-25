@@ -142,7 +142,7 @@ namespace Arma3TacMapLibrary.Arma3
             while ((i = str.Peek()) != -1)
             {
                 char c = (char)i;
-                if (char.IsDigit(c) || c == '.' || c == '-' || c == 'e')
+                if (char.IsDigit(c) || c == '.' || c == '-' || c == 'e' || c == '+')
                 {
                     str.Read();
                     sb.Append(c);

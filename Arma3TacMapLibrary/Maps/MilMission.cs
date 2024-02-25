@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Linq;
 using Esprima;
 using Esprima.Ast;
@@ -22,8 +20,8 @@ namespace Arma3TacMapLibrary.Maps
 
         public MilMission(string script)
         {
-            var parser = new JavaScriptParser(script, new ParserOptions() { Tolerant = true });
-            this.script = parser.ParseScript();
+            var parser = new JavaScriptParser(new ParserOptions() { Tolerant = true });
+            this.script = parser.ParseScript(script);
         }
 
         private static string ReadEmbedded()
