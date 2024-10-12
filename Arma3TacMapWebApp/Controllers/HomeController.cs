@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Arma3TacMapLibrary;
-using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
+using Arma3TacMapWebApp.Services.GameMapStorage;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,13 +21,13 @@ namespace Arma3TacMapWebApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly MapInfosService _mapInfos;
+        private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
         private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
         {
             _logger = logger;
             _mapInfos = mapInfos;
@@ -36,12 +39,22 @@ namespace Arma3TacMapWebApp.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var games = new List<GameJsonBase>();
+            var allGames = await _mapInfos.GetGames();
+            foreach (var game in allGames)
+            {
+                var maps = await _mapInfos.GetMaps(game.Name!);
+                if (maps.Length > 0)
+                {
+                    games.Add(game);
+                }
+            }
             var vm = new IndexViewModel();
-            vm.Maps = await _mapInfos.GetMapsInfos();
+            vm.Games = games;
             vm.TacMaps = await _mapSvc.GetUserMaps(User, 6);
             foreach(var map in vm.TacMaps)
             {
-                map.TacMap.MapInfos = vm.Maps.FirstOrDefault(m => m.worldName == map.TacMap.WorldName);
+                map.TacMap.MapInfos = await _mapInfos.GetMapBase(map.TacMap.GameName, map.TacMap.WorldName);
             }
             return View(vm);
         }
@@ -72,8 +85,23 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
+
+            var game = await _mapInfos.GetGame(access.TacMap.GameName) ?? throw new ApplicationException("Unknown game");
+
+            var baseUri = _mapInfos.BaseUri.AbsoluteUri;
+
+            foreach (var marker in game.Markers)
+            {
+                if (marker.IsColorCompatible) // Ensure contrast
+                {
+                    marker.ImagePng = $"{baseUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.png";
+                    marker.ImageWebp = $"{baseUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.webp";
+                }
+            }
+
             return View(new EditMapViewModel()
             {
+                Game = game,
                 InitLiveMap = new LiveMapModel()
                 {
                     endpoint = Arma3MapHelper.GetEndpoint(_configuration),
@@ -174,5 +202,27 @@ namespace Arma3TacMapWebApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        [Route("css/game-{gameName}.css")]
+        public async Task<IActionResult> ViewMapScreenShot(string gameName)
+        {
+            var game = await _mapInfos.GetGame(gameName);
+            if (game == null)
+            {
+                return NotFound();
+            }
+            var sb = new StringBuilder();
+            if (game.Colors != null)
+            {
+                foreach (var color in game.Colors)
+                {
+                    sb.Append($".game-bg-{color.Name!.ToLowerInvariant()} {{ color: {color.ContrastHexadecimal} !important; background-color: {color.Hexadecimal} !important; }}");
+                    sb.AppendLine();
+                }
+            }
+            return Content(sb.ToString(), "text/css");
+        }
+
     }
 }

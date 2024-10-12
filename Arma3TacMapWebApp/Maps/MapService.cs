@@ -43,7 +43,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
-        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label, Uri eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
+        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string gameName, string label, Uri? eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
         {
             var dbUser = await GetOrCreateUser(user);
             if (dbUser == null)
@@ -57,6 +57,7 @@ namespace Arma3TacMapWebApp.Maps
                 EventHref = eventHref,
                 Owner = dbUser,
                 WorldName = worldName,
+                GameName = gameName ?? "arma3",
                 ReadWriteToken = GenerateToken(),
                 ReadOnlyToken = GenerateToken(),
                 FriendlyOrbatID = friendlyOrbatID,
@@ -88,6 +89,7 @@ namespace Arma3TacMapWebApp.Maps
                 Label = label,
                 OwnerUserID = access.TacMap.OwnerUserID,
                 WorldName = access.TacMap.WorldName,
+                GameName = access.TacMap.GameName,
                 ReadWriteToken = GenerateToken(),
                 ReadOnlyToken = GenerateToken(),
                 Parent = access.TacMap
@@ -402,7 +404,8 @@ namespace Arma3TacMapWebApp.Maps
             return new StaticMapData()
             {
                 Markers = await GetMarkers(map.TacMapID, true),
-                WorldName = map.WorldName
+                WorldName = map.WorldName,
+                GameName = map.GameName
             };
         }
 

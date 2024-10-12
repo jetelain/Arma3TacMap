@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Arma3TacMapLibrary.Maps;
 
 namespace Arma3TacMapWebApp.Models
@@ -13,5 +10,6 @@ namespace Arma3TacMapWebApp.Models
         public string WorldName { get; set; }
 
         public double[] Center { get; set; }
+        public string GameName { get; set; }
     }
 }

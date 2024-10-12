@@ -83,6 +83,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 Id = access.TacMap.TacMapID,
                 WorldName = access.TacMap.WorldName,
+                GameName = access.TacMap.GameName,
                 Label = access.TacMap.Label,
                 EventHref = access.TacMap.EventHref,
                 Markers = includeMarkers ? await _mapSvc.GetMarkers(access.TacMap.TacMapID, true) : null,
@@ -108,7 +109,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ApiTacMapCreate value)
         {
-            var id = await _mapSvc.CreateMap(User, value.WorldName, value.Label, value.EventHref);
+            var id = await _mapSvc.CreateMap(User, value.WorldName, value.GameName, value.Label, value.EventHref);
             if (value.Markers != null && value.Markers.Count > 0 )
             {
                 var dbUser = await _mapSvc.GetUser(User);

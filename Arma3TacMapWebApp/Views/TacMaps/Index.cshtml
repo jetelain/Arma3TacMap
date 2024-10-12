@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Arma3TacMapWebApp.Entities.TacMapAccess>
+﻿@model IndexViewModel
 @inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
@@ -8,19 +8,32 @@
 <div class="container">
     <h1>@Localizer["Tactical maps"]</h1>
     <p>
-        <a class="btn btn-primary" asp-action="Create">@Localizer["Create tactical map"]</a>
+        <span class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                @Localizer["Create tactical map"]
+            </button>
+            <span class="dropdown-menu w-100">
+                @foreach (var game in Model.Games)
+                {
+                    <a class="dropdown-item" asp-action="Create" asp-route-gameName="@game.Name">@game.EnglishTitle</a>
+                }
+            </span>
+        </span>
     </p>
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.TacMap.Label)
+                    @Html.DisplayNameFor(model => model.TacMaps[0].TacMap.Label)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TacMap.Created)
+                    @Html.DisplayNameFor(model => model.TacMaps[0].TacMap.Created)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TacMap.WorldName)
+                    @Html.DisplayNameFor(model => model.TacMaps[0].TacMap.GameName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TacMaps[0].TacMap.WorldName)
                 </th>
                 <th>
                     @Localizer["Access"]
@@ -29,7 +42,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.TacMaps)
             {
                 var action = item.CanWrite ? "EditMap" : "ViewMap";
                 <tr>
@@ -40,7 +53,10 @@
                         @Html.DisplayFor(modelItem => item.TacMap.Created)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.TacMap.MapInfos.title)
+                        @Html.DisplayFor(modelItem => item.TacMap.GameName)
+                    </td>
+                    <td>
+                        @(item.TacMap.MapInfos?.EnglishTitle ?? item.TacMap.WorldName)
                     </td>
                     <td>
                         @if (item.TacMap.OwnerUserID == item.UserID)

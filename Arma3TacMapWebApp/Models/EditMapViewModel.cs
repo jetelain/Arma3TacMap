@@ -2,6 +2,7 @@
 using System.Linq;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 
 namespace Arma3TacMapWebApp.Models
 {
@@ -16,5 +17,7 @@ namespace Arma3TacMapWebApp.Models
         public LiveMapModel InitLiveMap { get; set; }
 
         public bool HasTopo => new[] { "xcam_taunus", "gossi", "gtd_taunus", "altis" }.Contains(Access.TacMap.WorldName);
+
+        public GameJson? Game { get; internal set; }
     }
 }

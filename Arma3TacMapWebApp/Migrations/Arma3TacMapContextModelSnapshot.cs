@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
@@ -13,8 +15,7 @@ namespace Arma3TacMapWebApp.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.14");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.Orbat", b =>
                 {
@@ -42,7 +43,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("OwnerUserID");
 
-                    b.ToTable("Orbat");
+                    b.ToTable("Orbat", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.OrbatUnit", b =>
@@ -100,7 +101,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("ParentOrbatUnitID");
 
-                    b.ToTable("OrbatUnit");
+                    b.ToTable("OrbatUnit", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.TacMap", b =>
@@ -118,6 +119,12 @@ namespace Arma3TacMapWebApp.Migrations
                     b.Property<int?>("FriendlyOrbatID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("GameName")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("arma3");
+
                     b.Property<int?>("HostileOrbatID")
                         .HasColumnType("INTEGER");
 
@@ -129,6 +136,9 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ParentTacMapID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Phase")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReadOnlyToken")
@@ -151,7 +161,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("ParentTacMapID");
 
-                    b.ToTable("TacMap");
+                    b.ToTable("TacMap", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.TacMapAccess", b =>
@@ -175,7 +185,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("TacMapAccess");
+                    b.ToTable("TacMapAccess", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.TacMapMarker", b =>
@@ -188,6 +198,7 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MarkerData")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TacMapID")
@@ -202,7 +213,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("TacMapMarker");
+                    b.ToTable("TacMapMarker", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.User", b =>
@@ -218,11 +229,12 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserLabel")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("UserID");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.UserApiKey", b =>
@@ -232,9 +244,11 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("HashedKey")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Salt")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserID")
@@ -247,7 +261,7 @@ namespace Arma3TacMapWebApp.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("UserApiKey");
+                    b.ToTable("UserApiKey", (string)null);
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.Orbat", b =>

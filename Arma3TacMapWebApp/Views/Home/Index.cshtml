@@ -32,18 +32,15 @@
             <h2>@Localizer["Create tactical map"]</h2>
 
             <div class="row justify-content-center">
-                @foreach (var map in Model.Maps)
+                @foreach (var map in Model.Games)
                 {
-                    <a class="btn btn-outline-secondary m-2" asp-action="CreateMap" asp-route-id="@map.worldName">
+                    <a class="btn btn-outline-secondary m-2" asp-controller="TacMaps" asp-action="Create" asp-route-gameName="@map.Name">
                         <div class="card">
-                            <img class="card-img" src="@map.fullMapTile" width="128" height="128" style="width:128px; height:128px;" />
-                            <div class="card-img-overlay d-flex p-0">
-                                <p class="text-dark align-self-center mx-auto btn-image-text">@map.title</p>
-                            </div>
+                            <img class="card-img" src="@map.LogoPng" style="max-width:128px; max-height:128px;" />
                         </div>
                     </a>
                 }
-            </div>
+            </div> 
         </div>
         <div class="col-md-6">
             <h2>@Localizer["Existing tactical maps"]</h2>
@@ -68,7 +65,7 @@
                                     <h5 class="card-title">
                                         <a asp-action="@action" asp-route-id="@map.TacMapID">@map.TacMap.Label</a>
                                         <span class="small">
-                                            @map.TacMap.MapInfos.title
+                                            @(map.TacMap.MapInfos?.EnglishTitle ?? map.TacMap.WorldName)
                                             @if (map.TacMap.OwnerUserID != map.UserID)
                                             {
                                                 <br /> @Localizer["shared by {0}", @map.TacMap.Owner.UserLabel]
@@ -91,7 +88,3 @@
     </div>
 
 </div>
-
-@section Styles {
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
-}

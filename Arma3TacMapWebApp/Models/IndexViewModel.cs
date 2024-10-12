@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Arma3TacMapLibrary.Arma3;
+﻿using System.Collections.Generic;
 using Arma3TacMapWebApp.Entities;
-using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 
 namespace Arma3TacMapWebApp.Models
 {
     public class IndexViewModel
     {
-        public List<MapInfos> Maps { get; set; }
+        //public List<MapInfos> Maps { get; set; }
         public List<TacMapAccess> TacMaps { get; internal set; }
+        public List<GameJsonBase> Games { get; internal set; }
     }
 }

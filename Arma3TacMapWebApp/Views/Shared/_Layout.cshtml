@@ -14,6 +14,9 @@
     }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/fontawesome.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/brands.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/solid.min.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -38,7 +41,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Orbats" asp-action="Index">@Localizer["ORBATs"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"] <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="https://github.com/jetelain/Arma3TacMap/wiki" target="_blank">@Localizer["Help"]</a>

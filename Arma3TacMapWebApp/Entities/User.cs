@@ -11,7 +11,7 @@ namespace Arma3TacMapWebApp.Entities
 
         public string UserLabel { get; set; }
 
-        public string SteamId { get; set; }
+        public string? SteamId { get; set; }
 
         public bool IsService { get; set; }
 

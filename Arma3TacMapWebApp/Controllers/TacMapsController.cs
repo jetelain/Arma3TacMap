@@ -6,11 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
+using Arma3TacMapWebApp.Services.GameMapStorage;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 using BAMCIS.GeoJSON;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,12 +31,12 @@ namespace Arma3TacMapWebApp.Controllers
     public class TacMapsController : Controller
     {
         private readonly Arma3TacMapContext _context;
-        private readonly MapInfosService _mapInfos;
+        private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
 
-        public TacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
+        public TacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapInfos = mapInfos;
@@ -45,24 +48,42 @@ namespace Arma3TacMapWebApp.Controllers
         // GET: TacMaps
         public async Task<IActionResult> Index()
         {
-            var maps = await _mapInfos.GetMapsInfos();
-            var list = await _mapSvc.GetUserMaps(User);
-            foreach (var map in list)
+            var games = new List<GameJsonBase>();
+            var allGames = await _mapInfos.GetGames();
+            foreach (var game in allGames)
             {
-                map.TacMap.MapInfos = maps.FirstOrDefault(m => m.worldName == map.TacMap.WorldName);
+                var maps = await _mapInfos.GetMaps(game.Name!);
+                if (maps.Length > 0)
+                {
+                    games.Add(game);
+                }
             }
-            return View(list);
+
+            var vm = new IndexViewModel();
+            vm.Games = games;
+            vm.TacMaps = await _mapSvc.GetUserMaps(User);
+            foreach (var map in vm.TacMaps)
+            {
+                map.TacMap.MapInfos = await _mapInfos.GetMapBase(map.TacMap.GameName, map.TacMap.WorldName);
+            }
+            return View(vm);
         }
 
         // GET: TacMaps/Create
-        public async Task<IActionResult> Create(string worldName)
+        public async Task<IActionResult> Create(string worldName, string gameName = "arma3")
         {
             var user = await _mapSvc.GetUser(User);
             await PrepareOrbatDropdown(user);
-            ViewBag.Maps = await _mapInfos.GetMapsInfos(); 
+            var maps = (await _mapInfos.GetMaps(gameName)).OrderBy(m => m.EnglishTitle).ToList();
+            if (string.IsNullOrEmpty(worldName) && maps.Count > 0)
+            {
+                worldName = maps.First().Name;
+            }
+            ViewBag.Maps = maps;
             return View(new TacMap()
             {
                 WorldName = worldName,
+                GameName = gameName,
                 Label = "Carte tactique sans nom"
             });
         }
@@ -88,14 +109,14 @@ namespace Arma3TacMapWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Label,WorldName,FriendlyOrbatID,HostileOrbatID")] TacMap tacMap)
+        public async Task<IActionResult> Create([Bind("Label,WorldName,GameName,FriendlyOrbatID,HostileOrbatID")] TacMap tacMap)
         {
             if (ModelState.IsValid)
             {
-                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.Label, null, tacMap.FriendlyOrbatID, tacMap.HostileOrbatID);
+                var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.GameName, tacMap.Label, null, tacMap.FriendlyOrbatID, tacMap.HostileOrbatID);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
-            ViewBag.Maps = await _mapInfos.GetMapsInfos();
+            ViewBag.Maps = await _mapInfos.GetMaps(tacMap.GameName);
             return View(tacMap);
         }
 
@@ -496,7 +517,7 @@ namespace Arma3TacMapWebApp.Controllers
             }
             if (ModelState.IsValid)
             {
-                var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, cloneInfos.Label, null, tacMap.TacMap.FriendlyOrbatID, tacMap.TacMap.HostileOrbatID);
+                var clone = await _mapSvc.CreateMap(User, tacMap.TacMap.WorldName, tacMap.TacMap.GameName, cloneInfos.Label, null, tacMap.TacMap.FriendlyOrbatID, tacMap.TacMap.HostileOrbatID);
 
                 var layerMapping = new Dictionary<int, int>
                 {
