@@ -19,5 +19,12 @@ namespace cTabWebAppTests
             Assert.AreEqual(true, value[5]);
             Assert.AreEqual(false, value[6]);
         }
+
+        [TestMethod]
+        public void ArmaSerializer_ParseDouble()
+        {
+            Assert.AreEqual(1.04858e+12, ArmaSerializer.ParseDouble("1.04858e+12"));
+            Assert.AreEqual(1.04858e-12, ArmaSerializer.ParseDouble("1.04858e-12"));
+        }
     }
 }
