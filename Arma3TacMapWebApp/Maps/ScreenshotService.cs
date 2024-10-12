@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using PuppeteerSharp;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using PuppeteerSharp;
 
 namespace Arma3TacMapWebApp.Maps
 {
@@ -73,7 +69,6 @@ namespace Arma3TacMapWebApp.Maps
             {
                 Headless = true,
                 ExecutablePath = chromePath,
-                IgnoreHTTPSErrors = true,
                 DefaultViewport = new ViewPortOptions() { Width = 2048, Height = 2048 }
             });
         }
