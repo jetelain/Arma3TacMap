@@ -80,24 +80,14 @@ namespace Arma3TacMapWebApp.Controllers
         [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> EditMap(int id, string t, string view)
         {
-            TacMapAccess access = await _mapSvc.GrantWriteAccess(User, id, t); 
+            TacMapAccess access = await _mapSvc.GrantWriteAccess(User, id, t);
             if (access == null)
             {
                 return Forbid();
             }
 
             var game = await _mapInfos.GetGame(access.TacMap.GameName) ?? throw new ApplicationException("Unknown game");
-
-            var baseUri = _mapInfos.BaseUri.AbsoluteUri;
-
-            foreach (var marker in game.Markers)
-            {
-                if (marker.IsColorCompatible) // Ensure contrast
-                {
-                    marker.ImagePng = $"{baseUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.png";
-                    marker.ImageWebp = $"{baseUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.webp";
-                }
-            }
+            var gameMap = await _mapInfos.GetMap(access.TacMap.GameName, access.TacMap.WorldName) ?? throw new ApplicationException("Unknown map");
 
             return View(new EditMapViewModel()
             {
@@ -114,7 +104,10 @@ namespace Arma3TacMapWebApp.Controllers
                         ReadToken = null
                     },
                     worldName = access.TacMap.WorldName,
-                    view = view
+                    view = view,
+                    Game = game,
+                    GameMap = gameMap,
+                    GmsBaseUri = _mapInfos.BaseUri.AbsoluteUri
                 },
                 Access = access,
                 Friendly = await _mapSvc.GetOrbatUnits(access.TacMap.FriendlyOrbatID),
@@ -130,6 +123,9 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
+            var game = await _mapInfos.GetGame(access.TacMap.GameName) ?? throw new ApplicationException("Unknown game");
+            var gameMap = await _mapInfos.GetMap(access.TacMap.GameName, access.TacMap.WorldName) ?? throw new ApplicationException("Unknown map");
+
             ViewBag.IsFullScreen = false;
             return View(new EditMapViewModel()
             {
@@ -146,7 +142,10 @@ namespace Arma3TacMapWebApp.Controllers
                         ReadToken = t
                     },
                     worldName = access.TacMap.WorldName,
-                    view = view
+                    view = view,
+                    Game = game,
+                    GameMap = gameMap,
+                    GmsBaseUri = _mapInfos.BaseUri.AbsoluteUri
                 }
             });
         }
@@ -159,13 +158,19 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
+            var game = await _mapInfos.GetGame(data.GameName) ?? throw new ApplicationException("Unknown game");
+            var gameMap = await _mapInfos.GetMap(data.GameName, data.WorldName) ?? throw new ApplicationException("Unknown map");
+
             ViewBag.IsFullScreen = true;
             return View(new StaticMapModel(){
                 center = data.Center,
+                GmsBaseUri = _mapInfos.BaseUri.AbsolutePath,
                 endpoint = Arma3MapHelper.GetEndpoint(_configuration),
                 markers = data.Markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData)),
                 worldName = data.WorldName,
-                fullScreen = true
+                fullScreen = true,
+                GameMap=gameMap,
+                Game=game
             });
         }
 

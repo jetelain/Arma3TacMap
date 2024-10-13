@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Entities;
@@ -41,9 +42,14 @@ namespace Arma3TacMapWebApp
             services.AddHttpClient();
             services.AddControllersWithViews()
                 .AddViewLocalization()
-                .AddDataAnnotationsLocalization(options => {
+                .AddDataAnnotationsLocalization(options =>
+                {
                     options.DataAnnotationLocalizerProvider = (type, factory) =>
                         factory.Create(typeof(SharedResource));
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             services.AddSignalR();

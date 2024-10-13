@@ -34,10 +34,8 @@
             <div class="row justify-content-center">
                 @foreach (var map in Model.Games)
                 {
-                    <a class="btn btn-outline-secondary m-2" asp-controller="TacMaps" asp-action="Create" asp-route-gameName="@map.Name">
-                        <div class="card">
-                            <img class="card-img" src="@map.LogoPng" style="max-width:128px; max-height:128px;" />
-                        </div>
+                    <a class="btn btn-outline-secondary m-2 p-3" asp-controller="TacMaps" asp-action="Create" asp-route-gameName="@map.Name">
+                        <img src="@map.LogoPng" class="bg-white" style="max-width:128px; max-height:128px;" alt="@map.EnglishTitle" title="@map.EnglishTitle" />
                     </a>
                 }
             </div> 

@@ -39,7 +39,7 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
             });
         }
 
-        private async Task<T?> Get<T>(string uri) where T : class
+        private async Task<T?> Get<T>(string uri, Action<T>? postProcess = null) where T : class
         {
             if (!memoryCache.TryGetValue(uri, out T? value) || value == null)
             {
@@ -47,6 +47,10 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
 
                 if (value != null)
                 {
+                    if (postProcess != null)
+                    {
+                        postProcess(value);
+                    }
                     using var entry = memoryCache.CreateEntry(uri);
                     entry.SlidingExpiration = TimeSpan.FromHours(1);
                     entry.Value = value;
@@ -89,7 +93,22 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
         /// <returns></returns>
         public Task<GameJson?> GetGame(string gameNameOrId)
         {
-            return Get<GameJson>($"/api/v1/games/{gameNameOrId}");
+            return Get<GameJson>($"/api/v1/games/{gameNameOrId}", EnsureContrast);
+        }
+
+        private void EnsureContrast(GameJson game)
+        {
+            if (game.Markers != null)
+            {
+                foreach (var marker in game.Markers)
+                {
+                    if (marker.IsColorCompatible) // Ensure contrast
+                    {
+                        marker.ImagePng = $"{BaseUri.AbsoluteUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.png";
+                        marker.ImageWebp = $"{BaseUri.AbsoluteUri}data/{game.GameId}/markers/808080/{marker.GameMarkerId}.webp";
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -60,7 +60,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost("{id}/grant")]
         public async Task<IActionResult> GrantReadWrite(int id, [FromForm] string readWriteToken, [FromForm] string readOnlyToken)
         {
-            TacMapAccess access;
+            TacMapAccess? access;
             if (!string.IsNullOrEmpty(readWriteToken))
             {
                 access = await _mapSvc.GrantWriteAccess(User, id, readWriteToken);
