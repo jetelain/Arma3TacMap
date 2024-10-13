@@ -49,9 +49,11 @@ namespace Arma3TacMapWebApp.Controllers
                     games.Add(game);
                 }
             }
-            var vm = new IndexViewModel();
-            vm.Games = games;
-            vm.TacMaps = await _mapSvc.GetUserMaps(User, 6);
+            var vm = new IndexViewModel()
+            {
+                Games = games,
+                TacMaps = await _mapSvc.GetUserMaps(User, 6)
+            };
             foreach(var map in vm.TacMaps)
             {
                 map.TacMap.MapInfos = await _mapInfos.GetMapBase(map.TacMap.GameName, map.TacMap.WorldName);
@@ -209,7 +211,7 @@ namespace Arma3TacMapWebApp.Controllers
 
 
         [Route("css/game-{gameName}.css")]
-        public async Task<IActionResult> ViewMapScreenShot(string gameName)
+        public async Task<IActionResult> GameCssContent(string gameName)
         {
             var game = await _mapInfos.GetGame(gameName);
             if (game == null)

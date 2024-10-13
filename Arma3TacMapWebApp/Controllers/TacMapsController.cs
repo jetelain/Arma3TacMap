@@ -59,9 +59,11 @@ namespace Arma3TacMapWebApp.Controllers
                 }
             }
 
-            var vm = new IndexViewModel();
-            vm.Games = games;
-            vm.TacMaps = await _mapSvc.GetUserMaps(User);
+            var vm = new IndexViewModel()
+            {
+                Games = games,
+                TacMaps = await _mapSvc.GetUserMaps(User)
+            };
             foreach (var map in vm.TacMaps)
             {
                 map.TacMap.MapInfos = await _mapInfos.GetMapBase(map.TacMap.GameName, map.TacMap.WorldName);

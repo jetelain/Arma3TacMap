@@ -6,8 +6,7 @@ namespace Arma3TacMapWebApp.Models
 {
     public class IndexViewModel
     {
-        //public List<MapInfos> Maps { get; set; }
-        public List<TacMapAccess> TacMaps { get; internal set; }
-        public List<GameJsonBase> Games { get; internal set; }
+        public required List<TacMapAccess> TacMaps { get; set; }
+        public required List<GameJsonBase> Games { get; set; }
     }
 }
