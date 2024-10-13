@@ -12,7 +12,7 @@ namespace Arma3TacMapWebApp.Models
 
         string init { get; }
 
-        string view { get; }
+        string? view { get; }
 
         GameJson Game { get; }
 

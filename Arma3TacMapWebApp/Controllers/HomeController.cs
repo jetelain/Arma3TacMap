@@ -80,7 +80,7 @@ namespace Arma3TacMapWebApp.Controllers
         [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> EditMap(int id, string t, string view)
         {
-            TacMapAccess access = await _mapSvc.GrantWriteAccess(User, id, t);
+            var access = await _mapSvc.GrantWriteAccess(User, id, t);
             if (access == null)
             {
                 return Forbid();
@@ -91,7 +91,6 @@ namespace Arma3TacMapWebApp.Controllers
 
             return View(new EditMapViewModel()
             {
-                Game = game,
                 InitLiveMap = new LiveMapModel()
                 {
                     endpoint = Arma3MapHelper.GetEndpoint(_configuration),
@@ -116,7 +115,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [Route("ViewMap/{id}")]
-        public async Task<IActionResult> ViewMap(int id, string t, string view)
+        public async Task<IActionResult> ViewMap(int id, string? t = null, string? view = null)
         {
             var access = await _mapSvc.GrantReadAccess(User, id, t);
             if (access == null)

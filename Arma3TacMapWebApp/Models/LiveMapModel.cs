@@ -15,7 +15,7 @@ namespace Arma3TacMapWebApp.Models
 
         public bool isReadOnly { get; set; }
 
-        public string view { get; set; }
+        public string? view { get; set; }
 
         public required GameJson Game { get; set; }
 
