@@ -314,7 +314,7 @@
                             <select id="basic-type" class="form-control">
                                 @foreach (var type in Model.Game.Markers)
                                 {
-                                    <option data-content="<img src='@(type.ImagePng)' height='24' /> @(type.EnglishTitle)" value="@type">@(type.EnglishTitle)</option>
+                                    <option data-content="<img src='@(type.ImagePng)' height='24' /> @(type.EnglishTitle)" value="@type.Name.ToLowerInvariant()">@(type.EnglishTitle)</option>
                                 }
                             </select>
                         </div>
@@ -323,7 +323,7 @@
                             <select id="basic-color" class="form-control">
                                 @foreach (var color in Model.Game.Colors)
                                 {
-                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color">@color.EnglishTitle</option>
+                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
@@ -385,7 +385,7 @@
                             <select id="line-color" class="form-control">
                                 @foreach (var color in Model.Game.Colors)
                                 {
-                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color">@color.EnglishTitle</option>
+                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
@@ -517,7 +517,7 @@
                         <select id="mission-selector-color" class="form-control">
                             @foreach (var color in Model.Game.Colors)
                             {
-                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color">@color.EnglishTitle</option>
+                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>
@@ -598,7 +598,7 @@
                         <select id="mission-edit-color" class="form-control">
                             @foreach (var color in Model.Game.Colors)
                             {
-                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color">@color.EnglishTitle</option>
+                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>

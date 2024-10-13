@@ -191,7 +191,29 @@ var Arma3TacMap;
         return symbol;
     }
 
-    var basicColors = { "ColorBlack": "000000", "ColorGrey": "7F7F7F", "ColorRed": "E50000", "ColorBrown": "7F3F00", "ColorOrange": "D86600", "ColorYellow": "D8D800", "ColorKhaki": "7F9966", "ColorGreen": "00CC00", "ColorBlue": "0000FF", "ColorPink": "FF4C66", "ColorWhite": "FFFFFF", "ColorUNKNOWN": "B29900", "colorBLUFOR": "004C99", "colorOPFOR": "7F0000", "colorIndependent": "007F00", "colorCivilian": "66007F" };
+    var basicColors = {
+        "colorblack": "#000000",
+        "colorgrey": "#7f7f7f",
+        "colorred": "#e50000",
+        "colorbrown": "#7f3f00",
+        "colororange": "#d86600",
+        "coloryellow": "#d8d800",
+        "colorkhaki": "#7f9966",
+        "colorgreen": "#00cc00",
+        "colorblue": "#0000ff",
+        "colorpink": "#ff4c66",
+        "colorwhite": "#ffffff",
+        "colorunknown": "#b29900",
+        "colorblufor": "#004c99",
+        "coloropfor": "#7f0000",
+        "colorindependent": "#007f00",
+        "colorcivilian": "#66007f"
+    };
+
+    function colorToCss(color) {
+        return basicColors[(color || '').toLowerCase()] || '#000000';
+    }
+
 
     var modalMarkerId;
     var modalMarker;
@@ -306,7 +328,7 @@ var Arma3TacMap;
 
         } else if (modalMarkerData.type == 'basic') {
             $('#basic-type').val(modalMarkerData.symbol);
-            $('#basic-color').val(modalMarkerData.config.color);
+            $('#basic-color').val(modalMarkerData.config.color.toLowerCase());
             $('#basic-dir').val(modalMarkerData.config.dir);
             $('#basic-label').val(modalMarkerData.config.label);
             $('#basic-scale').val((modalMarkerData.scale ?? 1) * 100);
@@ -319,13 +341,13 @@ var Arma3TacMap;
             $('#basicsymbol-grid').text(Arma3Map.toGrid(e.latlng));
 
         } else if (modalMarkerData.type == 'line') {
-            $('#line-color').val(modalMarkerData.config.color);
+            $('#line-color').val(modalMarkerData.config.color.toLowerCase());
             $('select').selectpicker('render');
             $('#line').modal('show');
         } else if (modalMarkerData.type == 'measure') {
             $('#measure').modal('show');
         } else if (modalMarkerData.type == 'mission') {
-            $('#mission-edit-color').val(modalMarkerData.config.color);
+            $('#mission-edit-color').val(modalMarkerData.config.color.toLowerCase());
             $('select').selectpicker('render');
             $('#mission-edit').modal('show');
 
@@ -577,7 +599,7 @@ var Arma3TacMap;
         var point = latlng;
 
         if (!currentLine) {
-            currentLine = L.polyline([point, point], { color: '#' + basicColors[colorPicker.val()], weight: 3, interactive: false }).addTo(map);
+            currentLine = L.polyline([point, point], { color: colorToCss(colorPicker.val()), weight: 3, interactive: false }).addTo(map);
         } else if (append) {
             var data = currentLine.getLatLngs();
             data[data.length - 1] = point;
@@ -698,7 +720,7 @@ var Arma3TacMap;
         } else {
             var result = generateMission(missionSelection.mission, missionSelection.points, missionSelection.size);
             if (!currentMission) {
-                var color = '#' + (basicColors[missionSelection.color] || '000000');
+                var color = colorToCss(missionSelection.color);
                 currentMission = L.polyline(result.lines, { smoothFactor: 0.5, color: color, weight: 3, interactive: false }).addTo(map);
             } else {
                 currentMission.setLatLngs(result.lines);
@@ -770,7 +792,7 @@ var Arma3TacMap;
             var iconHtml = $('<div></div>').append(
                 $('<div></div>')
                     .addClass('text-marker-content')
-                    .css('color', '#' + basicColors[markerData.config.color])
+                    .css('color', colorToCss(markerData.config.color))
                     .text(markerData.config.label)
                     .prepend(img))
                 .html();
@@ -800,7 +822,7 @@ var Arma3TacMap;
 
         if (markerData.type == 'line') {
             var posList = posToPoints(markerData.pos);
-            var color = '#' + (basicColors[markerData.config.color] || '000000');
+            var color = colorToCss(markerData.config.color);
             if (existing) {
                 existing.setLatLngs(posList);
                 existing.setStyle({ color: color });
@@ -830,7 +852,7 @@ var Arma3TacMap;
         }
         else if (markerData.type == 'mission') {
             var posList = posToPoints(markerData.pos);
-            var color = '#' + (basicColors[markerData.config.color] || '000000');
+            var color = colorToCss(markerData.config.color);
             var result = generateMission(markerData.symbol, posList, markerData.config.size || '13');
             if (existing) {
                 existing.setLatLngs(result.lines);
@@ -989,18 +1011,24 @@ var Arma3TacMap;
         }
     };
 
-    function createColorPicker() {
+    function createColorPicker(gameJson) {
+
+        if (gameJson && gameJson.colors) {
+            basicColors = {};
+            gameJson.colors.forEach(color => { basicColors[color.name.toLowerCase()] = color.hexadecimal; });
+        }
+        
         var previousColor = Object.getOwnPropertyNames(basicColors)[0];
-        var colorSelect = $('<select class="btn-maptool" data-container="body" id="color-tool" data-style="arma3-' + previousColor + '"></select>');
+        var colorSelect = $('<select class="btn-maptool" data-container="body" id="color-tool" data-style="game-bg-' + previousColor + '"></select>');
         Object.getOwnPropertyNames(basicColors).forEach(function (color) {
             colorSelect.append($('<option></option>').attr({
                 value: color,
-                'data-content': "<div class='arma3-" + color + "' style='width:20px; height:20px;'/>"
-            }).addClass('arma3-' + color));
+                'data-content': "<div class='game-bg-" + color + "' style='width:20px; height:20px;'/>"
+            }).addClass('game-bg-' + color));
         });
         colorSelect.on('change', function () {
-            colorSelect.selectpicker('setStyle', 'arma3-' + previousColor, 'remove');
-            colorSelect.selectpicker('setStyle', 'arma3-' + colorSelect.val(), 'add');
+            colorSelect.selectpicker('setStyle', 'game-bg-' + previousColor, 'remove');
+            colorSelect.selectpicker('setStyle', 'game-bg-' + colorSelect.val(), 'add');
             previousColor = colorSelect.val();
         });
         return colorSelect;
@@ -1126,7 +1154,7 @@ var Arma3TacMap;
         }
     };
 
-    function setupEditTools(map, backend) {
+    function setupEditTools(map, backend, gameJson) {
 
         tools = [
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 0); }, content: '<i class="far fa-hand-paper"></i>' }).addTo(map),
@@ -1139,7 +1167,7 @@ var Arma3TacMap;
             L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 7); }, content: '<i class="fas fa-sticky-note"></i>' }).addTo(map),
         ];
 
-        colorPicker = createColorPicker();
+        colorPicker = createColorPicker(gameJson);
         L.control.overlayDiv({ content: colorPicker.get(0), position: 'topleft' }).addTo(map);
 
         milsymbolMarkerTool(backend);
@@ -1585,7 +1613,7 @@ var Arma3TacMap;
             connect(map, backend, markers, pointing, canEdit, defaultOpacity, layers);
 
             if (canEdit) {
-                setupEditTools(map, backend);
+                setupEditTools(map, backend, config.game);
             }
         });
     };

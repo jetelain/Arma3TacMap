@@ -55,7 +55,6 @@ namespace Arma3TacMapWebApp
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();
             services.AddScoped<MapService>();
-            services.AddScoped<MapInfosService>();
             services.AddScoped<MapPreviewService>();
             services.AddSingleton<ScreenshotService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

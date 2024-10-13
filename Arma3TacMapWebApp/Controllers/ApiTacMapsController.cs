@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Arma3TacMapLibrary.Arma3;
+using Arma3TacMapLibrary.TacMaps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Services.GameMapStorage;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Arma3TacMapLibrary.TacMaps;
 using Microsoft.AspNetCore.Cors;
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.AspNetCore.Mvc;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -19,10 +17,10 @@ namespace Arma3TacMapWebApp.Controllers
     public class ApiTacMapsController : ControllerBase
     {
         private readonly Arma3TacMapContext _context;
-        private readonly MapInfosService _mapInfos;
+        private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
 
-        public ApiTacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc)
+        public ApiTacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc)
         {
             _context = context;
             _mapInfos = mapInfos;
