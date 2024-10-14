@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
-    [Migration("20241012142439_GMS")]
+    [Migration("20241014174458_GMS")]
     partial class GMS
     {
         /// <inheritdoc />
@@ -139,9 +139,6 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ParentTacMapID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Phase")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReadOnlyToken")

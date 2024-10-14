@@ -56,13 +56,6 @@ namespace Arma3TacMapWebApp.Migrations
                 type: "TEXT",
                 nullable: false,
                 defaultValue: "arma3");
-
-            migrationBuilder.AddColumn<int>(
-                name: "Phase",
-                table: "TacMap",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: 0);
         }
 
         /// <inheritdoc />
@@ -70,10 +63,6 @@ namespace Arma3TacMapWebApp.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "GameName",
-                table: "TacMap");
-
-            migrationBuilder.DropColumn(
-                name: "Phase",
                 table: "TacMap");
 
             migrationBuilder.AlterColumn<string>(

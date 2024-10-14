@@ -53,7 +53,5 @@ namespace Arma3TacMapWebApp.Entities
         public int? HostileOrbatID { get; set; }
         [Display(Name = "Hostile ORBAT")]
         public Orbat? HostileOrbat { get; set; }
-
-        public int Phase { get; set; }
     }
 }

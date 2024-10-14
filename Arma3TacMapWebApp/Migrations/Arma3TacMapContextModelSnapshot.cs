@@ -138,9 +138,6 @@ namespace Arma3TacMapWebApp.Migrations
                     b.Property<int?>("ParentTacMapID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Phase")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("ReadOnlyToken")
                         .HasColumnType("TEXT");
 
