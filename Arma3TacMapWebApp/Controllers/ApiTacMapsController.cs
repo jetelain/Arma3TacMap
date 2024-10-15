@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Arma3TacMapLibrary.Arma3;
+using Arma3TacMapLibrary.TacMaps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
+using Arma3TacMapWebApp.Services.GameMapStorage;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Arma3TacMapLibrary.TacMaps;
 using Microsoft.AspNetCore.Cors;
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.AspNetCore.Mvc;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -19,10 +17,10 @@ namespace Arma3TacMapWebApp.Controllers
     public class ApiTacMapsController : ControllerBase
     {
         private readonly Arma3TacMapContext _context;
-        private readonly MapInfosService _mapInfos;
+        private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
 
-        public ApiTacMapsController(Arma3TacMapContext context, MapInfosService mapInfos, MapService mapSvc)
+        public ApiTacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc)
         {
             _context = context;
             _mapInfos = mapInfos;
@@ -60,7 +58,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost("{id}/grant")]
         public async Task<IActionResult> GrantReadWrite(int id, [FromForm] string readWriteToken, [FromForm] string readOnlyToken)
         {
-            TacMapAccess access;
+            TacMapAccess? access;
             if (!string.IsNullOrEmpty(readWriteToken))
             {
                 access = await _mapSvc.GrantWriteAccess(User, id, readWriteToken);
@@ -83,6 +81,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 Id = access.TacMap.TacMapID,
                 WorldName = access.TacMap.WorldName,
+                GameName = access.TacMap.GameName,
                 Label = access.TacMap.Label,
                 EventHref = access.TacMap.EventHref,
                 Markers = includeMarkers ? await _mapSvc.GetMarkers(access.TacMap.TacMapID, true) : null,
@@ -108,7 +107,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ApiTacMapCreate value)
         {
-            var id = await _mapSvc.CreateMap(User, value.WorldName, value.Label, value.EventHref);
+            var id = await _mapSvc.CreateMap(User, value.WorldName, value.GameName, value.Label, value.EventHref);
             if (value.Markers != null && value.Markers.Count > 0 )
             {
                 var dbUser = await _mapSvc.GetUser(User);

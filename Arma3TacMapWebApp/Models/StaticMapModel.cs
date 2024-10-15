@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Arma3TacMapLibrary.Maps;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 
 namespace Arma3TacMapWebApp.Models
 {
@@ -16,6 +17,12 @@ namespace Arma3TacMapWebApp.Models
         public bool fullScreen { get; set; }
 
         public string view { get; set; }
+
+        public required GameJson Game { get; set; }
+
+        public required GameMapJson GameMap { get; set; }
+
+        public required string GmsBaseUri { get; set; }
 
         bool IMapCommonModel.isReadOnly => true;
 

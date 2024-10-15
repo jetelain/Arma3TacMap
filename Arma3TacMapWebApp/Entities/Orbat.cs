@@ -27,6 +27,6 @@ namespace Arma3TacMapWebApp.Entities
 
         public List<OrbatUnit> Units { get; set; }
 
-        public string Token { get; set; }
+        public string? Token { get; set; }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Arma3TacMapLibrary.Arma3;
+using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -21,32 +23,35 @@ namespace Arma3TacMapWebApp.Entities
         [Required]
         public string Label { get; set; }
 
-        public string ReadOnlyToken { get; set; }
+        public string? ReadOnlyToken { get; set; }
 
-        public string ReadWriteToken { get; set; }
+        public string? ReadWriteToken { get; set; }
 
         [Display(Name = "Map background")]
         [Required]
         public string WorldName { get; set; }
 
-        public Uri EventHref { get; set; }
+        [Display(Name = "Game")]
+        public string GameName { get; set; }
+
+        public Uri? EventHref { get; set; }
 
         [NotMapped]
-        public MapInfos MapInfos { get; set; }
+        public GameMapJsonBase? MapInfos { get; set; }
 
         public int? ParentTacMapID { get; set; }
 
-        public TacMap Parent { get; set; }
+        public TacMap? Parent { get; set; }
 
 
         [Display(Name = "Friendly ORBAT")]
         public int? FriendlyOrbatID { get; set; }
         [Display(Name = "Friendly ORBAT")]
-        public Orbat FriendlyOrbat { get; set; }
+        public Orbat? FriendlyOrbat { get; set; }
 
         [Display(Name = "Hostile ORBAT")]
         public int? HostileOrbatID { get; set; }
         [Display(Name = "Hostile ORBAT")]
-        public Orbat HostileOrbat { get; set; }
+        public Orbat? HostileOrbat { get; set; }
     }
 }

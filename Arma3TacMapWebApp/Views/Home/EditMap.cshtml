@@ -312,18 +312,18 @@
                         <div class="form-group col-md-4">
                             <label for="basic-type" class="control-label">@Localizer["Shape"]</label>
                             <select id="basic-type" class="form-control">
-                                @foreach (var type in Arma3MarkerTypeHelper.GetAll())
+                                @foreach (var type in Model.Game.Markers)
                                 {
-                                    <option data-content="<img src='/img/markers/ColorGrey/@(type).png' height='24' /> @Html.DisplayFor(m => type)" value="@type">@Html.DisplayFor(m => type)</option>
+                                    <option data-content="<img src='@(type.ImagePng)' height='24' /> @(type.EnglishTitle)" value="@type.Name.ToLowerInvariant()">@(type.EnglishTitle)</option>
                                 }
                             </select>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="basic-color" class="control-label">@Localizer["Color"]</label>
                             <select id="basic-color" class="form-control">
-                                @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                                @foreach (var color in Model.Game.Colors)
                                 {
-                                    <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
@@ -383,9 +383,9 @@
                         <div class="form-group">
                             <label for="line-color" class="control-label">@Localizer["Color"]</label>
                             <select id="line-color" class="form-control">
-                                @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                                @foreach (var color in Model.Game.Colors)
                                 {
-                                    <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
@@ -515,9 +515,9 @@
                     <div class="form-group col-md-4">
                         <label for="mission-selector-color" class="control-label">@Localizer["Color"]</label>
                         <select id="mission-selector-color" class="form-control">
-                            @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                            @foreach (var color in Model.Game.Colors)
                             {
-                                <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>
@@ -596,9 +596,9 @@
                     <div class="form-group col-md-4">
                         <label for="mission-edit-color" class="control-label">@Localizer["Color"]</label>
                         <select id="mission-edit-color" class="form-control">
-                            @foreach (var color in Arma3MarkerColorHelper.GetAll())
+                            @foreach (var color in Model.Game.Colors)
                             {
-                                <option class="arma3-@color" value="@color">@Html.DisplayFor(m => color)</option>
+                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>
@@ -676,4 +676,5 @@
 }
 @section Styles {
     @{await Html.RenderPartialAsync("_MapStyles", Model.InitLiveMap);}
+    <link rel="stylesheet" href="/css/game-@(Model.Game.Name).css?@(Model.Game.LastChangeUtc?.Ticks)" />
 }

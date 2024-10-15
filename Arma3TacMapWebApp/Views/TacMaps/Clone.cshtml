@@ -13,6 +13,7 @@
         <div class="col-md-4">
             <form asp-action="Clone" asp-route-id="@Model.TacMapID">
                 <input asp-for="WorldName" type="hidden" />
+                <input asp-for="GameName" type="hidden" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Label" class="control-label"></label>

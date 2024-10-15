@@ -1,4 +1,6 @@
-﻿namespace Arma3TacMapWebApp.Models
+﻿using Arma3TacMapWebApp.Services.GameMapStorage.Json;
+
+namespace Arma3TacMapWebApp.Models
 {
     public interface IMapCommonModel
     {
@@ -7,7 +9,15 @@
         string worldName { get; }
 
         bool isReadOnly { get; }
+
         string init { get; }
-        string view { get; }
+
+        string? view { get; }
+
+        GameJson Game { get; }
+
+        GameMapJson GameMap { get; }
+
+        string GmsBaseUri { get; }
     }
 }

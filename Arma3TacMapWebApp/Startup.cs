@@ -2,12 +2,14 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Hubs;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Security;
+using Arma3TacMapWebApp.Services.GameMapStorage;
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -40,15 +42,19 @@ namespace Arma3TacMapWebApp
             services.AddHttpClient();
             services.AddControllersWithViews()
                 .AddViewLocalization()
-                .AddDataAnnotationsLocalization(options => {
+                .AddDataAnnotationsLocalization(options =>
+                {
                     options.DataAnnotationLocalizerProvider = (type, factory) =>
                         factory.Create(typeof(SharedResource));
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();
             services.AddScoped<MapService>();
-            services.AddScoped<MapInfosService>();
             services.AddScoped<MapPreviewService>();
             services.AddSingleton<ScreenshotService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -78,7 +84,7 @@ namespace Arma3TacMapWebApp
 
             services.AddAuthorization(options =>
             {
-                var admins = Configuration.GetSection("Admins").Get<string[]>();
+                var admins = Configuration.GetSection("Admins").Get<string[]>() ?? [];
                 options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.ToArray())); 
                 var wip = Configuration.GetSection("WorkInProgress").Get<string[]>();
                 options.AddPolicy("WorkInProgress", policy => policy.RequireClaim(ClaimTypes.NameIdentifier, admins.Concat(wip ?? new string[0]).ToArray()));
@@ -90,11 +96,11 @@ namespace Arma3TacMapWebApp
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
                 services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetValue<string>("UnixKeysDirectory")))
+                    .PersistKeysToFileSystem(new DirectoryInfo(Configuration.GetValue<string>("UnixKeysDirectory") ?? "/var/www/aspnet-keys"))
                     .SetApplicationName("Arma3Event");
             }
 
-            var origins = Configuration.GetSection("CorsOrigins").Get<string[]>();
+            var origins = Configuration.GetSection("CorsOrigins").Get<string[]>() ?? [];
 
             services.AddCors(o => o.AddPolicy("SignalRHub", builder =>
             {
@@ -111,6 +117,7 @@ namespace Arma3TacMapWebApp
                     .AllowCredentials();
             }));
 
+            GameMapStorageService.AddTo(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

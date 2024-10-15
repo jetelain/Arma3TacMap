@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -17,37 +14,37 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Parent Unit")]
         public int? ParentOrbatUnitID { get; set; }
         [Display(Name = "Parent Unit")]
-        public OrbatUnit Parent { get; set; }
+        public OrbatUnit? Parent { get; set; }
 
         [Display(Name = "Call sign")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Display(Name = "Unique Designation")]
-        public string UniqueDesignation { get; set; }
+        public string? UniqueDesignation { get; set; }
 
         [Display(Name = "Symbol")]
-        public string NatoSymbolIcon { get; set; }
+        public string? NatoSymbolIcon { get; set; }
 
         [Display(Name = "Icon Modifier 1")]
-        public string NatoSymbolMod1 { get; set; }
+        public string? NatoSymbolMod1 { get; set; }
 
         [Display(Name = "Icon Modifier 2")]
-        public string NatoSymbolMod2 { get; set; }
+        public string? NatoSymbolMod2 { get; set; }
 
         [Display(Name = "Echelon")]
-        public string NatoSymbolSize { get; set; }
+        public string? NatoSymbolSize { get; set; }
 
         [Display(Name = "HQ, TF")]
-        public string NatoSymbolHQ { get; set; }
+        public string? NatoSymbolHQ { get; set; }
 
         [Display(Name = "Friendly Symbol")]
-        public string NatoSymbolFriendlyImageBase64 { get; set; }
+        public string? NatoSymbolFriendlyImageBase64 { get; set; }
         
         [Display(Name = "Hostile Symbol")]
-        public string NatoSymbolHostileImageBase64 { get; set; }
+        public string? NatoSymbolHostileImageBase64 { get; set; }
 
         [Display(Name = "Hostile Symbol")]
-        public string NatoSymbolHostileAssumedImageBase64 { get; set; }
+        public string? NatoSymbolHostileAssumedImageBase64 { get; set; }
 
         public int Position { get; set; }
 
@@ -65,7 +62,7 @@ namespace Arma3TacMapWebApp.Entities
 
         [Display(Name = "Trigram")]
         [MaxLength(3)]
-        public string Trigram { get; set; }
+        public string? Trigram { get; set; }
 
         internal bool IsSelfOrParent(OrbatUnit orbatUnit)
         {

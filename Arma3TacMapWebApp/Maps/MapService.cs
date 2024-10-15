@@ -43,7 +43,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
-        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string label, Uri eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
+        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string gameName, string label, Uri? eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
         {
             var dbUser = await GetOrCreateUser(user);
             if (dbUser == null)
@@ -57,6 +57,7 @@ namespace Arma3TacMapWebApp.Maps
                 EventHref = eventHref,
                 Owner = dbUser,
                 WorldName = worldName,
+                GameName = gameName ?? "arma3",
                 ReadWriteToken = GenerateToken(),
                 ReadOnlyToken = GenerateToken(),
                 FriendlyOrbatID = friendlyOrbatID,
@@ -88,6 +89,7 @@ namespace Arma3TacMapWebApp.Maps
                 Label = label,
                 OwnerUserID = access.TacMap.OwnerUserID,
                 WorldName = access.TacMap.WorldName,
+                GameName = access.TacMap.GameName,
                 ReadWriteToken = GenerateToken(),
                 ReadOnlyToken = GenerateToken(),
                 Parent = access.TacMap
@@ -102,7 +104,7 @@ namespace Arma3TacMapWebApp.Maps
             return new StoredLayer { Id = map.TacMapID, Label = map.Label };
         }
 
-        internal async Task<TacMapAccess> GrantReadAccess(ClaimsPrincipal user, int id, string t)
+        internal async Task<TacMapAccess?> GrantReadAccess(ClaimsPrincipal user, int id, string? t)
         {
             var dbUser = await GetUser(user);
             if (dbUser != null)
@@ -133,7 +135,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        internal async Task<TacMapAccess> GrantWriteAccess(ClaimsPrincipal user, int id, string t)
+        internal async Task<TacMapAccess?> GrantWriteAccess(ClaimsPrincipal user, int id, string? t)
         {
             var dbUser = await GetOrCreateUser(user);
             if (dbUser == null)
@@ -167,7 +169,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        public async Task<User> GetUser(ClaimsPrincipal user)
+        public async Task<User?> GetUser(ClaimsPrincipal user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
@@ -177,7 +179,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.Users.FirstOrDefaultAsync(u => u.SteamId == steamId);
         }
 
-        private async Task<User> GetApiUser(ClaimsPrincipal user)
+        private async Task<User?> GetApiUser(ClaimsPrincipal user)
         {
             if (user?.Identity?.IsAuthenticated ?? false)
             {
@@ -191,7 +193,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        private async Task<User> GetOrCreateUser(ClaimsPrincipal user)
+        private async Task<User?> GetOrCreateUser(ClaimsPrincipal user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
@@ -402,7 +404,8 @@ namespace Arma3TacMapWebApp.Maps
             return new StaticMapData()
             {
                 Markers = await GetMarkers(map.TacMapID, true),
-                WorldName = map.WorldName
+                WorldName = map.WorldName,
+                GameName = map.GameName
             };
         }
 
