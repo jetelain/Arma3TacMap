@@ -7,11 +7,11 @@ using PuppeteerSharp;
 
 namespace Arma3TacMapWebApp.Maps
 {
-    public class ScreenshotService : IDisposable
+    public class ScreenshotService : IScreenshotService, IDisposable
     {
-        private readonly string chromePath;
+        private readonly string? chromePath;
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
-        private Task<IBrowser> browserTask;
+        private Task<IBrowser>? browserTask;
 
         public ScreenshotService(IConfiguration config, IHostApplicationLifetime lifetime)
         {
@@ -28,7 +28,7 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        public async Task<byte[]> MakeScreenshotAsync(string uri)
+        public async Task<byte[]?> MakeScreenshotAsync(string uri)
         {
             if (string.IsNullOrEmpty(chromePath))
             {

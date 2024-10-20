@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Arma3TacMapLibrary;
-using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Hubs;
 using Arma3TacMapWebApp.Maps;
@@ -55,8 +54,8 @@ namespace Arma3TacMapWebApp
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();
             services.AddScoped<MapService>();
-            services.AddScoped<MapPreviewService>();
-            services.AddSingleton<ScreenshotService>();
+            services.AddScoped<IMapPreviewService, MapPreviewService>();
+            services.AddSingleton<IScreenshotService, ScreenshotService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDbContext<Arma3TacMapContext>(options =>

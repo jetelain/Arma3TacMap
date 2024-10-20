@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Maps;
-using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
 using Arma3TacMapWebApp.Services.GameMapStorage;
@@ -23,11 +22,11 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
-        private readonly MapPreviewService _preview;
+        private readonly IMapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
         private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, IMapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
         {
             _logger = logger;
             _mapInfos = mapInfos;
@@ -190,7 +189,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
-            if (!MapPreviewService.ValidSizes.Contains(size))
+            if (!_preview.ValidSizes.Contains(size))
             {
                 return NotFound();
             }

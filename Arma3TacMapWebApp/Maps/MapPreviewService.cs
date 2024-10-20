@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,22 +8,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace Arma3TacMapWebApp.Maps
 {
-    public class MapPreviewService
+    public class MapPreviewService : IMapPreviewService
     {
         private readonly Arma3TacMapContext _db;
         private readonly Arma3TacMapPreviewContext _pdb;
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _accessor;
-        private readonly ScreenshotService _screenshot;
+        private readonly IScreenshotService _screenshot;
 
-        public static int[] ValidSizes = new[] { 256, 512, 1024, 2048 };
+        public static int[] ValidSizesStatic = new[] { 256, 512, 1024, 2048 };
 
-        public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, ScreenshotService screenshot)
+        public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, IScreenshotService screenshot)
         {
             _db = db;
             _pdb = pdb;
@@ -32,10 +30,11 @@ namespace Arma3TacMapWebApp.Maps
             _accessor = accessor;
             _screenshot = screenshot;
         }
+        public int[] ValidSizes => ValidSizesStatic;
 
         public async Task<byte[]> GetPreview(TacMapAccess access, int size, int? phase = null)
         {
-            if ( !ValidSizes.Contains(size))
+            if ( !ValidSizesStatic.Contains(size))
             {
                 throw new ArgumentException(nameof(size));
             }
@@ -126,7 +125,7 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private async Task<byte[]> MakeScreenshot(TacMapAccess access, int? phase)
+        private async Task<byte[]?> MakeScreenshot(TacMapAccess access, int? phase)
         {
             var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken, phase = phase }, "https");
             return await _screenshot.MakeScreenshotAsync(uri);
