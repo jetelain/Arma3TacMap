@@ -16,7 +16,7 @@ namespace Arma3TacMapWebApp.Entities
 
         public int UserID { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
 
         internal bool IsValidToken(string token)
         {
