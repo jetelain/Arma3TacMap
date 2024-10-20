@@ -301,6 +301,19 @@ namespace Arma3TacMapWebApp.Maps
                 .ToList();
         }
 
+        internal async Task<List<StoredMarker>> GetPhaseMarkers(int tacMapID, int phase)
+        {
+            return (await _db.TacMapMarkers.Where(m => (m.TacMapID == tacMapID || m.TacMap.ParentTacMapID == tacMapID) && (m.TacMap.Phase == null || m.TacMap.Phase.Value == phase)).ToListAsync())
+                .Select(m => new StoredMarker()
+                {
+                    Id = m.TacMapMarkerID,
+                    LayerId = m.TacMapID,
+                    IsReadOnly = true,
+                    MarkerData = m.MarkerData
+                })
+                .ToList();
+        }
+
         internal async Task<List<StoredLayer>> GetLayers(int tacMapID)
         {
             return
@@ -401,12 +414,21 @@ namespace Arma3TacMapWebApp.Maps
         }
 
 
-        public async Task<StaticMapData> GetStaticMapModel(int id, string t)
+        public async Task<StaticMapData?> GetStaticMapModel(int id, string t, int? phase = null)
         {
             var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadOnlyToken == t);
             if (map == null)
             {
                 return null;
+            }
+            if (phase != null)
+            {
+                return new StaticMapData()
+                {
+                    Markers = await GetPhaseMarkers(map.TacMapID, phase.Value),
+                    WorldName = map.WorldName,
+                    GameName = map.GameName
+                };
             }
             return new StaticMapData()
             {

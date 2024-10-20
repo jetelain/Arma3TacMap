@@ -33,7 +33,7 @@ namespace Arma3TacMapWebApp.Maps
             _screenshot = screenshot;
         }
 
-        public async Task<byte[]> GetPreview(TacMapAccess access, int size)
+        public async Task<byte[]> GetPreview(TacMapAccess access, int size, int? phase = null)
         {
             if ( !ValidSizes.Contains(size))
             {
@@ -46,13 +46,15 @@ namespace Arma3TacMapWebApp.Maps
                 lastUpdate = (await _db.TacMaps.FindAsync(access.TacMapID)).Created;
             }
 
-            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.LastUpdate >= lastUpdate);
+            var phaseKey = phase == null ? string.Empty : phase.Value.ToString();
+
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.PhaseKey == phaseKey && p.LastUpdate >= lastUpdate);
             if (preview != null)
             {
                 return preview.Data;
             }
 
-            var bytes = await MakeScreenshot(access);
+            var bytes = await MakeScreenshot(access, phase);
             if (bytes == null)
             {
                 return File.ReadAllBytes(@"wwwroot/img/transparent.png");
@@ -62,10 +64,10 @@ namespace Arma3TacMapWebApp.Maps
 
                 using (var transaction = _pdb.Database.BeginTransaction())
                 {
-                    await AddPreview(access, 2048, lastUpdate, ToJpeg(image, 2048));;
-                    await AddPreview(access, 1024, lastUpdate, ToJpeg(image, 1024));
-                    await AddPreview(access, 512, lastUpdate, ToPng(image, 512));
-                    await AddPreview(access, 256, lastUpdate, ToPng(image, 256));
+                    await AddPreview(access, 2048, lastUpdate, phaseKey, ToJpeg(image, 2048));;
+                    await AddPreview(access, 1024, lastUpdate, phaseKey, ToJpeg(image, 1024));
+                    await AddPreview(access, 512, lastUpdate, phaseKey, ToPng(image, 512));
+                    await AddPreview(access, 256, lastUpdate, phaseKey, ToPng(image, 256));
                     await _pdb.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -101,9 +103,9 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private async Task AddPreview(TacMapAccess access, int size, DateTime? lastUpdate, byte[] data)
+        private async Task AddPreview(TacMapAccess access, int size, DateTime? lastUpdate, string phaseKey, byte[] data)
         {
-            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size);
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.PhaseKey == phaseKey);
             if (preview == null)
             {
                 preview = new TacMapPreview()
@@ -111,7 +113,8 @@ namespace Arma3TacMapWebApp.Maps
                     Data = data,
                     LastUpdate = lastUpdate,
                     TacMapID = access.TacMapID,
-                    Size = size
+                    Size = size,
+                    PhaseKey = phaseKey
                 };
                 _pdb.TacMapPreviews.Add(preview);
             }
@@ -123,9 +126,9 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private async Task<byte[]> MakeScreenshot(TacMapAccess access)
+        private async Task<byte[]> MakeScreenshot(TacMapAccess access, int? phase)
         {
-            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken }, "https");
+            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken, phase = phase }, "https");
             return await _screenshot.MakeScreenshotAsync(uri);
         }
     }
