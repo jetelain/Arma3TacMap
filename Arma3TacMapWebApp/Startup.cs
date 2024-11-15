@@ -10,6 +10,7 @@ using Arma3TacMapWebApp.Hubs;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Security;
 using Arma3TacMapWebApp.Services.GameMapStorage;
+using Arma3TacMapWebApp.Services.Screenshots;
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -56,7 +57,7 @@ namespace Arma3TacMapWebApp
             services.AddScoped<IMapService, MapService>();
             services.AddScoped<MapService>();
             services.AddScoped<MapPreviewService>();
-            services.AddSingleton<ScreenshotService>();
+            services.AddSingleton<IScreenshotService, ScreenshotService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDbContext<Arma3TacMapContext>(options =>
