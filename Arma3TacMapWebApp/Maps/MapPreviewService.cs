@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Arma3TacMapWebApp.Controllers;
 using Arma3TacMapWebApp.Entities;
+using Arma3TacMapWebApp.Services.Screenshots;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +21,11 @@ namespace Arma3TacMapWebApp.Maps
         private readonly Arma3TacMapPreviewContext _pdb;
         private readonly LinkGenerator _linkGenerator;
         private readonly IHttpContextAccessor _accessor;
-        private readonly ScreenshotService _screenshot;
+        private readonly IScreenshotService _screenshot;
 
         public static int[] ValidSizes = new[] { 256, 512, 1024, 2048 };
 
-        public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, ScreenshotService screenshot)
+        public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, IScreenshotService screenshot)
         {
             _db = db;
             _pdb = pdb;
