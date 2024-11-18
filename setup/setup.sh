@@ -3,6 +3,10 @@
 # Basic script to install / update a GameTacMap instance on a Linux server
 # Requires dotnet SDK, see https://learn.microsoft.com/en-us/dotnet/core/install/linux, `sudo apt-get install -y dotnet-sdk-8.0` on Ubuntu 24.04 LTS
 
+# Logs         : journalctl -fu kestrel-tacmap -n 100
+# Manual Stop  : sudo systemctl stop kestrel-tacmap
+# Manual Start : sudo systemctl start kestrel-tacmap
+
 if [ ! -d ~/build/GameTacMap ]; then
 	mkdir ~/build
 	cd ~/build
@@ -46,6 +50,7 @@ fi
 if [ ! -f /etc/systemd/system/kestrel-tacmap.service ]; then
 	echo " * Create kestrel-tacmap.service"
 	sudo cp setup/kestrel-tacmap.service /etc/systemd/system/kestrel-tacmap.service
+	sudo systemctl enable kestrel-tacmap
 fi
 
 echo "Build"
