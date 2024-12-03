@@ -4,10 +4,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
-using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
@@ -33,10 +31,10 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly Arma3TacMapContext _context;
         private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
-        private readonly MapPreviewService _preview;
+        private readonly IMapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
 
-        public TacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
+        public TacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc, IMapPreviewService preview, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapInfos = mapInfos;
@@ -86,7 +84,8 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 WorldName = worldName,
                 GameName = gameName,
-                Label = "Carte tactique sans nom"
+                Label = "Carte tactique sans nom",
+                OwnerUserID = user.UserID
             });
         }
 
@@ -118,7 +117,7 @@ namespace Arma3TacMapWebApp.Controllers
                 var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.GameName, tacMap.Label, null, tacMap.FriendlyOrbatID, tacMap.HostileOrbatID);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
-            ViewBag.Maps = await _mapInfos.GetMaps(tacMap.GameName);
+            ViewBag.Maps = (await _mapInfos.GetMaps(tacMap.GameName)).OrderBy(m => m.EnglishTitle).ToList();
             return View(tacMap);
         }
 
@@ -530,7 +529,7 @@ namespace Arma3TacMapWebApp.Controllers
                 {
                     if (layer.Id != tacMap.TacMapID)
                     {
-                        var clonedLayer = await _mapSvc.CreateLayer(User, clone, layer.Label);
+                        var clonedLayer = await _mapSvc.CreateLayer(User, clone, layer.Label, layer.Phase);
                         layerMapping.Add(layer.Id, clonedLayer.Id);
                     }
                 }

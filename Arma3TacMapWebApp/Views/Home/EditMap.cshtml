@@ -133,18 +133,6 @@
     {
         <a href="@Model.Access.TacMap.EventHref.AbsoluteUri" class="btn btn-sm btn-secondary"><i class="fas fa-external-link-alt"></i> @Localizer["Return to {0}", Model.Access.TacMap.EventHref.Host]</a>
     }
-    @if (Model.HasTopo)
-    {
-        @if (Model.InitLiveMap.view == "topo")
-        {
-            <a asp-action="EditMap" asp-route-id="@Model.Access.TacMapID" class="btn btn-sm btn-secondary">@Localizer["Topographic Map"] <span class="badge badge-light">BETA</span></a>
-        }
-        else
-        {
-            <a asp-action="EditMap" asp-route-id="@Model.Access.TacMapID" asp-route-view="topo" class="btn btn-sm btn-outline-secondary">@Localizer["Topographic Map"] <span class="badge badge-dark">BETA</span></a>
-        }
-
-    }
 </h1>
 
 @{await Html.RenderPartialAsync("_LiveMap", Model.InitLiveMap);}
@@ -445,9 +433,37 @@
             <div class="modal-body">
                 <div>
                     <div class="form-row">
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-12">
                             <label for="layer-label" class="control-label">@Localizer["Label"]</label>
                             <input type="text" id="layer-label" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label class="control-label">@Localizer["Phase"]</label>
+                            <div class="row no-gutters">
+                                <div class="input-group col-5">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="radio" name="layer-phase-mode" checked="checked" id="layer-phase-mode-all" value="all" />
+                                        </div>
+                                    </div>
+                                    <span class="input-group-append">
+                                        <label class="input-group-text bg-white" for="layer-phase-mode-all">@Localizer["All phases"]</label>
+                                    </span>
+                                </div>
+                                <div class="input-group col-7">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="radio" name="layer-phase-mode" id="layer-phase-mode-specific" value="number" />
+                                        </div>
+                                    </div>
+                                    <span class="input-group-prepend">
+                                        <label class="input-group-text bg-white" for="layer-phase-mode-specific">@Localizer["Phase number"]</label>
+                                    </span>
+                                    <input type="number" class="form-control" id="layer-phase-number" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

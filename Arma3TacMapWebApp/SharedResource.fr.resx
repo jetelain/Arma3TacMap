@@ -579,4 +579,13 @@
   <data name="Base map" xml:space="preserve">
     <value>Fond de carte</value>
   </data>
+  <data name="Phase" xml:space="preserve">
+    <value>Temps</value>
+  </data>
+  <data name="All phases" xml:space="preserve">
+    <value>Tout le temps</value>
+  </data>
+  <data name="Phase number" xml:space="preserve">
+    <value>Temps numéro</value>
+  </data>
 </root>
