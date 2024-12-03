@@ -10,6 +10,8 @@ KillSignal=SIGINT
 SyslogIdentifier=TacMap
 User=www-data
 Environment=ASPNETCORE_ENVIRONMENT=Production
+MemoryHigh=5G
+MemoryMax=6G
 
 [Install]
 WantedBy=multi-user.target

@@ -3,6 +3,10 @@
 # Basic script to install / update a GameTacMap instance on a Linux server
 # Requires dotnet SDK, see https://learn.microsoft.com/en-us/dotnet/core/install/linux, `sudo apt-get install -y dotnet-sdk-8.0` on Ubuntu 24.04 LTS
 
+# Requires Chromium 
+# - Install devmode version with `sudo snap install chromium --devmode`
+# - Change www-data home to `/home/www` with `sudo nano /etc/passwd`
+
 # Logs         : journalctl -fu kestrel-tacmap -n 100
 # Manual Stop  : sudo systemctl stop kestrel-tacmap
 # Manual Start : sudo systemctl start kestrel-tacmap
