@@ -7,6 +7,7 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
     public interface IGameMapStorageService
     {
         Uri BaseUri { get; }
+        Uri LegacyEndpoint { get; }
 
         Task<GameJsonBase[]> GetGames();
 
