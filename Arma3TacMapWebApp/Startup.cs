@@ -9,6 +9,7 @@ using Arma3TacMapWebApp.Hubs;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Security;
 using Arma3TacMapWebApp.Services.GameMapStorage;
+using Arma3TacMapWebApp.Services.Screenshots;
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;

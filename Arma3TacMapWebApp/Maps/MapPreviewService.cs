@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Arma3TacMapWebApp.Controllers;
 using Arma3TacMapWebApp.Entities;
+using Arma3TacMapWebApp.Services.Screenshots;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;

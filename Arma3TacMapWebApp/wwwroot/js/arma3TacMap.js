@@ -950,7 +950,8 @@ var Arma3TacMap;
             zoomSnap: fullScreen ? 0.01 : 0.2,
             zoomControl: !fullScreen,
             zoomDelta: 0.2,
-            zoomAnimation: !mapInfos.isSVG || isFastSvg()
+            zoomAnimation: !mapInfos.isSVG || isFastSvg(),
+            fadeAnimation: !fullScreen
         });
 
         var tileLayer = L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {

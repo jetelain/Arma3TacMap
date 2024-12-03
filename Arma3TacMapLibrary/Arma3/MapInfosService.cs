@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapLibrary.Arma3
 {
+    [Obsolete]
     public class MapInfosService : IMapInfosService
     {
         private readonly IHttpClientFactory _clientFactory;
