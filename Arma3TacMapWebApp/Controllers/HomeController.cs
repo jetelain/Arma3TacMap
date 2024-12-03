@@ -4,16 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Arma3TacMapLibrary;
 using Arma3TacMapLibrary.Maps;
-using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Models;
 using Arma3TacMapWebApp.Services.GameMapStorage;
 using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapWebApp.Controllers
@@ -25,16 +22,14 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly MapService _mapSvc;
         private readonly MapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
-        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
         {
             _logger = logger;
             _mapInfos = mapInfos;
             _mapSvc = mapSvc;
             _preview = preview;
             _authorizationService = authorizationService;
-            _configuration = configuration;
         }
 
         public async Task<IActionResult> Index()
@@ -95,7 +90,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 InitLiveMap = new LiveMapModel()
                 {
-                    endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                    endpoint = _mapInfos.LegacyEndpoint.AbsoluteUri,
                     hub = "/MapHub",
                     isReadOnly = false,
                     mapId = new MapId()
@@ -133,7 +128,7 @@ namespace Arma3TacMapWebApp.Controllers
                 Access = access,
                 InitLiveMap = new LiveMapModel()
                 {
-                    endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                    endpoint = _mapInfos.LegacyEndpoint.AbsoluteUri,
                     hub = "/MapHub",
                     isReadOnly = true,
                     mapId = new MapId()
@@ -166,7 +161,7 @@ namespace Arma3TacMapWebApp.Controllers
             return View(new StaticMapModel(){
                 center = data.Center,
                 GmsBaseUri = _mapInfos.BaseUri.AbsolutePath,
-                endpoint = Arma3MapHelper.GetEndpoint(_configuration),
+                endpoint = _mapInfos.LegacyEndpoint.AbsoluteUri,
                 markers = data.Markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData)),
                 worldName = data.WorldName,
                 fullScreen = true,

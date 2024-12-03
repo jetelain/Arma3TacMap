@@ -20,6 +20,8 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
 
         public Uri BaseUri { get; }
 
+        public Uri LegacyEndpoint => new Uri(BaseUri, "/data/1");
+
         public static Uri GetBaseUri(IConfiguration configuration)
             => configuration.GetValue<Uri>("GameMapStorage") ?? new Uri("https://atlas.plan-ops.fr/");
 

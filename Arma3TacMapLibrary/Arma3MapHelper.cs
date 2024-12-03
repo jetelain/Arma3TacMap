@@ -7,6 +7,7 @@ namespace Arma3TacMapLibrary
 {
     public static class Arma3MapHelper
     {
+        [Obsolete]
         public static string GetEndpoint(IConfiguration configuration)
         {
             return configuration.GetValue<string>("Arma3MapEndpoint") ?? "https://jetelain.github.io/Arma3Map";
