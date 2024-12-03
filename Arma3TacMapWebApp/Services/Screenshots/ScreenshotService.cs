@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +11,9 @@ namespace Arma3TacMapWebApp.Services.Screenshots
 {
     public sealed class ScreenshotService : IScreenshotService, IDisposable
     {
+        private const string DefaultChromeLinux = "/usr/bin/chromium-browser";
+        private const string DefaultChromeWindows = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+
         private readonly string? chromePath;
         private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         private BrowserHolder? browserHolder;
@@ -16,6 +21,17 @@ namespace Arma3TacMapWebApp.Services.Screenshots
         public ScreenshotService(IConfiguration config, IHostApplicationLifetime lifetime)
         {
             chromePath = config.GetValue<string>("Chrome");
+            if (chromePath == null)
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && File.Exists(DefaultChromeLinux))
+                {
+                    chromePath = DefaultChromeLinux;
+                }
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && File.Exists(DefaultChromeWindows))
+                {
+                    chromePath = DefaultChromeWindows;
+                }
+            }
             lifetime.ApplicationStopping.Register(Dispose);
         }
 
