@@ -20,7 +20,7 @@ namespace Arma3TacMapWebApp.Maps
             _db = db;
         }
 
-        internal static string GetSteamId(ClaimsPrincipal user)
+        internal static string? GetSteamId(ClaimsPrincipal user)
         {
             if (user?.Identity?.IsAuthenticated ?? false)
             {

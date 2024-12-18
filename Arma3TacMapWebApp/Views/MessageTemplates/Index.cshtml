@@ -1,0 +1,120 @@
+﻿@model IEnumerable<Arma3TacMapWebApp.Entities.MessageTemplate>
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = Localizer["Preformatted messages"];
+    var isAdmin = (await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded;
+}
+
+<div class="container">
+    <h1>@Localizer["Preformatted messages"]</h1>
+    <p>@Localizer["Preformatted messages allows to create precise and quick messages in a mission. They can be used here online, or with cTab on Arma 3."]</p>
+
+    <h2>@Localizer["User Defined"]</h2>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">@Localizer["Create a preformatted message"]</a>
+    </p>
+
+    <table class="table">
+        <colgroup>
+            <col style="width:30%;" />
+            <col style="width:20%;" />
+            <col style="width:10%;" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CountryCode)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(o => o.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Default))
+            {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Label)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CountryCode)
+                </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.MessageTemplateID">@Localizer["View"]</a>
+                        @if (ViewBag.UserId == item.OwnerUserID || (item.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public && isAdmin))
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.MessageTemplateID">@Localizer["Edit"]</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.MessageTemplateID">@Localizer["Delete"]</a>
+                        }
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+
+    <h2>@Localizer["Public"]</h2>
+
+    <table class="table">
+        <colgroup>
+            <col style="width:30%;" />
+            <col style="width:20%;" />
+            <col style="width:10%;" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Label)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CountryCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Owner)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(o => o.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public))
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Label)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CountryCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Owner!.UserLabel)
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.MessageTemplateID">@Localizer["View"]</a>
+                        @if (ViewBag.UserId == item.OwnerUserID || (item.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public && isAdmin))
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.MessageTemplateID">@Localizer["Edit"]</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.MessageTemplateID">@Localizer["Delete"]</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

@@ -1,0 +1,89 @@
+﻿@model Arma3TacMapWebApp.Entities.MessageLineTemplate
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>MessageLineTemplate</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MessageTemplate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MessageTemplate.Label)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SortNumber)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SortNumber)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.MessageLineTemplateID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+<p>
+    <a asp-controller="MessageFieldTemplates" asp-action="Create" asp-route-messageLineTemplateID="@Model.MessageLineTemplateID">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Fields![0].SortNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fields![0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fields![0].Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fields![0].Type)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Fields!)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SortNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    <a asp-controller="MessageFieldTemplates" asp-action="Edit" asp-route-id="@item.MessageFieldTemplateID">Edit</a> |
+                    <a asp-controller="MessageFieldTemplates" asp-action="Delete" asp-route-id="@item.MessageFieldTemplateID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
