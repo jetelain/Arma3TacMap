@@ -19,8 +19,38 @@
     <h1>@Model.Title</h1>
 
     <div>
-        <p>@Model.Description</p>
+        <div class="row">
+            <div id="compose-form-fields" class="col-8">
+            </div>
+            <div class="col-4">
+                <p>Generated message</p>
+                <textarea id="compose-text" class="w-100" rows="2">
+                </textarea>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h2>@Localizer["Line Configuration"]</h2>
+        @if (canEdit)
+        {
+            <p>
+                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageLineTemplateID">@Localizer["Edit"]</a>
+            </p>
+        }
         <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.SortNumber)
             </dt>
@@ -28,23 +58,10 @@
                 @Html.DisplayFor(model => model.SortNumber)
             </dd>
         </dl>
-        @if (canEdit)
-        {
-            <p>
-                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageLineTemplateID">@Localizer["Edit"]</a>
-            </p>
-        }
-    </div>
-
-    <div>
-        <h2>@Localizer["Preview"]</h2>
-        <hr />
-        TODO
     </div>
 
     <div>
         <h2>@Localizer["Fields Configuration"]</h2>
-        <hr />
         @if (canEdit)
         {
             <p>
@@ -98,3 +115,10 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/preformat.js"></script>
+    <script>
+        showPerformated({lines:[ @Json.Serialize(Model) ]});
+    </script>
+}
