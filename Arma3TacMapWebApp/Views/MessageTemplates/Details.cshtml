@@ -1,101 +1,108 @@
 ﻿@model Arma3TacMapWebApp.Entities.MessageTemplate
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Title;
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
 }
+<div class="container">
 
-<h1>Details</h1>
+    <h1>@Model.Title</h1>
 
-<div>
-    <h4>MessageTemplate</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Owner)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Owner.UserID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Created)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Label)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Label)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Visibility)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Visibility)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CountryCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CountryCode)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.MessageTemplateID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-
-<p>
-    <a asp-asp-controller="MessageLineTemplates" asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Lines![0].SortNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lines![0].Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lines![0].Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Lines!)
+    <div>
+        <p>@Model.Description</p>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Owner)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.Owner!.UserLabel)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Visibility)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.Visibility)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Type)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.Type)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.CountryCode)
+            </dt>
+            <dd class="col-sm-4">
+                @Html.DisplayFor(model => model.CountryCode)
+            </dd>
+        </dl>
+        @if (canEdit)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SortNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <a asp-asp-controller="MessageLineTemplates" asp-action="Edit" asp-route-id="@item.MessageLineTemplateID">Edit</a> |
-                    <a asp-asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">Details</a> |
-                    <a asp-asp-controller="MessageLineTemplates" asp-action="Delete" asp-route-id="@item.MessageLineTemplateID">Delete</a>
-                </td>
-            </tr>
+            <p>
+                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageTemplateID">@Localizer["Edit"]</a>
+            </p>
         }
-    </tbody>
-</table>
+    </div>
+
+    <div>
+        <h2>@Localizer["Preview"]</h2>
+        <hr />
+        TODO
+    </div>
+
+    <div>
+        <h2>@Localizer["Lines Configuration"]</h2>
+        <hr />
+        @if (canEdit)
+        {
+            <p>
+                <a class="btn btn-primary" asp-controller="MessageLineTemplates" asp-action="Create" asp-route-messageTemplateID="@Model.MessageTemplateID">@Localizer["Add a line"]</a>
+            </p>
+        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Lines![0].SortNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Lines![0].Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Lines![0].Description)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Lines!)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">
+                                @Html.DisplayFor(modelItem => item.SortNumber)
+                            </a>
+                        </td>
+                        <td>
+                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">@Localizer["View"]</a>
+                            @if (canEdit)
+                            {
+                                <a class="btn btn-sm btn-outline-primary" asp-controller="MessageLineTemplates" asp-action="Edit" asp-route-id="@item.MessageLineTemplateID">@Localizer["Edit"]</a>
+                                <a class="btn btn-sm btn-outline-danger"  asp-controller="MessageLineTemplates" asp-action="Delete" asp-route-id="@item.MessageLineTemplateID">@Localizer["Delete"]</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
-using Arma3TacMapWebApp.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ namespace Arma3TacMapWebApp.Controllers
             var arma3TacMapContext = _context.MessageTemplate
                 .Include(m => m.Owner)
                 .Where(m => m.OwnerUserID == userId || m.Visibility == OrbatVisibility.Public)
-                .OrderBy(e => e.Visibility).ThenBy(e => e.Label);
+                .OrderBy(e => e.Visibility).ThenBy(e => e.Title);
 
             return View(await arma3TacMapContext.ToListAsync());
         }
@@ -74,9 +74,20 @@ namespace Arma3TacMapWebApp.Controllers
 
         // GET: MessageTemplates/Create
         [Authorize(Policy = "LoggedUser")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var user = await _mapSvc.GetUser(User);
+            if (user == null)
+            {
+                return Forbid();
+            }
+            return View(new MessageTemplate()
+            {
+                Title = string.Empty,
+                OwnerUserID = user.UserID,
+                Owner = user,
+                Created = DateTime.UtcNow,
+            });
         }
 
         // POST: MessageTemplates/Create
@@ -85,7 +96,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "LoggedUser")]
-        public async Task<IActionResult> Create([Bind("MessageTemplateID,OwnerUserID,Created,Label,Description,Visibility,Type,CountryCode,Token")] MessageTemplate messageTemplate)
+        public async Task<IActionResult> Create([Bind("MessageTemplateID,OwnerUserID,Created,Title,Description,Visibility,Type,CountryCode,Token")] MessageTemplate messageTemplate)
         {
             if (messageTemplate.Visibility != OrbatVisibility.Default && !await IsUserAdmin())
             {
@@ -97,12 +108,18 @@ namespace Arma3TacMapWebApp.Controllers
                 return Forbid();
             }
             messageTemplate.OwnerUserID = messageTemplate.Owner.UserID;
+            messageTemplate.Created = DateTime.UtcNow;
             if (ModelState.IsValid)
             {
                 messageTemplate.Token = MapService.GenerateToken();
+                messageTemplate.Lines = [new MessageLineTemplate()
+                {
+                    Title = messageTemplate.Title,
+                    SortNumber = 0
+                }];
                 _context.Add(messageTemplate);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = messageTemplate.MessageTemplateID });
             }
             return View(messageTemplate);
         }
@@ -144,13 +161,13 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "LoggedUser")]
-        public async Task<IActionResult> Edit(int id, [Bind("MessageTemplateID,OwnerUserID,Created,Label,Description,Visibility,Type,CountryCode,Token")] MessageTemplate messageTemplate)
+        public async Task<IActionResult> Edit(int id, [Bind("MessageTemplateID,OwnerUserID,Created,Title,Description,Visibility,Type,CountryCode,Token")] MessageTemplate messageTemplate)
         {
             if (id != messageTemplate.MessageTemplateID)
             {
                 return NotFound();
             }
-            var existing = await _context.MessageTemplate.FindAsync(id);
+            var existing = await _context.MessageTemplate.AsNoTracking().FirstOrDefaultAsync(m => m.MessageTemplateID == id);
             if (existing == null) 
             {
                 return NotFound();
@@ -162,6 +179,7 @@ namespace Arma3TacMapWebApp.Controllers
             messageTemplate.OwnerUserID = existing.OwnerUserID;
             messageTemplate.Owner = existing.Owner;
             messageTemplate.Token = existing.Token;
+            messageTemplate.Created = existing.Created;
             if (messageTemplate.Visibility != OrbatVisibility.Default && !await IsUserAdmin())
             {
                 return Forbid();
@@ -184,7 +202,7 @@ namespace Arma3TacMapWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = messageTemplate.MessageTemplateID });
             }
             return View(messageTemplate);
         }

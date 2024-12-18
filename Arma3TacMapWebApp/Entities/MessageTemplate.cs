@@ -19,7 +19,7 @@ namespace Arma3TacMapWebApp.Entities
 
         [Display(Name = "Label")]
         [Required]
-        public required string Label { get; set; }
+        public required string Title { get; set; }
 
         [Display(Name = "Description")]
         public string? Description { get; set; }

@@ -41,7 +41,13 @@ namespace Arma3TacMapWebApp.Controllers
         {
             var messageFieldTemplate = new MessageFieldTemplate()
             {
-                MessageLineTemplateID = messageLineTemplateID
+                MessageLineTemplateID = messageLineTemplateID,
+                SortNumber = (await _context.MessageFieldTemplate
+                    .Where(f => f.MessageLineTemplateID == messageLineTemplateID)
+                    .Select(f => f.SortNumber)
+                    .ToListAsync())
+                    .DefaultIfEmpty(0)
+                    .Max() + 1
             };
             if (!await IsEditAllowed(messageFieldTemplate))
             {
@@ -56,7 +62,7 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "LoggedUser")]
-        public async Task<IActionResult> Create([Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Name,Description,Type")] MessageFieldTemplate messageFieldTemplate)
+        public async Task<IActionResult> Create([Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Title,Description,Type")] MessageFieldTemplate messageFieldTemplate)
         {
             if (!await IsEditAllowed(messageFieldTemplate))
             {
@@ -66,7 +72,7 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 _context.Add(messageFieldTemplate);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageFieldTemplateID });
+                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageLineTemplateID });
             }
             return View(messageFieldTemplate);
         }
@@ -98,22 +104,19 @@ namespace Arma3TacMapWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "LoggedUser")]
-        public async Task<IActionResult> Edit(int id, [Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Name,Description,Type")] MessageFieldTemplate messageFieldTemplate)
+        public async Task<IActionResult> Edit(int id, [Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Title,Description,Type")] MessageFieldTemplate messageFieldTemplate)
         {
             if (id != messageFieldTemplate.MessageFieldTemplateID)
             {
                 return NotFound();
             }
             var existing = _context.MessageFieldTemplate.AsNoTracking()
-                .Include(m => m.MessageLineTemplate)
-                .Include(m => m.MessageLineTemplate!.MessageTemplate)
                 .FirstOrDefault(m => m.MessageFieldTemplateID == id);
             if (existing == null)
             {
                 return NotFound();
             }
             messageFieldTemplate.MessageLineTemplateID = existing.MessageLineTemplateID;
-            messageFieldTemplate.MessageLineTemplate = existing.MessageLineTemplate;
             if (!await IsEditAllowed(messageFieldTemplate))
             {
                 return Forbid();
@@ -136,7 +139,7 @@ namespace Arma3TacMapWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageFieldTemplateID });
+                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageLineTemplateID });
             }
             return View(messageFieldTemplate);
         }
@@ -185,7 +188,7 @@ namespace Arma3TacMapWebApp.Controllers
                 }
                 _context.MessageFieldTemplate.Remove(messageFieldTemplate);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageFieldTemplateID });
+                return RedirectToAction(nameof(MessageLineTemplatesController.Details), "MessageLineTemplates", new { id = messageFieldTemplate.MessageLineTemplateID });
             }
             return RedirectToAction(nameof(MessageTemplatesController.Index), "MessageTemplates");
         }

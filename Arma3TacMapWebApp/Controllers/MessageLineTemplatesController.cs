@@ -68,7 +68,14 @@ namespace Arma3TacMapWebApp.Controllers
         {
             var messageLineTemplate = new MessageLineTemplate()
             {
-                MessageTemplateID = messageTemplateID
+                MessageTemplateID = messageTemplateID,
+
+                SortNumber = (await _context.MessageLineTemplate
+                    .Where(l => l.MessageTemplateID == messageTemplateID)
+                    .Select(l => l.SortNumber)
+                    .ToListAsync())
+                    .DefaultIfEmpty(0)
+                    .Max() + 1
             };
             if (!await IsEditAllowed(messageLineTemplate)) 
             {
@@ -132,13 +139,12 @@ namespace Arma3TacMapWebApp.Controllers
                 return NotFound();
             }
 
-            var existing = _context.MessageLineTemplate.AsNoTracking().Include(l => l.MessageTemplate).FirstOrDefault(l => l.MessageLineTemplateID == id);
+            var existing = _context.MessageLineTemplate.AsNoTracking().FirstOrDefault(l => l.MessageLineTemplateID == id);
             if (existing == null)
             {
                 return NotFound();
             }
             messageLineTemplate.MessageTemplateID = existing.MessageTemplateID;
-            messageLineTemplate.MessageTemplate = existing.MessageTemplate;
             if (!await IsEditAllowed(messageLineTemplate))
             {
                 return Forbid();

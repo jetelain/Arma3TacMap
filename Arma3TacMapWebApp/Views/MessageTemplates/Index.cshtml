@@ -26,7 +26,7 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Label)
+                    @Html.DisplayNameFor(model => model.Title)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Type)
@@ -42,7 +42,7 @@
             {
             <tr>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Label)</a>
+                    <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Title)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Type)
@@ -74,7 +74,7 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Label)
+                    @Html.DisplayNameFor(model => model.Title)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Type)
@@ -93,7 +93,7 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Label)</a>
+                        <a asp-action="Details" asp-route-id="@item.MessageTemplateID">@Html.DisplayFor(modelItem => item.Title)</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Type)

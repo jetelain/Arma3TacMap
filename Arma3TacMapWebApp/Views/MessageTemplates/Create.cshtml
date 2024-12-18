@@ -1,73 +1,63 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 @model Arma3TacMapWebApp.Entities.MessageTemplate
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = Localizer["Create a preformatted message"];
 }
+<div class="container">
+    <h1>@Localizer["Create a preformatted message"]</h1>
 
-<h1>Create</h1>
-
-<h4>MessageTemplate</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="OwnerUserID" />
-            <input type="hidden" asp-for="Token" />
-            <div class="form-group">
-                <label asp-for="OwnerUserID" class="control-label"></label>
-                <select asp-for="OwnerUserID" class ="form-control" asp-items="ViewBag.OwnerUserID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Created" class="control-label"></label>
-                <input asp-for="Created" class="form-control" />
-                <span asp-validation-for="Created" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Label" class="control-label"></label>
-                <input asp-for="Label" class="form-control" />
-                <span asp-validation-for="Label" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            @if ((await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
-            {
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="OwnerUserID" />
+                <input type="hidden" asp-for="Token" />
+                <input type="hidden" asp-for="Created" />
                 <div class="form-group">
-                    <label asp-for="Visibility" class="control-label"></label>
-                    <select asp-for="Visibility" class="form-control" asp-items="Html.GetEnumSelectList<Arma3TacMapWebApp.Entities.OrbatVisibility>()"></select>
-                    <span asp-validation-for="Visibility" class="text-danger"></span>
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
-            }
-            else
-            {
-                <input type="hidden" asp-for="Visibility" value="Default" />
-            }
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control"></select>
-                <span asp-validation-for="Type" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CountryCode" class="control-label"></label>
-                <input asp-for="CountryCode" class="form-control" />
-                <span asp-validation-for="CountryCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
+                {
+                    <div class="form-group">
+                        <label asp-for="Visibility" class="control-label"></label>
+                        <select asp-for="Visibility" class="form-control" asp-items="Html.GetEnumSelectList<Arma3TacMapWebApp.Entities.OrbatVisibility>()"></select>
+                        <span asp-validation-for="Visibility" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Visibility" value="Default" />
+                }
+                <div class="form-group">
+                    <label asp-for="Type" class="control-label"></label>
+                    <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<Arma3TacMapWebApp.Entities.MessageTemplateType>()"></select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CountryCode" class="control-label"></label>
+                    <input asp-for="CountryCode" class="form-control" />
+                    <span asp-validation-for="CountryCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Create"]" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

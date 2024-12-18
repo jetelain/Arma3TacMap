@@ -1,89 +1,100 @@
 ﻿@model Arma3TacMapWebApp.Entities.MessageLineTemplate
+@inject IHtmlLocalizer<SharedResource> Localizer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Title + " - " + Model.MessageTemplate!.Title;
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
+
 }
+<div class="container">
 
-<h1>Details</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="MessageTemplates" asp-action="Details" asp-route-id="@Model.MessageTemplateID">@Model.MessageTemplate!.Title</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
 
-<div>
-    <h4>MessageLineTemplate</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MessageTemplate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MessageTemplate.Label)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SortNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SortNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.MessageLineTemplateID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+        </ol>
+    </nav>
 
+    <h1>@Model.Title</h1>
 
-<p>
-    <a asp-controller="MessageFieldTemplates" asp-action="Create" asp-route-messageLineTemplateID="@Model.MessageLineTemplateID">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Fields![0].SortNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fields![0].Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fields![0].Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fields![0].Type)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Fields!)
+    <div>
+        <p>@Model.Description</p>
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.SortNumber)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.SortNumber)
+            </dd>
+        </dl>
+        @if (canEdit)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SortNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    <a asp-controller="MessageFieldTemplates" asp-action="Edit" asp-route-id="@item.MessageFieldTemplateID">Edit</a> |
-                    <a asp-controller="MessageFieldTemplates" asp-action="Delete" asp-route-id="@item.MessageFieldTemplateID">Delete</a>
-                </td>
-            </tr>
+            <p>
+                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageLineTemplateID">@Localizer["Edit"]</a>
+            </p>
         }
-    </tbody>
-</table>
+    </div>
+
+    <div>
+        <h2>@Localizer["Preview"]</h2>
+        <hr />
+        TODO
+    </div>
+
+    <div>
+        <h2>@Localizer["Fields Configuration"]</h2>
+        <hr />
+        @if (canEdit)
+        {
+            <p>
+                <a class="btn btn-primary" asp-controller="MessageFieldTemplates" asp-action="Create" asp-route-messageLineTemplateID="@Model.MessageLineTemplateID">@Localizer["Add a field"]</a>
+            </p>
+        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fields![0].SortNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fields![0].Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fields![0].Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Fields![0].Type)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Fields!)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SortNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @if (canEdit)
+                            {
+                                <a class="btn btn-sm btn-outline-primary" asp-controller="MessageFieldTemplates" asp-action="Edit" asp-route-id="@item.MessageFieldTemplateID">Edit</a>
+                                <a class="btn btn-sm btn-outline-danger" asp-controller="MessageFieldTemplates" asp-action="Delete" asp-route-id="@item.MessageFieldTemplateID">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
