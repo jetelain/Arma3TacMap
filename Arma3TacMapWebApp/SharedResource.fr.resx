@@ -636,4 +636,13 @@
   <data name="Checkbox" xml:space="preserve">
     <value>Case à cocher</value>
   </data>
+  <data name="Create a preformatted message" xml:space="preserve">
+    <value>Créer un message préformaté</value>
+  </data>
+  <data name="Preformatted messages" xml:space="preserve">
+    <value>Messages préformatés</value>
+  </data>
+  <data name="Preformatted messages allows to create precise and quick messages in a mission. They can be used here online, or with cTab on Arma 3." xml:space="preserve">
+    <value>Les messages préformatés permettent de créer des messages précis et rapide lors d'une mission. Ils peuevnt être utilisés ici en ligne ou dans Arma 3 avec cTab.</value>
+  </data>
 </root>

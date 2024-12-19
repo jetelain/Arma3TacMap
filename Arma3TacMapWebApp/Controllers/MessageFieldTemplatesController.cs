@@ -4,11 +4,11 @@ using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Arma3TacMapWebApp.Controllers
 {
+    [Authorize(Policy = "LoggedUser")]
     public class MessageFieldTemplatesController : Controller
     {
         private readonly Arma3TacMapContext _context;
@@ -19,6 +19,7 @@ namespace Arma3TacMapWebApp.Controllers
             _context = context;
             _mapSvc = mapSvc;
         }
+
         private async Task<bool> IsEditAllowed(MessageFieldTemplate messageFieldTemplate)
         {
             var user = await _mapSvc.GetUser(User);
@@ -36,7 +37,6 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageFieldTemplates/Create
-        [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Create(int messageLineTemplateID)
         {
             var messageFieldTemplate = new MessageFieldTemplate()
@@ -61,7 +61,6 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Create([Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Title,Description,Type")] MessageFieldTemplate messageFieldTemplate)
         {
             if (!await IsEditAllowed(messageFieldTemplate))
@@ -78,7 +77,6 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageFieldTemplates/Edit/5
-        [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -103,7 +101,6 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Edit(int id, [Bind("MessageFieldTemplateID,MessageLineTemplateID,SortNumber,Title,Description,Type")] MessageFieldTemplate messageFieldTemplate)
         {
             if (id != messageFieldTemplate.MessageFieldTemplateID)
@@ -145,7 +142,6 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageFieldTemplates/Delete/5
-        [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
