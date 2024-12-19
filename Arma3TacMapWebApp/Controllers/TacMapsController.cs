@@ -121,7 +121,8 @@ namespace Arma3TacMapWebApp.Controllers
                 var map = await _mapSvc.CreateMap(User, tacMap.WorldName, tacMap.GameName, tacMap.Label, null, tacMap.FriendlyOrbatID, tacMap.HostileOrbatID);
                 return RedirectToAction(nameof(HomeController.EditMap), "Home", new { id = map.TacMapID });
             }
-            ViewBag.Maps = (await _mapInfos.GetMaps(tacMap.GameName)).OrderBy(m => m.EnglishTitle).ToList();
+            var maps = (await _mapInfos.GetMaps(tacMap.GameName)).OrderBy(m => m.EnglishTitle).ToList();
+            ViewBag.Maps = maps;
             return View(tacMap);
         }
 
@@ -154,7 +155,7 @@ namespace Arma3TacMapWebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TacMapID,Label,WorldName,FriendlyOrbatID,HostileOrbatID")] TacMap edited)
+        public async Task<IActionResult> Edit(int id, [Bind("TacMapID,Label,WorldName,GameName,FriendlyOrbatID,HostileOrbatID")] TacMap edited)
         {
             if (id != edited.TacMapID)
             {

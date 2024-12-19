@@ -28,10 +28,10 @@
         </div>
         <div class="col-sm-4">
             <p>@Localizer["Generated message"]</p>
-            <p><button class="btn btn-secondary btn-copy" type="button" data-copy="compose-text">@Localizer["Copy"]</button></p>
             <div class="input-group">
                 <textarea id="compose-text" class="form-control" rows="@Math.Max(Model.Lines!.Count+1,2)"></textarea>
             </div>
+            <p class="mt-2"><button class="btn btn-secondary btn-copy" type="button" data-copy="compose-text">@Localizer["Copy"]</button></p>
         </div>
     </div>
 

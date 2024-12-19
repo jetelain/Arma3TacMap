@@ -118,6 +118,13 @@ namespace Arma3TacMapWebApp
             }));
 
             GameMapStorageService.AddTo(services, Configuration);
+
+            var communauty = Configuration.GetSection("Community").Get<CommunityInfos>() ?? new CommunityInfos() { 
+                Name = "PLANOPS", 
+                Home = "https://plan-ops.fr/", 
+                Contact = "https://discord.gg/9JTHHKWJPn" 
+            };
+            services.AddSingleton(communauty);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

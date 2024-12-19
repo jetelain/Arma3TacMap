@@ -8,7 +8,7 @@
     <h1>@SharedLocalizer["Create tactical map"]</h1>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-12 col-lg-8">
             <form asp-action="Create">
                 <input asp-for="GameName" type="hidden" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -22,28 +22,39 @@
                     <select asp-for="WorldName" class="form-control">
                         @foreach (var name in ((List<Arma3TacMapWebApp.Services.GameMapStorage.Json.GameMapJsonBase>)ViewBag.Maps))
                         {
-                            <option value="@name.Name">@name.EnglishTitle</option>
+                            <option value="@name.Name" data-thumbnail="@name.Thumbnail" data-pattern="@name.Layers?.FirstOrDefault()?.Pattern" data-info="@string.Format("{0:0.0}x{0:0.0} Km",name.SizeInMeters/1000.0)">@name.EnglishTitle</option>
                         }
                     </select>
-                    @* <span asp-validation-for="WorldName" class="text-danger"></span> *@
+                    <div class="row text-center mt-2">
+                        <div class="col-md-6">
+                            <img src="" id="pattern" width="250" height="250" alt="Preview of the map background" />
+                        </div>
+                        <div class="col-md-6">
+                            <p id="name"></p>
+                            <p id="info"></p>
+                            <img src="" id="thumbnail" width="250" alt="In-game preview" />
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="FriendlyOrbatID" class="control-label"></label>
-                    <select asp-for="FriendlyOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
-                        <option value="">@SharedLocalizer["(none)"]</option>
-                    </select>
-                    <span asp-validation-for="FriendlyOrbatID" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="HostileOrbatID" class="control-label"></label>
-                    <select asp-for="HostileOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
-                        <option value="">@SharedLocalizer["(none)"]</option>
-                    </select>
-                    <span asp-validation-for="HostileOrbatID" class="text-danger"></span>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="FriendlyOrbatID" class="control-label"></label>
+                        <select asp-for="FriendlyOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                            <option value="">@SharedLocalizer["(none)"]</option>
+                        </select>
+                        <span asp-validation-for="FriendlyOrbatID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="HostileOrbatID" class="control-label"></label>
+                        <select asp-for="HostileOrbatID" class="form-control" asp-items="@ViewBag.OrbatID">
+                            <option value="">@SharedLocalizer["(none)"]</option>
+                        </select>
+                        <span asp-validation-for="HostileOrbatID" class="text-danger"></span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="@SharedLocalizer["Create"]" class="btn btn-primary" />
-                </div>
+                    </div>
             </form>
         </div>
     </div>
@@ -51,4 +62,22 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updatePreview(e)
+        {
+            document.getElementById("name").innerText = e.options[e.selectedIndex].innerText;
+            document.getElementById("info").innerText = e.options[e.selectedIndex].getAttribute("data-info");
+            document.getElementById("thumbnail").src = e.options[e.selectedIndex].getAttribute("data-thumbnail");
+            document.getElementById("pattern").src = e.options[e.selectedIndex].getAttribute("data-pattern").replace(/\{.\}/,'0');
+        }
+        document.getElementsByName("WorldName").forEach(e =>
+            {
+                updatePreview(e);
+            e.addEventListener("change", function ()
+            {
+                updatePreview(e);
+            });
+        });
+
+    </script>
 }
