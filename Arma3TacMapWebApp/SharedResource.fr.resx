@@ -255,9 +255,6 @@
   <data name="Your steam id will be associated with the maps you will create, and to maps you will edit." xml:space="preserve">
     <value>Votre identifiant steam sera associé aux cartes que vous allez créer, et aux cartes que vous modifirez.</value>
   </data>
-  <data name="Provided by the 1er GTD" xml:space="preserve">
-    <value>Proposé par le 1er GTD</value>
-  </data>
   <data name="By default map is user specific, an administrator can share the map with all users using the chat command &lt;code&gt;#tacmap global&lt;/code&gt;." xml:space="preserve">
     <value>Par défaut la carte est propre à l'utilisateur, un administrateur peut partager la carte avec tous les utilisateurs en écrivant dans le tchat &lt;code&gt;#tacmap global&lt;/code&gt;.</value>
   </data>
@@ -644,5 +641,11 @@
   </data>
   <data name="Preformatted messages allows to create precise and quick messages in a mission. They can be used here online, or with cTab on Arma 3." xml:space="preserve">
     <value>Les messages préformatés permettent de créer des messages précis et rapide lors d'une mission. Ils peuvent être utilisés ici en ligne ou dans Arma 3 avec cTab.</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Hosted by {0}" xml:space="preserve">
+    <value>Hébergé par {0}</value>
   </data>
 </root>

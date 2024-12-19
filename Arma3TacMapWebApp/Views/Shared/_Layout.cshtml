@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @inject IHtmlLocalizer<SharedResource> Localizer
 @inject IAuthorizationService AuthorizationService
+@inject CommunityInfos Community
 <!DOCTYPE html>
 <html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
@@ -23,7 +24,6 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                @*<a class="mr-3" href="https://www.1ergtd-reality.fr/"><img src="https://www.1ergtd-reality.fr/files/logos/insigne_gtd.png" width="32" /></a>*@
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PLANOPS Maps@*<span class="badge badge-primary">BETA</span>*@</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -41,10 +41,10 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Orbats" asp-action="Index">@Localizer["ORBATs"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"] <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="MessageTemplates" asp-action="Index">@Localizer["Messages"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="MessageTemplates" asp-action="Index">@Localizer["Messages"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Atlas" asp-action="Index">@Localizer["Atlas"] <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="https://github.com/jetelain/Arma3TacMap/wiki" target="_blank">@Localizer["Help"]</a>
@@ -67,6 +67,13 @@
                 </div>
             </div>
         </nav>
+        @if (Community.IsTestInstance)
+        {
+            <div class="container alert alert-danger" role="alert">
+                <p>This is a development instance: data is regularly replaced by a backup.</p>
+                <p><strong>Any changes made here will be lost. Use for testing purposes only.</strong></p>
+            </div>
+        }
     </header>
     @*<div class="container">*@
     <main role="main" class="pb-3">
@@ -76,8 +83,15 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2022 - maps.plan-ops.fr - <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["Privacy"]</a> -
-            <a href="https://www.1ergtd-reality.fr/" target="_blank">@Localizer["Provided by the 1er GTD"]</a>
+            &copy; 2022-2024 - maps.plan-ops.fr - <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["Privacy"]</a>
+            @if (!string.IsNullOrEmpty(Community.Name))
+            {
+                @:- <a href="@Community.Home" target="_blank">@Localizer["Hosted by {0}", Community.Name]</a>
+            }            
+            @if (!string.IsNullOrEmpty(Community.Contact))
+            {
+                @:- <a href="@Community.Contact">@Localizer["Contact"]</a>
+            }
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
