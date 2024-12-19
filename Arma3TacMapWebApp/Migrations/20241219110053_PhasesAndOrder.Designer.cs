@@ -11,14 +11,105 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
-    [Migration("20241019190905_PhasesAndOrder")]
+    [Migration("20241219110053_PhasesAndOrder")]
     partial class PhasesAndOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageFieldTemplate", b =>
+                {
+                    b.Property<int>("MessageFieldTemplateID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageLineTemplateID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MessageFieldTemplateID");
+
+                    b.HasIndex("MessageLineTemplateID");
+
+                    b.ToTable("MessageFieldTemplate", (string)null);
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageLineTemplate", b =>
+                {
+                    b.Property<int>("MessageLineTemplateID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageTemplateID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MessageLineTemplateID");
+
+                    b.HasIndex("MessageTemplateID");
+
+                    b.ToTable("MessageLineTemplate", (string)null);
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageTemplate", b =>
+                {
+                    b.Property<int>("MessageTemplateID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CountryCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OwnerUserID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MessageTemplateID");
+
+                    b.HasIndex("OwnerUserID");
+
+                    b.ToTable("MessageTemplate", (string)null);
+                });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.Orbat", b =>
                 {
@@ -270,6 +361,39 @@ namespace Arma3TacMapWebApp.Migrations
                     b.ToTable("UserApiKey", (string)null);
                 });
 
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageFieldTemplate", b =>
+                {
+                    b.HasOne("Arma3TacMapWebApp.Entities.MessageLineTemplate", "MessageLineTemplate")
+                        .WithMany("Fields")
+                        .HasForeignKey("MessageLineTemplateID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MessageLineTemplate");
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageLineTemplate", b =>
+                {
+                    b.HasOne("Arma3TacMapWebApp.Entities.MessageTemplate", "MessageTemplate")
+                        .WithMany("Lines")
+                        .HasForeignKey("MessageTemplateID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MessageTemplate");
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageTemplate", b =>
+                {
+                    b.HasOne("Arma3TacMapWebApp.Entities.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerUserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.Orbat", b =>
                 {
                     b.HasOne("Arma3TacMapWebApp.Entities.User", "Owner")
@@ -374,6 +498,16 @@ namespace Arma3TacMapWebApp.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageLineTemplate", b =>
+                {
+                    b.Navigation("Fields");
+                });
+
+            modelBuilder.Entity("Arma3TacMapWebApp.Entities.MessageTemplate", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.Orbat", b =>
