@@ -29,15 +29,7 @@
     <h2 class="mt-3">@Localizer["Export to JSON"]</h2>
     <p><button class="btn btn-secondary btn-copy" type="button" data-copy="json">@Localizer["Copy"]</button></p>
     <div class="input-group">
-        <textarea id="json" class="form-control" rows="10" readonly="readonly">@Json.Serialize(new
-                {
-                    id = Context.Request.Host + "#" + Model.MessageTemplateID,
-                    lines = Model.Lines,
-                    title = Model.Title,
-                    description = Model.Description,
-                    type = Model.Type,
-                    href = Url.Action("Details", "MessageTemplates", new { id = Model.MessageTemplateID, t = Model.Token }, Context.Request.Scheme)
-                })</textarea>
+        <textarea id="json" class="form-control" rows="10" readonly="readonly">@Json.Serialize((Arma3TacMapWebApp.Entities.MessageTemplateJson)ViewBag.Json)</textarea>
     </div>
 
 </div>

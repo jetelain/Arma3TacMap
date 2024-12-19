@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.Authorization;
@@ -38,7 +39,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageTemplates/Details/5
-        public async Task<IActionResult> Details(int? id, string? t = null)
+        public async Task<IActionResult> Details(int? id, string? t = null, string? format = null)
         {
             if (id == null)
             {
@@ -56,15 +57,27 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 return Forbid();
             }
+
             ViewBag.CanEdit = await IsEditAllowed(messageTemplate);
 
+            await LoadLines(messageTemplate);
+
+            if (format == "json")
+            {
+                return Json(MessageTemplateExporter.ToJson(messageTemplate, GetUid(messageTemplate), GetHref(messageTemplate)));
+            }
+            return View(messageTemplate);
+        }
+
+        private async Task LoadLines(MessageTemplate messageTemplate)
+        {
             messageTemplate.Lines = await _context.MessageLineTemplate
-                .Where(l => l.MessageTemplateID == id)
+                .Where(l => l.MessageTemplateID == messageTemplate.MessageTemplateID)
                 .OrderBy(l => l.SortNumber)
                 .ToListAsync();
 
             var fields = await _context.MessageFieldTemplate
-                .Where(f => f.MessageLineTemplate!.MessageTemplateID == id)
+                .Where(f => f.MessageLineTemplate!.MessageTemplateID == messageTemplate.MessageTemplateID)
                 .OrderBy(f => f.MessageLineTemplateID).ThenBy(l => l.SortNumber)
                 .ToListAsync();
 
@@ -72,8 +85,16 @@ namespace Arma3TacMapWebApp.Controllers
             {
                 line.Fields = fields.Where(f => f.MessageLineTemplateID == line.MessageLineTemplateID).ToList();
             }
+        }
 
-            return View(messageTemplate);
+        private string GetUid(MessageTemplate messageTemplate)
+        {
+            return HttpContext.Request.Host + "#" + messageTemplate.MessageTemplateID;
+        }
+
+        private string GetHref(MessageTemplate messageTemplate)
+        {
+            return Url.Action("Details", "MessageTemplates", new { id = messageTemplate.MessageTemplateID, t = messageTemplate.Token }, HttpContext.Request.Scheme) ?? string.Empty;
         }
 
         // GET: MessageTemplates/Clone
@@ -383,22 +404,15 @@ namespace Arma3TacMapWebApp.Controllers
             }
             ViewBag.CanEdit = await IsEditAllowed(messageTemplate);
 
-            messageTemplate.Lines = await _context.MessageLineTemplate
-                .Where(l => l.MessageTemplateID == id)
-                .OrderBy(l => l.SortNumber)
-                .ToListAsync();
+            await LoadLines(messageTemplate);
 
-            var fields = await _context.MessageFieldTemplate
-                .Where(f => f.MessageLineTemplate!.MessageTemplateID == id)
-                .OrderBy(f => f.MessageLineTemplateID).ThenBy(l => l.SortNumber)
-                .ToListAsync();
+            var uid = GetUid(messageTemplate);
 
-            foreach (var line in messageTemplate.Lines)
-            {
-                line.Fields = fields.Where(f => f.MessageLineTemplateID == line.MessageLineTemplateID).ToList();
-            }
+            var href = GetHref(messageTemplate);
 
-            ViewBag.Script = "TODO";
+            ViewBag.Script = $"{ArmaSerializer.ToSimpleArrayString(MessageTemplateExporter.ToArma3(messageTemplate, uid, href))} call ctab_fnc_registerMessageTemplate;";
+            
+            ViewBag.Json = MessageTemplateExporter.ToJson(messageTemplate, uid, href);
 
             return View(messageTemplate);
         }

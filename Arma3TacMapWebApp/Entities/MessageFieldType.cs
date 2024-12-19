@@ -10,16 +10,16 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Number (Integer)")]
         Number,
 
-        [Display(Name = "Date and Time (Local)")]
+        [Display(Name = "Date and time (Local)")]
         DateTime,
 
-        [Display(Name = "Call Sign")]
+        [Display(Name = "Call sign")]
         CallSign,
 
         [Display(Name = "Frequency (MHz)")]
         Frequency,
 
-        [Display(Name = "Grid Position (MRGS coordinates)")]
+        [Display(Name = "Grid position (MRGS coordinates)")]
         Grid,
 
         [Display(Name = "Checkbox")]
