@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arma3TacMapWebApp.Migrations.Arma3TacMapPreview
 {
     [DbContext(typeof(Arma3TacMapPreviewContext))]
-    [Migration("20241020082856_PhaseKey")]
+    [Migration("20241219190715_PhaseKey")]
     partial class PhaseKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
             modelBuilder.Entity("Arma3TacMapWebApp.Entities.TacMapPreview", b =>
                 {
@@ -29,7 +29,9 @@ namespace Arma3TacMapWebApp.Migrations.Arma3TacMapPreview
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PhaseKey")
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("");
 
                     b.Property<byte[]>("Data")
                         .IsRequired()
