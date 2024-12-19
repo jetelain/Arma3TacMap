@@ -67,7 +67,7 @@
                 </div>
             </div>
         </nav>
-        @if (Communauty.IsTestInstance)
+        @if (Community.IsTestInstance)
         {
             <div class="container alert alert-danger" role="alert">
                 <p>This is a development instance: data is regularly replaced by a backup.</p>
@@ -84,13 +84,13 @@
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2022-2024 - maps.plan-ops.fr - <a asp-area="" asp-controller="Home" asp-action="Privacy">@Localizer["Privacy"]</a>
-            @if (!string.IsNullOrEmpty(Communauty.Name))
+            @if (!string.IsNullOrEmpty(Community.Name))
             {
-                @:- <a href="@Communauty.Home" target="_blank">@Localizer["Hosted by {0}", Communauty.Name]</a>
+                @:- <a href="@Community.Home" target="_blank">@Localizer["Hosted by {0}", Community.Name]</a>
             }            
-            @if (!string.IsNullOrEmpty(Communauty.Contact))
+            @if (!string.IsNullOrEmpty(Community.Contact))
             {
-                @:- <a href="@Communauty.Contact">@Localizer["Contact"]</a>
+                @:- <a href="@Community.Contact">@Localizer["Contact"]</a>
             }
         </div>
     </footer>
