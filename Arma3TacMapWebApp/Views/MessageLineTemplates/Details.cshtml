@@ -4,13 +4,14 @@
 @{
     ViewData["Title"] = Model.Title + " - " + Model.MessageTemplate!.Title;
     var canEdit = ViewBag.CanEdit as bool? ?? false;
+    var token = canEdit || Model.MessageTemplate.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public ? null : Model.MessageTemplate.Token;
 
 }
 <div class="container">
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="MessageTemplates" asp-action="Details" asp-route-id="@Model.MessageTemplateID">@Model.MessageTemplate!.Title</a></li>
+            <li class="breadcrumb-item"><a asp-controller="MessageTemplates" asp-action="Details" asp-route-id="@Model.MessageTemplateID" asp-route-t="@token">@Model.MessageTemplate!.Title</a></li>
             <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
 
         </ol>
@@ -32,21 +33,17 @@
                 </div>
             </div>
             <div class="col-4">
-                <p>Generated message</p>
-                <textarea id="compose-text" class="w-100" rows="2">
-                </textarea>
+                <p>@Localizer["Generated message"]</p>
+                <div class="input-group">
+                    <textarea id="compose-text" class="form-control" rows="2"></textarea>
+                </div>
             </div>
         </div>
     </div>
 
     <div>
         <h2>@Localizer["Line Configuration"]</h2>
-        @if (canEdit)
-        {
-            <p>
-                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageLineTemplateID">@Localizer["Edit"]</a>
-            </p>
-        }
+
         <dl class="row">
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Title)
@@ -67,14 +64,12 @@
                 @Html.DisplayFor(model => model.SortNumber)
             </dd>
         </dl>
-    </div>
 
-    <div>
-        <h2>@Localizer["Fields Configuration"]</h2>
         @if (canEdit)
         {
             <p>
                 <a class="btn btn-primary" asp-controller="MessageFieldTemplates" asp-action="Create" asp-route-messageLineTemplateID="@Model.MessageLineTemplateID">@Localizer["Add a field"]</a>
+                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageLineTemplateID">@Localizer["Edit"]</a>
             </p>
         }
         <table class="table">
@@ -117,6 +112,17 @@
                                 <a class="btn btn-sm btn-outline-primary" asp-controller="MessageFieldTemplates" asp-action="Edit" asp-route-id="@item.MessageFieldTemplateID">Edit</a>
                                 <a class="btn btn-sm btn-outline-danger" asp-controller="MessageFieldTemplates" asp-action="Delete" asp-route-id="@item.MessageFieldTemplateID">Delete</a>
                             }
+                        </td>
+                    </tr>
+                }
+                @if (Model.Fields.Count == 0 && canEdit)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <p>
+                                @Localizer["To allow the user to enter values in the line, one or more fields must be provided."]<br />
+                                <strong>@Localizer["Use the button 'Add a field' above."]</strong>
+                            </p>
                         </td>
                     </tr>
                 }

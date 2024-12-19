@@ -38,7 +38,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageTemplates/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string? t = null)
         {
             if (id == null)
             {
@@ -51,6 +51,10 @@ namespace Arma3TacMapWebApp.Controllers
             if (messageTemplate == null)
             {
                 return NotFound();
+            }
+            if (!await IsAccessAllowed(messageTemplate, t))
+            {
+                return Forbid();
             }
             ViewBag.CanEdit = await IsEditAllowed(messageTemplate);
 
@@ -69,6 +73,96 @@ namespace Arma3TacMapWebApp.Controllers
                 line.Fields = fields.Where(f => f.MessageLineTemplateID == line.MessageLineTemplateID).ToList();
             }
 
+            return View(messageTemplate);
+        }
+
+        // GET: MessageTemplates/Clone
+        [Authorize(Policy = "LoggedUser")]
+        public async Task<IActionResult> Clone(int id, string? t = null)
+        {
+            var user = await _mapSvc.GetUser(User);
+            if (user == null)
+            {
+                return Forbid();
+            }
+            var messageTemplate = await _context.MessageTemplate
+                .FirstOrDefaultAsync(m => m.MessageTemplateID == id);
+            if (messageTemplate == null)
+            {
+                return NotFound();
+            }
+            if (!await IsAccessAllowed(messageTemplate, t))
+            {
+                return Forbid();
+            }
+            return View(new MessageTemplate()
+            {
+                MessageTemplateID = messageTemplate.MessageTemplateID,
+                CountryCode = messageTemplate.CountryCode,
+                Title = messageTemplate.Title + " (copy)",
+                Description = messageTemplate.Description,
+                Visibility = messageTemplate.Visibility,
+                Type = messageTemplate.Type,
+                OwnerUserID = user.UserID,
+                Owner = user,
+                Created = DateTime.UtcNow,
+            });
+        }
+
+        // POST: MessageTemplates/Clone
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Policy = "LoggedUser")]
+        public async Task<IActionResult> Clone(int id, [Bind("MessageTemplateID,OwnerUserID,Created,Title,Description,Visibility,Type,CountryCode,Token")] MessageTemplate messageTemplate)
+        {
+            if (messageTemplate.Visibility != OrbatVisibility.Default && !await IsUserAdmin())
+            {
+                return Forbid();
+            }
+            messageTemplate.MessageTemplateID = 0;
+            messageTemplate.Owner = await _mapSvc.GetUser(User);
+            if (messageTemplate.Owner == null)
+            {
+                return Forbid();
+            }
+            messageTemplate.OwnerUserID = messageTemplate.Owner.UserID;
+            messageTemplate.Created = DateTime.UtcNow;
+            if (ModelState.IsValid)
+            {
+                var lines = await _context.MessageLineTemplate
+                    .AsNoTracking()
+                    .Where(l => l.MessageTemplateID == id)
+                    .OrderBy(l => l.SortNumber)
+                    .ToListAsync();
+
+                var fields = await _context.MessageFieldTemplate
+                    .AsNoTracking()
+                    .Where(f => f.MessageLineTemplate!.MessageTemplateID == id)
+                    .OrderBy(f => f.MessageLineTemplateID).ThenBy(l => l.SortNumber)
+                    .ToListAsync();
+
+                foreach (var line in lines)
+                {
+                    line.Fields = fields.Where(f => f.MessageLineTemplateID == line.MessageLineTemplateID).ToList();
+                    line.MessageLineTemplateID = 0;
+                    line.MessageTemplate = messageTemplate;
+                    line.MessageTemplateID = 0;
+                    foreach (var field in line.Fields)
+                    {
+                        field.MessageFieldTemplateID = 0;
+                        field.MessageLineTemplateID = 0;
+                        field.MessageLineTemplate = null;
+                    }
+                }
+
+                messageTemplate.Token = MapService.GenerateToken();
+                messageTemplate.Lines = lines;
+                _context.Add(messageTemplate);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Details), new { id = messageTemplate.MessageTemplateID });
+            }
             return View(messageTemplate);
         }
 
@@ -126,6 +220,24 @@ namespace Arma3TacMapWebApp.Controllers
 
         private async Task<bool> IsEditAllowed(MessageTemplate messageTemplate)
         {
+            var user = await _mapSvc.GetUser(User);
+            if (user == null || messageTemplate.OwnerUserID != user.UserID)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> IsAccessAllowed(MessageTemplate messageTemplate, string? token)
+        {
+            if ( messageTemplate.Visibility == OrbatVisibility.Public)
+            {
+                return true;
+            }
+            if (!string.IsNullOrEmpty(token) && messageTemplate.Token == token)
+            {
+                return true;
+            }
             var user = await _mapSvc.GetUser(User);
             if (user == null || messageTemplate.OwnerUserID != user.UserID)
             {
@@ -249,6 +361,46 @@ namespace Arma3TacMapWebApp.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Export(int? id, string? t = null)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var messageTemplate = await _context.MessageTemplate
+                .Include(m => m.Owner)
+                .FirstOrDefaultAsync(m => m.MessageTemplateID == id);
+            if (messageTemplate == null)
+            {
+                return NotFound();
+            }
+            if (!await IsAccessAllowed(messageTemplate, t))
+            {
+                return Forbid();
+            }
+            ViewBag.CanEdit = await IsEditAllowed(messageTemplate);
+
+            messageTemplate.Lines = await _context.MessageLineTemplate
+                .Where(l => l.MessageTemplateID == id)
+                .OrderBy(l => l.SortNumber)
+                .ToListAsync();
+
+            var fields = await _context.MessageFieldTemplate
+                .Where(f => f.MessageLineTemplate!.MessageTemplateID == id)
+                .OrderBy(f => f.MessageLineTemplateID).ThenBy(l => l.SortNumber)
+                .ToListAsync();
+
+            foreach (var line in messageTemplate.Lines)
+            {
+                line.Fields = fields.Where(f => f.MessageLineTemplateID == line.MessageLineTemplateID).ToList();
+            }
+
+            ViewBag.Script = "TODO";
+
+            return View(messageTemplate);
         }
 
         private bool MessageTemplateExists(int id)

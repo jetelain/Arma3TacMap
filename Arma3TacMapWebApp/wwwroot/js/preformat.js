@@ -1,59 +1,81 @@
-﻿var currentPreformated = { id: null };
-var preformatedConfig = [];
-var lastValues = {};
-function closePerformated() {
-    $('#compose-form-fields').empty();
-    $('#compose-text').prop('readonly', false);
-    currentPreformated = { id: null };
-}
-function generatePreformated() {
-    if (currentPreformated.config) {
+﻿
+class MessageTemplateUI {
+
+    constructor(composeFormFields, composeText, defaultValues) {
+        this.composeFormFields = composeFormFields;
+        this.composeText = composeText;
+        this.lastValues = defaultValues || {};
+    }
+
+    clear() {
+        this.composeFormFields.innerHTML = '';
+        this.composeText.readOnly = false;
+        this.config = null;
+    }
+
+    getText() {
+        if (!this.config) {
+            return '';
+        }
         var data = [];
-        currentPreformated.config.lines.forEach((line, lnum) => {
+        this.config.lines.forEach((line, lnum) => {
             var lineData = line.title ? line.title + ':' : '';
             line.fields.forEach((field, fnum) => {
                 var id = 'l' + lnum + 'f' + fnum;
+                var element = document.getElementById(id);
 
                 switch (field.type) {
                     case 'checkbox':
                     case 'CheckBox':
-                        if ($('#' + id).is(':checked')) {
+                        if (element.checked) {
                             lineData = lineData + ' ' + field.title;
-                            $('#' + id + '-box').addClass('bg-primary text-white');
-                        }
-                        else {
-                            $('#' + id + '-box').removeClass('bg-primary text-white');
+                            document.getElementById(id + '-box').classList.add('bg-primary', 'text-white');
+                        } else {
+                            document.getElementById(id + '-box').classList.remove('bg-primary', 'text-white');
                         }
                         break;
                     default:
-                        var value = ('' + $('#' + id).val()).trim();
+                        var value = ('' + element.value).trim();
                         if (value && value.length > 0) {
                             lineData = lineData + ' ' + (field.title || '') + value;
-                            $('#' + id + '-box').addClass('bg-primary text-white');
+                            document.getElementById(id + '-box').classList.add('bg-primary', 'text-white');
+                        } else {
+                            document.getElementById(id + '-box').classList.remove('bg-primary', 'text-white');
                         }
-                        else {
-                            $('#' + id + '-box').removeClass('bg-primary text-white');
-                        }
-                        if (field.type == 'callsign' || field.type == 'frequency') {
-                            lastValues[field.type.toLocaleLowerCase()] = value;
+                        switch (field.type) {
+                            case 'callsign':
+                            case 'CallSign':
+                            case 'frequency':
+                            case 'Frequency':
+                                this.lastValues[field.type.toLocaleLowerCase()] = value;
+                                break;
                         }
                         break;
                 }
             });
             data.push(lineData);
         });
-        $('#compose-text').val(data.join('\n'));
+        return data.join('\n');
     }
-}
 
-function showPerformated(config) {
-    $('#compose-text').prop('readonly', true);
-    currentPreformated = { config: config };
-    if (currentPreformated.config) {
-        currentPreformated.config.lines.forEach((line, lnum) => {
-            var fieldsDiv = $('<div class="form-inline" />');
+    updateComposeText() {
+        if (this.config) {
+            this.composeText.value = this.getText();
+        }
+    }
+
+    setup(config) {
+        this.config = config;
+        this.composeText.readOnly = true;
+        this.composeFormFields.innerHTML = '';
+
+        const generatePreformated = this.updateComposeText.bind(this);
+
+        config.lines.forEach((line, lnum) => {
+            const fieldsDiv = document.createElement('div');
+            fieldsDiv.className = 'form-inline';
             line.fields.forEach((field, fnum) => {
-                var id = 'l' + lnum + 'f' + fnum;
+                const id = 'l' + lnum + 'f' + fnum;
                 var width = '7em';
                 if (line.fields.length == 1) {
                     width = '15em';
@@ -61,29 +83,55 @@ function showPerformated(config) {
                 switch (field.type) {
                     case 'checkbox':
                     case 'CheckBox':
-                        fieldsDiv.append($('<div class="input-group input-group-sm mb-2 mr-sm-2">')
-                            .append($('<div class="input-group-prepend">').append($('<div class="input-group-text">').attr({ id: id + '-box' })
-                                .append($('<input type="checkbox" />').attr({ id: id })).on('click', generatePreformated)
-                                .append($('<label class="form-check-label ml-1" />').attr({ for: id }).text(field.title || ''))
-                            ))
-                            .append($('<label class="form-control bg-light" />').attr({ for: id }).text(field.description || '')));
+                        var inputGroup = document.createElement('div');
+                        inputGroup.className = 'input-group input-group-sm mb-2 mr-sm-2';
+
+                        var inputGroupPrepend = document.createElement('div');
+                        inputGroupPrepend.className = 'input-group-prepend';
+
+                        var inputGroupText = document.createElement('div');
+                        inputGroupText.className = 'input-group-text';
+                        inputGroupText.id = id + '-box';
+
+                        var checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = id;
+                        checkbox.addEventListener('click', generatePreformated);
+
+                        var label = document.createElement('label');
+                        label.className = 'form-check-label ml-1';
+                        label.htmlFor = id;
+                        label.textContent = field.title || '';
+
+                        inputGroupText.appendChild(checkbox);
+                        inputGroupText.appendChild(label);
+                        inputGroupPrepend.appendChild(inputGroupText);
+
+                        var descriptionLabel = document.createElement('label');
+                        descriptionLabel.className = 'form-control bg-light';
+                        descriptionLabel.htmlFor = id;
+                        descriptionLabel.textContent = field.description || '';
+
+                        inputGroup.appendChild(inputGroupPrepend);
+                        inputGroup.appendChild(descriptionLabel);
+                        fieldsDiv.appendChild(inputGroup);
                         break;
                     default:
                         var attr = { id: id, placeholder: field.description, type: 'text' };
                         switch (field.type) {
                             case 'utm':
                             case 'Grid':
-                                attr.value = $('#position').text().trim();
+                                attr.value = '';
                                 break;
                             case 'callsign':
                             case 'CallSign':
-                                attr.value = lastValues['callsign'] || '';
+                                attr.value = this.lastValues['callsign'] || '';
                                 break;
                             case 'frequency':
                             case 'Frequency':
                                 attr.type = 'number';
                                 attr.step = '0.025';
-                                attr.value = lastValues['frequency'] || '45.000';
+                                attr.value = this.lastValues['frequency'] || '';
                                 break;
                             case 'number':
                             case 'Number':
@@ -93,26 +141,43 @@ function showPerformated(config) {
                                 attr.type = 'datetime-local';
                                 break;
                         }
-                        fieldsDiv.append($('<div class="input-group input-group-sm mb-2 mr-sm-2">')
-                            .append($('<div class="input-group-prepend">').append($('<label class="input-group-text">').attr({ for: id, id: id + '-box' }).text(field.title || '')))
-                            .append($('<input type="text" class="form-control" />').attr(attr).css({ width: width })
-                                .on('change', generatePreformated)
-                                .on('keyup', generatePreformated)));
+                        var inputGroup = document.createElement('div');
+                        inputGroup.className = 'input-group input-group-sm mb-2 mr-sm-2';
+
+                        var inputGroupPrepend = document.createElement('div');
+                        inputGroupPrepend.className = 'input-group-prepend';
+
+                        var inputGroupText = document.createElement('label');
+                        inputGroupText.className = 'input-group-text';
+                        inputGroupText.htmlFor = id;
+                        inputGroupText.id = id + '-box';
+                        inputGroupText.textContent = field.title || '';
+
+                        var input = document.createElement('input');
+                        input.className = 'form-control';
+                        Object.assign(input, attr);
+                        input.style.width = width;
+                        input.addEventListener('change', generatePreformated);
+                        input.addEventListener('keyup', generatePreformated);
+
+                        inputGroupPrepend.appendChild(inputGroupText);
+                        inputGroup.appendChild(inputGroupPrepend);
+                        inputGroup.appendChild(input);
+                        fieldsDiv.appendChild(inputGroup);
                         break;
                 }
             });
-            $('#compose-form-fields')
-                .append($('<div class="col" />').text(line.title ? line.title + ': ' + (line.description || '') : (line.description || ''))
-                    .append(fieldsDiv));
+            var colDiv = document.createElement('div');
+            colDiv.className = 'col';
+            colDiv.textContent = line.title ? line.title + ': ' + (line.description || '') : (line.description || '');
+            colDiv.appendChild(fieldsDiv);
+            this.composeFormFields.appendChild(colDiv);
         });
-        generatePreformated();
-    } else {
-        var content = $('<div class="mb-2" />');
-        preformatedConfig.forEach(config => {
-            content.append($('<a class="btn btn-sm btn-primary mr-2"></a>').text(config.title).on('click', function () {
-                showPerformated(config.id);
-            }));
-        });
-        $('#compose-form-fields').append(content);
+
+        this.updateComposeText();
     }
+}
+
+function showPerformated(config) {
+    new MessageTemplateUI(document.getElementById('compose-form-fields'), document.getElementById('compose-text')).setup(config);
 }

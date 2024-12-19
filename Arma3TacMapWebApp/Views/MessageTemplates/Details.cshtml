@@ -4,10 +4,15 @@
 @{
     ViewData["Title"] = Model.Title;
     var canEdit = ViewBag.CanEdit as bool? ?? false;
+    var token = canEdit || Model.Visibility == Arma3TacMapWebApp.Entities.OrbatVisibility.Public ? null : Model.Token;
 }
 <div class="container">
 
-    <h1>@Model.Title</h1>
+    <h1 class="text-center">
+        @Model.Title
+        <a asp-action="Clone" class="btn btn-sm btn-secondary" asp-route-id="@Model.MessageTemplateID" asp-route-t="@token"><i class="far fa-clone"></i> @Localizer["Create a copy"]</a>
+        <a asp-action="Export" class="btn btn-sm btn-secondary" asp-route-id="@Model.MessageTemplateID" asp-route-t="@token"><i class="fas fa-share-square"></i> @Localizer["Export"]</a>
+    </h1>
 
     <div class="row">
         <div class="col-sm-8">
@@ -22,21 +27,16 @@
             </div>
         </div>
         <div class="col-sm-4">
-            <p>Generated message</p>
-            <textarea id="compose-text" class="w-100" rows="@Math.Max(Model.Lines!.Count+1,2)">
-            </textarea>
-            <button class="btn btn-secondary" onclick="copyToClipboard()">Copy to clipboard</button>
+            <p>@Localizer["Generated message"]</p>
+            <p><button class="btn btn-secondary btn-copy" type="button" data-copy="compose-text">@Localizer["Copy"]</button></p>
+            <div class="input-group">
+                <textarea id="compose-text" class="form-control" rows="@Math.Max(Model.Lines!.Count+1,2)"></textarea>
+            </div>
         </div>
     </div>
 
     <div class="mt-2">
         <h2>@Localizer["Informations"]</h2>
-        @if (canEdit)
-        {
-            <p>
-                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageTemplateID">@Localizer["Edit"]</a>
-            </p>
-        }
         <dl class="row">
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Title)
@@ -75,14 +75,11 @@
                 @Html.DisplayFor(model => model.CountryCode)
             </dd>
         </dl>
-    </div>
-
-    <div class="mt-4">
-        <h2>@Localizer["Lines Configuration"]</h2>
         @if (canEdit)
         {
             <p>
                 <a class="btn btn-primary" asp-controller="MessageLineTemplates" asp-action="Create" asp-route-messageTemplateID="@Model.MessageTemplateID">@Localizer["Add a line"]</a>
+                <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@Model.MessageTemplateID">@Localizer["Edit"]</a>
             </p>
         }
         <table class="table">
@@ -101,16 +98,28 @@
                 </tr>
             </thead>
             <tbody>
+                @if (Model.Lines.Count < 2 && canEdit)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <p>
+                                @Localizer["To allow the user to enter values, one or more lines with fields must be provided."]<br />
+                                <strong>@Localizer["Use the button 'Add a line' above."]</strong>
+                            </p>
+                            <p>@Localizer["First line should be used to specify the message type."]</p>
+                        </td>
+                    </tr>
+                }
                 @foreach (var item in Model.Lines!)
                 {
                     <tr>
                         <td>
-                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">
+                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID" asp-route-t="@token">
                                 @Html.DisplayFor(modelItem => item.SortNumber)
                             </a>
                         </td>
                         <td>
-                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">
+                            <a asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID" asp-route-t="@token">
                                 @Html.DisplayFor(modelItem => item.Title)
                             </a>
                         </td>
@@ -118,11 +127,11 @@
                             @Html.DisplayFor(modelItem => item.Description)
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-outline-primary" asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID">@Localizer["View"]</a>
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="MessageLineTemplates" asp-action="Details" asp-route-id="@item.MessageLineTemplateID" asp-route-t="@token">@Localizer["View"]</a>
                             @if (canEdit)
                             {
                                 <a class="btn btn-sm btn-outline-primary" asp-controller="MessageLineTemplates" asp-action="Edit" asp-route-id="@item.MessageLineTemplateID">@Localizer["Edit"]</a>
-                                <a class="btn btn-sm btn-outline-danger"  asp-controller="MessageLineTemplates" asp-action="Delete" asp-route-id="@item.MessageLineTemplateID">@Localizer["Delete"]</a>
+                                <a class="btn btn-sm btn-outline-danger" asp-controller="MessageLineTemplates" asp-action="Delete" asp-route-id="@item.MessageLineTemplateID">@Localizer["Delete"]</a>
                             }
                         </td>
                     </tr>
@@ -132,15 +141,9 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script src="~/js/preformat.js"></script>
     <script>
-        function copyToClipboard() {
-            const textField = document.getElementById('compose-text');
-            navigator.clipboard.writeText(textField.value);
-        }
-
         showPerformated({lines: @Json.Serialize(Model.Lines)});
     </script>
 }

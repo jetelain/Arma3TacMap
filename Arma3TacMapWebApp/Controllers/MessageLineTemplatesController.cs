@@ -23,7 +23,7 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: MessageLineTemplates/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string? t = null)
         {
             if (id == null)
             {
@@ -36,6 +36,10 @@ namespace Arma3TacMapWebApp.Controllers
             if (messageLineTemplate == null)
             {
                 return NotFound();
+            }
+            if (!await IsAccessAllowed(messageLineTemplate, t))
+            {
+                return Forbid();
             }
 
             ViewBag.CanEdit = await IsEditAllowed(messageLineTemplate);
@@ -62,20 +66,44 @@ namespace Arma3TacMapWebApp.Controllers
             return true;
         }
 
+        private async Task<bool> IsAccessAllowed(MessageLineTemplate messageLineTemplate, string? token)
+        {
+            if (messageLineTemplate.MessageTemplate == null)
+            {
+                messageLineTemplate.MessageTemplate = await _context.MessageTemplate
+                        .FirstOrDefaultAsync(l => l.MessageTemplateID == messageLineTemplate.MessageTemplateID);
+            }
+            if (messageLineTemplate.MessageTemplate!.Visibility == OrbatVisibility.Public)
+            {
+                return true;
+            }
+            if (!string.IsNullOrEmpty(token) && messageLineTemplate.MessageTemplate!.Token == token)
+            {
+                return true;
+            }
+            var user = await _mapSvc.GetUser(User);
+            if (user == null || messageLineTemplate.MessageTemplate!.OwnerUserID != user.UserID)
+            {
+                return false;
+            }
+            return true;
+        }
+
         // GET: MessageLineTemplates/Create
         [Authorize(Policy = "LoggedUser")]
         public async Task<IActionResult> Create(int messageTemplateID)
         {
-            var messageLineTemplate = new MessageLineTemplate()
-            {
-                MessageTemplateID = messageTemplateID,
-
-                SortNumber = (await _context.MessageLineTemplate
+            var sortNumber = (await _context.MessageLineTemplate
                     .Where(l => l.MessageTemplateID == messageTemplateID)
                     .Select(l => l.SortNumber)
                     .ToListAsync())
                     .DefaultIfEmpty(0)
-                    .Max() + 1
+                    .Max() + 1;
+            var messageLineTemplate = new MessageLineTemplate()
+            {
+                MessageTemplateID = messageTemplateID,
+                SortNumber = sortNumber,
+                Title = $"Line {sortNumber}"
             };
             if (!await IsEditAllowed(messageLineTemplate)) 
             {

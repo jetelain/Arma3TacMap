@@ -31,4 +31,11 @@
     <Folder Include="wwwroot\img\missions\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\MessageTemplates\Clone.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
