@@ -9,7 +9,7 @@ namespace Arma3TacMapWebApp.Entities
         public int OrbatUnitID { get; set; }
 
         public int OrbatID { get; set; }
-        public Orbat Orbat { get; set; }
+        public Orbat? Orbat { get; set; }
 
         [Display(Name = "Parent Unit")]
         public int? ParentOrbatUnitID { get; set; }
@@ -55,7 +55,7 @@ namespace Arma3TacMapWebApp.Entities
             (NatoSymbolMod1 ?? string.Empty).PadLeft(2, '0') +
             (NatoSymbolMod2 ?? string.Empty).PadLeft(2, '0');
 
-        public List<OrbatUnit> Children { get; set; }
+        public List<OrbatUnit>? Children { get; set; }
 
         [NotMapped]
         public int RelativeLevel { get; set; }
