@@ -224,7 +224,9 @@ namespace Arma3TacMapWebApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("OwnerUserID")
                         .HasColumnType("INTEGER");
