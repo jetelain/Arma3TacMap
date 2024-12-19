@@ -11,6 +11,7 @@ namespace Arma3TacMapWebApp.Entities
 
         [Display(Name = "Owner")]
         public int OwnerUserID { get; set; }
+
         [Display(Name = "Owner")]
         public User? Owner { get; set; }
 
@@ -51,5 +52,9 @@ namespace Arma3TacMapWebApp.Entities
         public int? HostileOrbatID { get; set; }
         [Display(Name = "Hostile ORBAT")]
         public Orbat? HostileOrbat { get; set; }
+
+        public int? Phase { get; set; }
+
+        public int Order { get; set; }
     }
 }

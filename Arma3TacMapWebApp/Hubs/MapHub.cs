@@ -38,9 +38,9 @@ namespace Arma3TacMapWebApp.Hubs
             }
         }
 
-        private MapId GetContexMapId()
+        private MapId? GetContexMapId()
         {
-            return (MapId)Context.Items[MapIdProperty];
+            return (MapId?)Context.Items[MapIdProperty];
         }
 
         private string GetPseudoUserId()
@@ -55,7 +55,7 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 return;
             }
-            var layer = await _svc.CreateLayer(Context.User, mapId, layerData.label);
+            var layer = await _svc.CreateLayer(Context.User, mapId, layerData.label, layerData.phase, layerData.order);
             if (layer != null)
             {
                 await Notify(mapId, "AddOrUpdateLayer", layer);
@@ -103,7 +103,7 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 return;
             }
-            var layer = await _svc.UpdateLayer(Context.User, mapId, layerId, layerData.label);
+            var layer = await _svc.UpdateLayer(Context.User, mapId, layerId, layerData.label, layerData.phase, layerData.order);
             if (layer != null)
             {
                 await Notify(mapId, "AddOrUpdateLayer", layer);
@@ -226,7 +226,7 @@ namespace Arma3TacMapWebApp.Hubs
             {
                 id = layer.Id,
                 mapId = mapId,
-                data = new LayerData { label = layer.Label },
+                data = new LayerData { label = layer.Label, phase = layer.Phase, order = layer.Order },
                 isDefaultLayer = layer.Id == mapId.TacMapID
             };
         }

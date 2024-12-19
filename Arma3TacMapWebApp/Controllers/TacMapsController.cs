@@ -31,10 +31,10 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly Arma3TacMapContext _context;
         private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
-        private readonly MapPreviewService _preview;
+        private readonly IMapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
 
-        public TacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
+        public TacMapsController(Arma3TacMapContext context, IGameMapStorageService mapInfos, MapService mapSvc, IMapPreviewService preview, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapInfos = mapInfos;
@@ -537,7 +537,7 @@ namespace Arma3TacMapWebApp.Controllers
                 {
                     if (layer.Id != tacMap.TacMapID)
                     {
-                        var clonedLayer = await _mapSvc.CreateLayer(User, clone, layer.Label);
+                        var clonedLayer = await _mapSvc.CreateLayer(User, clone, layer.Label, layer.Phase);
                         layerMapping.Add(layer.Id, clonedLayer.Id);
                     }
                 }

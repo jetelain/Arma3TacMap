@@ -648,4 +648,13 @@
   <data name="Hosted by {0}" xml:space="preserve">
     <value>Hébergé par {0}</value>
   </data>
+  <data name="Phase" xml:space="preserve">
+    <value>Temps</value>
+  </data>
+  <data name="All phases" xml:space="preserve">
+    <value>Tout le temps</value>
+  </data>
+  <data name="Phase number" xml:space="preserve">
+    <value>Temps numéro</value>
+  </data>
 </root>
