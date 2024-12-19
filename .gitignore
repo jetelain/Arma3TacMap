@@ -354,3 +354,4 @@ MigrationBackup/
 /Arma3TacMapWebApp/wwwroot/help/legal.html
 *.db-shm
 *.db-wal
+/Arma3TacMapWebApp/SharedResource.resx
