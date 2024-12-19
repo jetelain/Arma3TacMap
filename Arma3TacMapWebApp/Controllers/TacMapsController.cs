@@ -516,7 +516,7 @@ namespace Arma3TacMapWebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Clone(int id, [Bind("WorldName,Label")] TacMap cloneInfos)
+        public async Task<IActionResult> Clone(int id, [Bind("WorldName,GameName,Label")] TacMap cloneInfos)
         {
             var tacMap = await _mapSvc.GrantWriteAccess(User, id, null);
             if (tacMap == null)
