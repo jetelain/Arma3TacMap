@@ -23,7 +23,7 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Visibility")]
         public OrbatVisibility Visibility { get; set; }
 
-        public List<OrbatUnit> Units { get; set; }
+        public List<OrbatUnit>? Units { get; set; }
 
         public string? Token { get; set; }
     }

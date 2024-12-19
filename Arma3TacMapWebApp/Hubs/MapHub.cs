@@ -20,7 +20,7 @@ namespace Arma3TacMapWebApp.Hubs
         public async Task Hello(MapId mapId)
         {
             var userAccess = await _svc.GetInitialData(Context.User, mapId);
-            if (userAccess.CanRead)
+            if (userAccess != null && userAccess.CanRead)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, GetGroup(mapId));
 

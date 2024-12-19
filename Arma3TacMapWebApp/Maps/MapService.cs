@@ -147,7 +147,7 @@ namespace Arma3TacMapWebApp.Maps
             var access = await _db.TacMapAccesses.Include(a => a.TacMap).FirstOrDefaultAsync(a => a.UserID == dbUser.UserID && a.TacMapID == id);
             if (access != null)
             {
-                if (t == access.TacMap.ReadWriteToken)
+                if (t == access.TacMap!.ReadWriteToken)
                 {
                     access.CanWrite = true;
                     await _db.SaveChangesAsync();
@@ -258,7 +258,7 @@ namespace Arma3TacMapWebApp.Maps
             var steamId = GetSteamId(user);
             if (!string.IsNullOrEmpty(steamId))
             {
-                var userAccess = await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID);
+                var userAccess = await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User!.SteamId == steamId && a.TacMapID == mapId.TacMapID);
                 if (userAccess != null)
                 {
                     if (!mapId.IsReadOnly && !userAccess.CanWrite)
