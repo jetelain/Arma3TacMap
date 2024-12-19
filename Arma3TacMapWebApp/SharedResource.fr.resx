@@ -579,4 +579,70 @@
   <data name="Base map" xml:space="preserve">
     <value>Fond de carte</value>
   </data>
+  <data name="Add a field" xml:space="preserve">
+    <value>Ajouter un champ</value>
+  </data>
+  <data name="Add a line" xml:space="preserve">
+    <value>Ajouter une ligne</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>Numéro</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="Prefix" xml:space="preserve">
+    <value>Préfixe</value>
+  </data>
+  <data name="Input type" xml:space="preserve">
+    <value>Type de saisie</value>
+  </data>
+  <data name="Generated message" xml:space="preserve">
+    <value>Message généré</value>
+  </data>
+  <data name="Informations" xml:space="preserve">
+    <value>Informations</value>
+  </data>
+  <data name="To allow the user to enter values in the line, one or more fields must be provided." xml:space="preserve">
+    <value>Pour permettre à l'utilisateur de saisir des valeurs dans la ligne, un ou plusieurs champs doivent être fournis.</value>
+  </data>
+  <data name="Use the button 'Add a field' above." xml:space="preserve">
+    <value>Utilisez le bouton « Ajouter un champ » ci-dessus.</value>
+  </data>
+  <data name="To allow the user to enter values, one or more lines with fields must be provided." xml:space="preserve">
+    <value>Pour permettre à l'utilisateur de saisir des valeurs, une ou plusieurs lignes avec des champs doivent être fournies.</value>
+  </data>
+  <data name="Use the button 'Add a line' above." xml:space="preserve">
+    <value>Utilisez le bouton « Ajouter une ligne » ci-dessus.</value>
+  </data>
+  <data name="First line (number 0) should be used to specify the message type." xml:space="preserve">
+    <value>La première ligne (numéro 0) devrait être utilisée pour spécifier le type de message.</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <data name="Number (Integer)" xml:space="preserve">
+    <value>Nomber (entier)</value>
+  </data>
+  <data name="Date and time (Local)" xml:space="preserve">
+    <value>Date et heure (locale)</value>
+  </data>
+  <data name="Frequency (MHz)" xml:space="preserve">
+    <value>Fréquence (MHz)</value>
+  </data>
+  <data name="Grid position (MRGS coordinates)" xml:space="preserve">
+    <value>Position sur la grille (Coordonnées MGRS)</value>
+  </data>
+  <data name="Checkbox" xml:space="preserve">
+    <value>Case à cocher</value>
+  </data>
+  <data name="Create a preformatted message" xml:space="preserve">
+    <value>Créer un message préformaté</value>
+  </data>
+  <data name="Preformatted messages" xml:space="preserve">
+    <value>Messages préformatés</value>
+  </data>
+  <data name="Preformatted messages allows to create precise and quick messages in a mission. They can be used here online, or with cTab on Arma 3." xml:space="preserve">
+    <value>Les messages préformatés permettent de créer des messages précis et rapide lors d'une mission. Ils peuvent être utilisés ici en ligne ou dans Arma 3 avec cTab.</value>
+  </data>
 </root>

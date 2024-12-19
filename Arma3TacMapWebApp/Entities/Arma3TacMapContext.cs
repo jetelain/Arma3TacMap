@@ -46,6 +46,17 @@ namespace Arma3TacMapWebApp.Entities
 
             var userApiKey = modelBuilder.Entity<UserApiKey>();
             userApiKey.ToTable(nameof(UserApiKey));
+
+            // Message templates
+            modelBuilder.Entity<MessageTemplate>().ToTable(nameof(MessageTemplate));
+
+            var line = modelBuilder.Entity<MessageLineTemplate>();
+            line.HasOne(t => t.MessageTemplate).WithMany(t => t.Lines).OnDelete(DeleteBehavior.Cascade);
+            line.ToTable(nameof(MessageLineTemplate));
+
+            var field = modelBuilder.Entity<MessageFieldTemplate>();
+            field.HasOne(t => t.MessageLineTemplate).WithMany(t => t.Fields).OnDelete(DeleteBehavior.Cascade);
+            field.ToTable(nameof(MessageFieldTemplate));
         }
 
         internal void UpgradeData()
@@ -57,5 +68,8 @@ namespace Arma3TacMapWebApp.Entities
             }
             SaveChanges();
         }
+        public DbSet<Arma3TacMapWebApp.Entities.MessageTemplate> MessageTemplate { get; set; } = default!;
+        public DbSet<Arma3TacMapWebApp.Entities.MessageLineTemplate> MessageLineTemplate { get; set; } = default!;
+        public DbSet<Arma3TacMapWebApp.Entities.MessageFieldTemplate> MessageFieldTemplate { get; set; } = default!;
     }
 }
