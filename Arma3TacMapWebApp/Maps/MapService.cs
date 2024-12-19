@@ -20,7 +20,7 @@ namespace Arma3TacMapWebApp.Maps
             _db = db;
         }
 
-        internal static string? GetSteamId(ClaimsPrincipal user)
+        internal static string? GetSteamId(ClaimsPrincipal? user)
         {
             if (user?.Identity?.IsAuthenticated ?? false)
             {
@@ -33,14 +33,14 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        public async Task<TacMapAccess> CanWrite(ClaimsPrincipal user, MapId mapId)
+        public async Task<TacMapAccess?> CanWrite(ClaimsPrincipal? user, MapId mapId)
         {
             if (mapId.IsReadOnly)
             {
                 return null;
             }
             var steamId = GetSteamId(user);
-            return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
+            return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User!.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
         internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string gameName, string label, Uri? eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
@@ -383,10 +383,10 @@ namespace Arma3TacMapWebApp.Maps
             if (dbUser != null)
             {
                 return await _db.TacMapAccesses
-                    .Where(m => m.UserID == dbUser.UserID && m.TacMap.ParentTacMapID == null)
+                    .Where(m => m.UserID == dbUser.UserID && m.TacMap!.ParentTacMapID == null)
                     .Include(t => t.TacMap)
-                    .Include(t => t.TacMap.Owner)
-                    .OrderByDescending(m => m.TacMap.Created)
+                    .Include(t => t.TacMap!.Owner)
+                    .OrderByDescending(m => m.TacMap!.Created)
                     .Take(maxMaps)
                     .ToListAsync();
             }

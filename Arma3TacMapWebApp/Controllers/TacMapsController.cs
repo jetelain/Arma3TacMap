@@ -4,10 +4,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
-using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapLibrary.Maps;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
@@ -72,9 +70,13 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         // GET: TacMaps/Create
-        public async Task<IActionResult> Create(string worldName, string gameName = "arma3")
+        public async Task<IActionResult> Create(string? worldName, string gameName = "arma3")
         {
             var user = await _mapSvc.GetUser(User);
+            if (user == null)
+            {
+                return Forbid();
+            }
             await PrepareOrbatDropdown(user);
             var maps = (await _mapInfos.GetMaps(gameName)).OrderBy(m => m.EnglishTitle).ToList();
             if (string.IsNullOrEmpty(worldName) && maps.Count > 0)
@@ -84,9 +86,10 @@ namespace Arma3TacMapWebApp.Controllers
             ViewBag.Maps = maps;
             return View(new TacMap()
             {
-                WorldName = worldName,
+                WorldName = worldName ?? string.Empty,
                 GameName = gameName,
-                Label = "Carte tactique sans nom"
+                Label = "Carte tactique sans nom",
+                OwnerUserID = user.UserID
             });
         }
 
@@ -138,7 +141,7 @@ namespace Arma3TacMapWebApp.Controllers
                 return NotFound();
             }
             var user = await _mapSvc.GetUser(User);
-            if (tacMap.OwnerUserID != user.UserID)
+            if (user == null || tacMap.OwnerUserID != user.UserID)
             {
                 return Forbid();
             }
@@ -160,9 +163,12 @@ namespace Arma3TacMapWebApp.Controllers
             var tacMap = await _context.TacMaps
                 .Include(t => t.Owner)
                 .FirstOrDefaultAsync(m => m.TacMapID == id);
-
+            if (tacMap == null)
+            {
+                return NotFound();
+            }
             var user = await _mapSvc.GetUser(User);
-            if (tacMap.OwnerUserID != user.UserID || tacMap.ParentTacMapID != null)
+            if (user == null || tacMap.OwnerUserID != user.UserID || tacMap.ParentTacMapID != null)
             {
                 return Forbid();
             }
@@ -407,7 +413,7 @@ namespace Arma3TacMapWebApp.Controllers
             vm.TacMap = mapAccess.TacMap;
             vm.Access = mapAccess;
 
-            FeatureCollection collection = null;
+            FeatureCollection? collection = null;
             GeoJsonConfig.IgnorePositionValidation();
             try
             {

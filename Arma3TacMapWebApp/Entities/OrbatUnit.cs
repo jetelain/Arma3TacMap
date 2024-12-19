@@ -9,7 +9,7 @@ namespace Arma3TacMapWebApp.Entities
         public int OrbatUnitID { get; set; }
 
         public int OrbatID { get; set; }
-        public Orbat Orbat { get; set; }
+        public Orbat? Orbat { get; set; }
 
         [Display(Name = "Parent Unit")]
         public int? ParentOrbatUnitID { get; set; }
