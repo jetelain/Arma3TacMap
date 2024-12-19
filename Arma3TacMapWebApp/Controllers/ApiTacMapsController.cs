@@ -96,7 +96,7 @@ namespace Arma3TacMapWebApp.Controllers
                 map.ReadWriteHref = Url.Action(nameof(HomeController.EditMap), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadWriteToken }, Request.Scheme);
             }
             map.PreviewHref = new Dictionary<int, string>();
-            foreach(var size in MapPreviewService.ValidSizes)
+            foreach(var size in MapPreviewService.ValidSizesStatic)
             {
                 map.PreviewHref.Add(size, Url.Action(nameof(HomeController.ViewMapScreenShot), "Home", new { id = access.TacMap.TacMapID, t = access.TacMap.ReadOnlyToken, size }, Request.Scheme));
             }

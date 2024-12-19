@@ -645,4 +645,13 @@
   <data name="Preformatted messages allows to create precise and quick messages in a mission. They can be used here online, or with cTab on Arma 3." xml:space="preserve">
     <value>Les messages préformatés permettent de créer des messages précis et rapide lors d'une mission. Ils peuvent être utilisés ici en ligne ou dans Arma 3 avec cTab.</value>
   </data>
+  <data name="Phase" xml:space="preserve">
+    <value>Temps</value>
+  </data>
+  <data name="All phases" xml:space="preserve">
+    <value>Tout le temps</value>
+  </data>
+  <data name="Phase number" xml:space="preserve">
+    <value>Temps numéro</value>
+  </data>
 </root>

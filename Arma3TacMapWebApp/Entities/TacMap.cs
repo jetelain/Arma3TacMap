@@ -1,8 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Arma3TacMapLibrary.Arma3;
 using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 
 namespace Arma3TacMapWebApp.Entities
@@ -13,8 +11,9 @@ namespace Arma3TacMapWebApp.Entities
 
         [Display(Name = "Owner")]
         public int OwnerUserID { get; set; }
+
         [Display(Name = "Owner")]
-        public User Owner { get; set; }
+        public User? Owner { get; set; }
 
         [Display(Name = "Creation date")]
         public DateTime Created { get; set; }
@@ -53,5 +52,9 @@ namespace Arma3TacMapWebApp.Entities
         public int? HostileOrbatID { get; set; }
         [Display(Name = "Hostile ORBAT")]
         public Orbat? HostileOrbat { get; set; }
+
+        public int? Phase { get; set; }
+
+        public int Order { get; set; }
     }
 }
