@@ -1418,6 +1418,34 @@ var Arma3TacMap;
         }
     }
 
+    function getOrderedLayers(layers) {
+        let allLayers = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+        allLayers.sort((a, b) => {
+            if (a.data.phase === b.data.phase) {
+                if (a.data.order === b.data.order) {
+                    return a.id - b.id;
+                }
+                return a.data.order - b.data.order;
+            }
+            if (a.data.phase === null) return -1;
+            if (b.data.phase === null) return 1;
+            return a.data.phase - b.data.phase;
+        });
+        return allLayers;
+    }
+
+    function applyLayersOrder(layers) {
+        const sorted = getOrderedLayers(layers);
+        const listItems = sorted.map((l) => l.listItem.detach());
+        $('#layers-list').append(listItems);
+
+        $('select.layers-dropdown').each((index, selectElement) => {
+            const selectElements = sorted.map((l) => $(selectElement).find('option[value=' + l.id + ']').detach());
+            $(selectElement).append(selectElements);
+            $(selectElement).selectpicker('refresh');
+        });
+    }
+
     function setupLayerUI(map, layer, layers) {
         layer.listItem.on('click', function () { setCurrentLayer(layer, layers); });
 
@@ -1505,7 +1533,6 @@ var Arma3TacMap;
         if (!layer.listItem) {
             if (!layerJson.isDefaultLayer) {
                 layer.listItem = layerTemplate.clone();
-                $('#layers-list').append(layer.listItem);
                 $('select.layers-dropdown').append($('<option />').attr('value', '' + layerJson.id));
             }
             else {
@@ -1516,16 +1543,15 @@ var Arma3TacMap;
         if (!layerJson.isDefaultLayer) {
             layer.listItem.find('.layers-item-label').text(layerJson.data.label);
             $('select.layers-dropdown option[value=' + layerJson.id + ']').text(layerJson.data.label);
-            $('select.layers-dropdown').selectpicker('refresh');
         } else if (!currentLayer) {
             currentLayer = layer;
         }
 
-        updatePhaseSelectorItems(layers, phaseTemplate);
+        applyLayersOrder(layers);
 
-        // TODO: Sort $('#layers-list')
-        // TODO: Sort $('select.layers-dropdown')
+        updatePhaseSelectorItems(layers, phaseTemplate);
     }
+
 
     function connect(map, backend, markers, pointing, canEdit, opacity, layers) {
 
