@@ -33,6 +33,7 @@ namespace Arma3TacMapWebApp.Entities
             var tacMap = modelBuilder.Entity<TacMap>();
             tacMap.HasOne(t => t.HostileOrbat).WithMany().OnDelete(DeleteBehavior.SetNull);
             tacMap.HasOne(t => t.FriendlyOrbat).WithMany().OnDelete(DeleteBehavior.SetNull);
+            tacMap.HasOne(t => t.Parent).WithMany().OnDelete(DeleteBehavior.Cascade);
             tacMap.Property(t => t.GameName).HasDefaultValue("arma3");
             tacMap.Property(t => t.Order).HasDefaultValue(0);
             tacMap.ToTable(nameof(TacMap));
