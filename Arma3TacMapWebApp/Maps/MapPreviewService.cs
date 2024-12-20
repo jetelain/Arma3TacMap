@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace Arma3TacMapWebApp.Maps
 {
-    public class MapPreviewService
+    public class MapPreviewService : IMapPreviewService
     {
         private readonly Arma3TacMapContext _db;
         private readonly Arma3TacMapPreviewContext _pdb;
@@ -23,7 +21,7 @@ namespace Arma3TacMapWebApp.Maps
         private readonly IHttpContextAccessor _accessor;
         private readonly IScreenshotService _screenshot;
 
-        public static int[] ValidSizes = new[] { 256, 512, 1024, 2048 };
+        public static int[] ValidSizesStatic = new[] { 256, 512, 1024, 2048 };
 
         public MapPreviewService(Arma3TacMapContext db, Arma3TacMapPreviewContext pdb, IHttpContextAccessor accessor, LinkGenerator linkGenerator, IScreenshotService screenshot)
         {
@@ -33,10 +31,11 @@ namespace Arma3TacMapWebApp.Maps
             _accessor = accessor;
             _screenshot = screenshot;
         }
+        public int[] ValidSizes => ValidSizesStatic;
 
-        public async Task<byte[]> GetPreview(TacMapAccess access, int size)
+        public async Task<byte[]> GetPreview(TacMapAccess access, int size, int? phase = null)
         {
-            if ( !ValidSizes.Contains(size))
+            if ( !ValidSizesStatic.Contains(size))
             {
                 throw new ArgumentException(nameof(size));
             }
@@ -47,13 +46,15 @@ namespace Arma3TacMapWebApp.Maps
                 lastUpdate = (await _db.TacMaps.FindAsync(access.TacMapID)).Created;
             }
 
-            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.LastUpdate >= lastUpdate);
+            var phaseKey = phase == null ? string.Empty : phase.Value.ToString();
+
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.PhaseKey == phaseKey && p.LastUpdate >= lastUpdate);
             if (preview != null)
             {
                 return preview.Data;
             }
 
-            var bytes = await MakeScreenshot(access);
+            var bytes = await MakeScreenshot(access, phase);
             if (bytes == null)
             {
                 return File.ReadAllBytes(@"wwwroot/img/transparent.png");
@@ -63,10 +64,10 @@ namespace Arma3TacMapWebApp.Maps
 
                 using (var transaction = _pdb.Database.BeginTransaction())
                 {
-                    await AddPreview(access, 2048, lastUpdate, ToJpeg(image, 2048));;
-                    await AddPreview(access, 1024, lastUpdate, ToJpeg(image, 1024));
-                    await AddPreview(access, 512, lastUpdate, ToPng(image, 512));
-                    await AddPreview(access, 256, lastUpdate, ToPng(image, 256));
+                    await AddPreview(access, 2048, lastUpdate, phaseKey, ToJpeg(image, 2048));;
+                    await AddPreview(access, 1024, lastUpdate, phaseKey, ToJpeg(image, 1024));
+                    await AddPreview(access, 512, lastUpdate, phaseKey, ToPng(image, 512));
+                    await AddPreview(access, 256, lastUpdate, phaseKey, ToPng(image, 256));
                     await _pdb.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -102,9 +103,9 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private async Task AddPreview(TacMapAccess access, int size, DateTime? lastUpdate, byte[] data)
+        private async Task AddPreview(TacMapAccess access, int size, DateTime? lastUpdate, string phaseKey, byte[] data)
         {
-            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size);
+            var preview = await _pdb.TacMapPreviews.AsNoTracking().FirstOrDefaultAsync(p => p.TacMapID == access.TacMapID && p.Size == size && p.PhaseKey == phaseKey);
             if (preview == null)
             {
                 preview = new TacMapPreview()
@@ -112,7 +113,8 @@ namespace Arma3TacMapWebApp.Maps
                     Data = data,
                     LastUpdate = lastUpdate,
                     TacMapID = access.TacMapID,
-                    Size = size
+                    Size = size,
+                    PhaseKey = phaseKey
                 };
                 _pdb.TacMapPreviews.Add(preview);
             }
@@ -124,9 +126,9 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        private async Task<byte[]> MakeScreenshot(TacMapAccess access)
+        private async Task<byte[]?> MakeScreenshot(TacMapAccess access, int? phase)
         {
-            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken }, "https");
+            var uri = _linkGenerator.GetUriByAction(_accessor.HttpContext, nameof(HomeController.ViewMapFullStatic), "Home", new { id = access.TacMapID, t = access.TacMap.ReadOnlyToken, phase = phase }, "https");
             return await _screenshot.MakeScreenshotAsync(uri);
         }
     }

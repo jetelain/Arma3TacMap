@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -11,7 +9,9 @@ namespace Arma3TacMapWebApp.Entities
 
         public int Size { get; set; }
 
-        public byte[] Data { get; set; }
+        public required string PhaseKey { get; set; }
+
+        public required byte[] Data { get; set; }
 
         public DateTime? LastUpdate { get; set; }
     }

@@ -14,7 +14,8 @@ namespace Arma3TacMapWebApp.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var tacMapPreview = modelBuilder.Entity<TacMapPreview>();
-            tacMapPreview.HasKey(m => new { m.TacMapID, m.Size });
+            tacMapPreview.Property(t => t.PhaseKey).HasDefaultValue("");
+            tacMapPreview.HasKey(m => new { m.TacMapID, m.Size, m.PhaseKey });
             tacMapPreview.ToTable(nameof(TacMapPreview));
         }
     }

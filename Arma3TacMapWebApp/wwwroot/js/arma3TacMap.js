@@ -567,9 +567,15 @@ var Arma3TacMap;
     }
 
     function layersModal(backend) {
+        function getPhase() {
+            return $('#layer-phase-mode-all').is(':checked') ? null : Number($('#layer-phase-number').val());
+        }
 
         $('#layers-add').on('click', function () {
             $('#layer-label').val('');
+            $('#layer-phase-mode-all').prop("checked", true);
+            $('#layer-phase-mode-specific').prop("checked", false);
+            $('#layer-phase-number').val("0");
             $('#layer-insert').show();
             $('#layer-update').hide();
             $('#layer').modal('show');
@@ -577,13 +583,13 @@ var Arma3TacMap;
         });
 
         $('#layer-insert').on('click', function () {
-            backend.addLayer({ label: $('#layer-label').val() });
+            backend.addLayer({ label: $('#layer-label').val(), phase: getPhase() });
             $('#layer').modal('hide');
             return false;
         });
 
         $('#layer-update').on('click', function () {
-            backend.updateLayer(currentLayer.id, { label: $('#layer-label').val() });
+            backend.updateLayer(currentLayer.id, { label: $('#layer-label').val(), phase: getPhase() });
             $('#layer').modal('hide');
             return false;
         });
@@ -1361,22 +1367,91 @@ var Arma3TacMap;
         }
     }
 
+    function setLayerVisibility(layer, isVisible) {
+        var i = $(layer.listItem).find('.layers-item-display').find('i.fas');
+        layer.isHidden = !isVisible;
+        if (layer.isHidden) {
+            i.attr('class', 'fas fa-eye-slash');
+            layer.group.remove();
+        } else {
+            i.attr('class', 'fas fa-eye');
+            map.addLayer(layer.group);
+        }
+        layer.group.eachLayer(function (marker) {
+            updateMarkerState(layer, marker);
+        });
+    }
+
+    function updatePhaseSelectorActive(layers) {
+        let allLayers = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+        getAllPhases(layers).forEach(phase => {
+            let phaseItem = $('#phase-num-' + phase);
+            let active = allLayers.every(l =>
+                (!!l.isHidden) === !(
+                    l.data.phase == phase || l.data.phase === null || l.data.phase === undefined
+                )
+            );
+            if (active) {
+                phaseItem.addClass('active');
+            } else {
+                phaseItem.removeClass('active');
+            }
+        });
+    }
+
+    function getAllPhases(layers) {
+        var set = new Set(Object.getOwnPropertyNames(layers).map(id => layers[id].data.phase));
+        set.delete(null);
+        set.delete(undefined);
+        return Array.from(set.values()).sort();
+    }
+
+    function setCurrentPhase(layers, phase) {
+        let allLayers = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+        allLayers.forEach(layer => {
+            setLayerVisibility(layer, layer.data.phase == phase || layer.data.phase === null || layer.data.phase === undefined);
+        });
+        updatePhaseSelectorActive(layers);
+        let wantedLayer = allLayers.find(l => l.data.phase == phase);
+        if (wantedLayer) {
+            setCurrentLayer(wantedLayer, layers);
+        }
+    }
+
+    function getOrderedLayers(layers) {
+        let allLayers = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+        allLayers.sort((a, b) => {
+            if (a.data.phase === b.data.phase) {
+                if (a.data.order === b.data.order) {
+                    return a.id - b.id;
+                }
+                return a.data.order - b.data.order;
+            }
+            if (a.data.phase === null) return -1;
+            if (b.data.phase === null) return 1;
+            return a.data.phase - b.data.phase;
+        });
+        return allLayers;
+    }
+
+    function applyLayersOrder(layers) {
+        const sorted = getOrderedLayers(layers);
+        const listItems = sorted.map((l) => l.listItem.detach());
+        $('#layers-list').append(listItems);
+
+        $('select.layers-dropdown').each((index, selectElement) => {
+            const selectElements = sorted.map((l) => $(selectElement).find('option[value=' + l.id + ']').detach());
+            $(selectElement).append(selectElements);
+            $(selectElement).selectpicker('refresh');
+        });
+    }
+
     function setupLayerUI(map, layer, layers) {
         layer.listItem.on('click', function () { setCurrentLayer(layer, layers); });
 
         layer.listItem.find('.layers-item-display').on('click', function () {
-            var i = $(this).find('i.fas');
-            layer.isHidden = !layer.isHidden;
-            if (layer.isHidden) {
-                i.attr('class', 'fas fa-eye-slash');
-                layer.group.remove();
-            } else {
-                i.attr('class', 'fas fa-eye');
-                map.addLayer(layer.group);
-            }
-            layer.group.eachLayer(function (marker) {
-                updateMarkerState(layer, marker);
-            });
+            setLayerVisibility(layer, layer.isHidden);
+            updatePhaseSelectorActive(layers);
             return false;
         });
 
@@ -1396,6 +1471,10 @@ var Arma3TacMap;
         layer.listItem.find('.layers-item-edit').on('click', function () {
             setCurrentLayer(layer, layers);
             $('#layer-label').val(layer.data.label);
+            var isAll = layer.data.phase === null || layer.data.phase === undefined;
+            $('#layer-phase-mode-all').prop("checked", isAll);
+            $('#layer-phase-mode-specific').prop("checked", !isAll);
+            $('#layer-phase-number').val(!isAll ? String(layer.data.phase) : "0");
             $('#layer-insert').hide();
             $('#layer-update').show();
             $('#layer').modal('show');
@@ -1410,14 +1489,50 @@ var Arma3TacMap;
         });
     }
 
-    function addOrUpdateLayer(map, layers, layerJson, layerTemplate) {
+    function updatePhaseSelectorItems(layers, phaseTemplate) {
+        let phases = getAllPhases(layers);
+        if (phases.length == 0) {
+            $('#phase-selector').hide();
+            $('.phase-item').remove();
+        } else {
+            let phaseItems = [];
+            $('.phase-item').each((index, element) => {
+                let phaseItem = $(element);
+                let phase = Number(phaseItem.attr('data-phase'));
+                if (!(phases.includes(phase))) {
+                    phaseItem.remove();
+                } else {
+                    phaseItems.push({ number: phase, item: phaseItem });
+                }
+            });
+            phases.forEach(phase => {
+                let id = 'phase-num-' + phase;
+                let phaseItem = $('#' + id);
+                if (phaseItem.length == 0) {
+                    phaseItem = phaseTemplate.clone().attr('id', id).attr('data-phase', phase);
+                    phaseItem.find('a')
+                        .on('click', (e) => { setCurrentPhase(layers, phase); e.preventDefault(); })
+                        .text(String(phase));
+                    let before = phaseItems.find(other => other.number > phase);
+                    if (before) {
+                        phaseItem.insertBefore(before.item);
+                    } else {
+                        $('#phase-selector').append(phaseItem);
+                    }
+                }
+            });
+            $('#phase-selector').show();
+        }
+        updatePhaseSelectorActive(layers);
+    }
+
+    function addOrUpdateLayer(map, layers, layerJson, layerTemplate, phaseTemplate) {
         var layer = getOrCreateLayer(map, layerJson.id, layers);
         layer.data = layerJson.data;
         layer.isDefaultLayer = layerJson.isDefaultLayer;
         if (!layer.listItem) {
             if (!layerJson.isDefaultLayer) {
                 layer.listItem = layerTemplate.clone();
-                $('#layers-list').append(layer.listItem);
                 $('select.layers-dropdown').append($('<option />').attr('value', '' + layerJson.id));
             }
             else {
@@ -1428,11 +1543,15 @@ var Arma3TacMap;
         if (!layerJson.isDefaultLayer) {
             layer.listItem.find('.layers-item-label').text(layerJson.data.label);
             $('select.layers-dropdown option[value=' + layerJson.id + ']').text(layerJson.data.label);
-            $('select.layers-dropdown').selectpicker('refresh');
         } else if (!currentLayer) {
             currentLayer = layer;
         }
+
+        applyLayersOrder(layers);
+
+        updatePhaseSelectorItems(layers, phaseTemplate);
     }
+
 
     function connect(map, backend, markers, pointing, canEdit, opacity, layers) {
 
@@ -1441,12 +1560,15 @@ var Arma3TacMap;
         var layerTemplate = $('#layers-template').remove();
         layerTemplate.removeAttr('id');
 
+        var phaseTemplate = $('#phases-template').remove();
+        phaseTemplate.removeAttr('id');
+
         backend.connect({
             addOrUpdateMarker: function (marker, isReadOnly) {
                 addOrUpdateMarker(map, markers, marker, canEdit && !isReadOnly, backend, opacity, getOrCreateLayer(map, marker.layerId, layers));
             },
             addOrUpdateLayer: function (layerJson) {
-                addOrUpdateLayer(map, layers, layerJson, layerTemplate);
+                addOrUpdateLayer(map, layers, layerJson, layerTemplate, phaseTemplate);
             },
             removeMarker: function (marker) {
                 var existing = markers[marker.id];

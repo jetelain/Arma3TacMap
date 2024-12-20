@@ -87,7 +87,7 @@
         <h2 class="mt-5">@Localizer["Export to Image"]</h2>
         <p>@Localizer["Images can be used on a web page, a document, or can be used as a texture in Arma 3."]</p>
         <ul>
-            @foreach (var size in Arma3TacMapWebApp.Maps.MapPreviewService.ValidSizes)
+            @foreach (var size in Arma3TacMapWebApp.Maps.MapPreviewService.ValidSizesStatic)
             {
                 var uri = Url.Action("ViewMapScreenShot", "Home", new { id = Model.Access.TacMapID, t = Model.TacMap.ReadOnlyToken, size = size }, "https");
                 <li>@size x @size : <a href="@uri">@uri</a></li>

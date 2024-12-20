@@ -20,10 +20,10 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IGameMapStorageService _mapInfos;
         private readonly MapService _mapSvc;
-        private readonly MapPreviewService _preview;
+        private readonly IMapPreviewService _preview;
         private readonly IAuthorizationService _authorizationService;
 
-        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, MapPreviewService preview, IAuthorizationService authorizationService)
+        public HomeController(ILogger<HomeController> logger, IGameMapStorageService mapInfos, MapService mapSvc, IMapPreviewService preview, IAuthorizationService authorizationService)
         {
             _logger = logger;
             _mapInfos = mapInfos;
@@ -147,16 +147,15 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [Route("ViewMap/{id}/FullScreen")]
-        public async Task<IActionResult> ViewMapFullStatic(int id, string t)
+        public async Task<IActionResult> ViewMapFullStatic(int id, string t, int? phase = null)
         {
-            var data = await _mapSvc.GetStaticMapModel(id, t);
+            var data = await _mapSvc.GetStaticMapModel(id, t, phase);
             if (data == null)
             {
                 return Forbid();
             }
             var game = await _mapInfos.GetGame(data.GameName) ?? throw new ApplicationException("Unknown game");
             var gameMap = await _mapInfos.GetMap(data.GameName, data.WorldName) ?? throw new ApplicationException("Unknown map");
-
             ViewBag.IsFullScreen = true;
             return View(new StaticMapModel(){
                 center = data.Center,
@@ -179,18 +178,18 @@ namespace Arma3TacMapWebApp.Controllers
         }
 
         [Route("ViewMap/{id}/Preview/{size=512}")]
-        public async Task<IActionResult> ViewMapScreenShot(int id, int size, string t)
+        public async Task<IActionResult> ViewMapScreenShot(int id, int size, string t, int? phase = null)
         {
             var access = await _mapSvc.GrantReadAccess(User, id, t);
             if (access == null)
             {
                 return Forbid();
             }
-            if (!MapPreviewService.ValidSizes.Contains(size))
+            if (!_preview.ValidSizes.Contains(size))
             {
                 return NotFound();
             }
-            return File(await _preview.GetPreview(access, size), size > 512 ? "image/jpeg" : "image/png");
+            return File(await _preview.GetPreview(access, size, phase), size > 512 ? "image/jpeg" : "image/png");
         }
 
         public IActionResult Privacy()

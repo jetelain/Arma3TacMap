@@ -43,7 +43,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.TacMapAccesses.FirstOrDefaultAsync(a => a.User!.SteamId == steamId && a.TacMapID == mapId.TacMapID && a.CanWrite);
         }
 
-        internal async Task<MapId> CreateMap(ClaimsPrincipal user, string worldName, string gameName, string label, Uri? eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
+        internal async Task<MapId> CreateMap(ClaimsPrincipal? user, string worldName, string gameName, string label, Uri? eventHref, int? friendlyOrbatID = null, int? hostileOrbatID = null)
         {
             var dbUser = await GetOrCreateUser(user);
             if (dbUser == null)
@@ -75,7 +75,7 @@ namespace Arma3TacMapWebApp.Maps
             return new MapId() { TacMapID = map.TacMapID };
         }
 
-        public async Task<StoredLayer> CreateLayer(ClaimsPrincipal user, MapId mapId, string label)
+        public async Task<StoredLayer?> CreateLayer(ClaimsPrincipal? user, MapId mapId, string label, int? phase = null, int order = 0)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -92,7 +92,9 @@ namespace Arma3TacMapWebApp.Maps
                 GameName = access.TacMap.GameName,
                 ReadWriteToken = GenerateToken(),
                 ReadOnlyToken = GenerateToken(),
-                Parent = access.TacMap
+                Parent = access.TacMap,
+                Phase = phase,
+                Order = order
             };
             await _db.AddAsync(map);
             await _db.SaveChangesAsync();
@@ -101,10 +103,10 @@ namespace Arma3TacMapWebApp.Maps
 
         private static StoredLayer ToStored(TacMap map)
         {
-            return new StoredLayer { Id = map.TacMapID, Label = map.Label };
+            return new StoredLayer { Id = map.TacMapID, Label = map.Label, Phase = map.Phase, Order = map.Order };
         }
 
-        internal async Task<TacMapAccess?> GrantReadAccess(ClaimsPrincipal user, int id, string? t)
+        internal async Task<TacMapAccess?> GrantReadAccess(ClaimsPrincipal? user, int id, string? t)
         {
             var dbUser = await GetUser(user);
             if (dbUser != null)
@@ -169,7 +171,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        public async Task<User?> GetUser(ClaimsPrincipal user)
+        public async Task<User?> GetUser(ClaimsPrincipal? user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
@@ -179,7 +181,7 @@ namespace Arma3TacMapWebApp.Maps
             return await _db.Users.FirstOrDefaultAsync(u => u.SteamId == steamId);
         }
 
-        private async Task<User?> GetApiUser(ClaimsPrincipal user)
+        private async Task<User?> GetApiUser(ClaimsPrincipal? user)
         {
             if (user?.Identity?.IsAuthenticated ?? false)
             {
@@ -193,7 +195,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        private async Task<User?> GetOrCreateUser(ClaimsPrincipal user)
+        private async Task<User?> GetOrCreateUser(ClaimsPrincipal? user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
@@ -215,7 +217,7 @@ namespace Arma3TacMapWebApp.Maps
             return dbUser;
         }
 
-        public async Task<StoredMarker> AddMarker(ClaimsPrincipal user, MapId mapId, int? layerId, string markerData)
+        public async Task<StoredMarker?> AddMarker(ClaimsPrincipal? user, MapId mapId, int? layerId, string markerData)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -246,12 +248,12 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        public async Task<bool> CanPointMap(ClaimsPrincipal user, MapId mapId)
+        public async Task<bool> CanPointMap(ClaimsPrincipal? user, MapId mapId)
         {
             return await CanWrite(user, mapId) != null;
         }
 
-        public async Task<MapUserInitialData> GetInitialData(ClaimsPrincipal user, MapId mapId)
+        public async Task<MapUserInitialData?> GetInitialData(ClaimsPrincipal? user, MapId mapId)
         {
             var steamId = GetSteamId(user);
             if (!string.IsNullOrEmpty(steamId))
@@ -299,6 +301,19 @@ namespace Arma3TacMapWebApp.Maps
                 .ToList();
         }
 
+        internal async Task<List<StoredMarker>> GetPhaseMarkers(int tacMapID, int phase)
+        {
+            return (await _db.TacMapMarkers.Where(m => (m.TacMapID == tacMapID || m.TacMap.ParentTacMapID == tacMapID) && (m.TacMap.Phase == null || m.TacMap.Phase.Value == phase)).ToListAsync())
+                .Select(m => new StoredMarker()
+                {
+                    Id = m.TacMapMarkerID,
+                    LayerId = m.TacMapID,
+                    IsReadOnly = true,
+                    MarkerData = m.MarkerData
+                })
+                .ToList();
+        }
+
         internal async Task<List<StoredLayer>> GetLayers(int tacMapID)
         {
             return
@@ -310,13 +325,18 @@ namespace Arma3TacMapWebApp.Maps
                         Label = "Calque par défaut"
                     }
                 })
-                .Concat(
-                    (await _db.TacMaps.Where(m => m.ParentTacMapID == tacMapID).ToListAsync())
-                    .Select(ToStored)
-                ).ToList();
+                .Concat((await GetChildLayers(tacMapID)).Select(ToStored))
+                .ToList();
         }
 
-        public async Task<StoredMarker> RemoveMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID)
+        private async Task<List<TacMap>> GetChildLayers(int tacMapID)
+        {
+            return await _db.TacMaps.Where(m => m.ParentTacMapID == tacMapID)
+                                .OrderBy(l => l.Phase).ThenBy(l => l.Order).ThenBy(l => l.TacMapID)
+                                .ToListAsync();
+        }
+
+        public async Task<StoredMarker?> RemoveMarker(ClaimsPrincipal? user, MapId mapId, int mapMarkerID)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -344,7 +364,7 @@ namespace Arma3TacMapWebApp.Maps
             };
         }
 
-        public async Task<StoredMarker> UpdateMarker(ClaimsPrincipal user, MapId mapId, int mapMarkerID, int? layerId, string markerData)
+        public async Task<StoredMarker?> UpdateMarker(ClaimsPrincipal? user, MapId mapId, int mapMarkerID, int? layerId, string markerData)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -394,12 +414,21 @@ namespace Arma3TacMapWebApp.Maps
         }
 
 
-        public async Task<StaticMapData> GetStaticMapModel(int id, string t)
+        public async Task<StaticMapData?> GetStaticMapModel(int id, string t, int? phase = null)
         {
             var map = await _db.TacMaps.FirstOrDefaultAsync(a => a.TacMapID == id && a.ReadOnlyToken == t);
             if (map == null)
             {
                 return null;
+            }
+            if (phase != null)
+            {
+                return new StaticMapData()
+                {
+                    Markers = await GetPhaseMarkers(map.TacMapID, phase.Value),
+                    WorldName = map.WorldName,
+                    GameName = map.GameName
+                };
             }
             return new StaticMapData()
             {
@@ -440,7 +469,7 @@ namespace Arma3TacMapWebApp.Maps
             }
         }
 
-        public async Task<StoredLayer> UpdateLayer(ClaimsPrincipal user, MapId mapId, int layerId, string label)
+        public async Task<StoredLayer?> UpdateLayer(ClaimsPrincipal? user, MapId mapId, int layerId, string label, int? phase = null, int order = 0)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -451,6 +480,8 @@ namespace Arma3TacMapWebApp.Maps
             if (layer != null)
             {
                 layer.Label = label;
+                layer.Phase = phase;
+                layer.Order = order;
                 _db.Update(layer);
                 await _db.SaveChangesAsync();
                 return ToStored(layer);
@@ -458,7 +489,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        public async Task<StoredLayerWithMarkers> RemoveLayer(ClaimsPrincipal user, MapId mapId, int layerId)
+        public async Task<StoredLayerWithMarkers?> RemoveLayer(ClaimsPrincipal? user, MapId mapId, int layerId)
         {
             var access = await CanWrite(user, mapId);
             if (access == null)
@@ -472,7 +503,7 @@ namespace Arma3TacMapWebApp.Maps
 
                 _db.Remove(layer);
                 await _db.SaveChangesAsync();
-                return new StoredLayerWithMarkers { Id = layer.TacMapID, Label = layer.Label, Markers = markers.Select(ToStored).ToList() };
+                return new StoredLayerWithMarkers { Id = layer.TacMapID, Label = layer.Label, Markers = markers.Select(ToStored).ToList(), Phase = layer.Phase, Order = layer.Order };
             }
             return null;
         }
