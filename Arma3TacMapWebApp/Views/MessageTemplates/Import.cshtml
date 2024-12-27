@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model Arma3TacMapWebApp.Models.MessageTemplateImportViewModel
+@inject IHtmlLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = Localizer["Import a preformatted message"];
+}
+<div class="container">
+    <h1>@Localizer["Import a preformatted message"]</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Import">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Json" class="control-label"></label>
+                    <textarea asp-for="Json" class="form-control" rows="10"></textarea>
+                    <span asp-validation-for="Json" class="text-danger"></span>
+                </div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
+                {
+                    <div class="form-group">
+                        <label asp-for="Visibility" class="control-label"></label>
+                        <select asp-for="Visibility" class="form-control" asp-items="Html.GetEnumSelectList<Arma3TacMapWebApp.Entities.OrbatVisibility>()"></select>
+                        <span asp-validation-for="Visibility" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Visibility" value="Default" />
+                }
+                <div class="form-group">
+                    <input type="submit" value="@Localizer["Import"]" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

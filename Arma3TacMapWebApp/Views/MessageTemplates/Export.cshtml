@@ -21,15 +21,15 @@
     </div>
 
     <h2 class="mt-3">@Localizer["Export to Arma3 with cTab"]</h2>
-    <p><button class="btn btn-secondary btn-copy" type="button" data-copy="script">@Localizer["Copy"]</button></p>
     <div class="input-group">
         <textarea id="script" class="form-control" rows="10" readonly="readonly">@ViewBag.Script</textarea>
     </div>
+    <p><button class="btn btn-secondary btn-copy" type="button" data-copy="script">@Localizer["Copy"]</button></p>
 
     <h2 class="mt-3">@Localizer["Export to JSON"]</h2>
-    <p><button class="btn btn-secondary btn-copy" type="button" data-copy="json">@Localizer["Copy"]</button></p>
     <div class="input-group">
         <textarea id="json" class="form-control" rows="10" readonly="readonly">@Json.Serialize((Arma3TacMapWebApp.Entities.MessageTemplateJson)ViewBag.Json)</textarea>
     </div>
+    <p><button class="btn btn-secondary btn-copy" type="button" data-copy="json">@Localizer["Copy"]</button></p>
 
 </div>
