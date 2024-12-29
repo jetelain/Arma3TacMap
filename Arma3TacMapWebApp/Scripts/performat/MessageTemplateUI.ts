@@ -1,15 +1,39 @@
+﻿interface MessageLineTemplate {
+    title: string;
+    description: string;
+    fields: MessageFieldTemplate[];
+}
+
+interface MessageFieldTemplate {
+    title: string;
+    description: string;
+    type: string;
+}
+
+interface MessageTemplateConfig {
+    lines: MessageLineTemplate[];
+}
+
 class MessageTemplateUI {
-    constructor(composeFormFields, composeText, defaultValues) {
+
+    config: MessageTemplateConfig;
+    composeText: HTMLTextAreaElement;
+    composeFormFields: HTMLElement;
+    lastValues: any;
+
+    constructor(composeFormFields: HTMLElement, composeText: HTMLTextAreaElement, defaultValues?: any) {
         this.composeFormFields = composeFormFields;
         this.composeText = composeText;
         this.lastValues = defaultValues || {};
     }
-    clear() {
+
+    clear(): void {
         this.composeFormFields.innerHTML = '';
         this.composeText.readOnly = false;
         this.config = null;
     }
-    getText() {
+
+    getText(): string {
         if (!this.config) {
             return '';
         }
@@ -18,15 +42,15 @@ class MessageTemplateUI {
             var lineData = line.title ? line.title + ':' : '';
             line.fields.forEach((field, fnum) => {
                 var id = 'l' + lnum + 'f' + fnum;
-                var element = document.getElementById(id);
+                var element = document.getElementById(id) as HTMLInputElement;
+
                 switch (field.type) {
                     case 'checkbox':
                     case 'CheckBox':
                         if (element.checked) {
                             lineData = lineData + ' ' + field.title;
                             document.getElementById(id + '-box').classList.add('bg-primary', 'text-white');
-                        }
-                        else {
+                        } else {
                             document.getElementById(id + '-box').classList.remove('bg-primary', 'text-white');
                         }
                         break;
@@ -35,8 +59,7 @@ class MessageTemplateUI {
                         if (value && value.length > 0) {
                             lineData = lineData + ' ' + (field.title || '') + value;
                             document.getElementById(id + '-box').classList.add('bg-primary', 'text-white');
-                        }
-                        else {
+                        } else {
                             document.getElementById(id + '-box').classList.remove('bg-primary', 'text-white');
                         }
                         switch (field.type) {
@@ -54,16 +77,20 @@ class MessageTemplateUI {
         });
         return data.join('\n');
     }
-    updateComposeText() {
+
+    updateComposeText(): void {
         if (this.config) {
             this.composeText.value = this.getText();
         }
     }
-    setup(config) {
+
+    setup(config: MessageTemplateConfig): void {
         this.config = config;
         this.composeText.readOnly = true;
         this.composeFormFields.innerHTML = '';
+
         const generatePreformated = this.updateComposeText.bind(this);
+
         config.lines.forEach((line, lnum) => {
             const fieldsDiv = document.createElement('div');
             fieldsDiv.className = 'form-inline';
@@ -89,45 +116,58 @@ class MessageTemplateUI {
             colDiv.appendChild(fieldsDiv);
             this.composeFormFields.appendChild(colDiv);
         });
+
         this.updateComposeText();
     }
-    generateCheckBox(id, generatePreformated, field) {
+
+    private generateCheckBox(id: string, generatePreformated: any, field: MessageFieldTemplate): HTMLElement {
         var inputGroup = document.createElement('div');
         inputGroup.className = 'input-group input-group-sm mb-2 mr-sm-2';
+
         var inputGroupPrepend = document.createElement('div');
         inputGroupPrepend.className = 'input-group-prepend';
+
         var inputGroupText = document.createElement('div');
         inputGroupText.className = 'input-group-text';
         inputGroupText.id = id + '-box';
+
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = id;
         checkbox.addEventListener('click', generatePreformated);
+
         var label = document.createElement('label');
         label.className = 'form-check-label ml-1';
         label.htmlFor = id;
         label.textContent = field.title || '';
+
         inputGroupText.appendChild(checkbox);
         inputGroupText.appendChild(label);
         inputGroupPrepend.appendChild(inputGroupText);
+
         var descriptionLabel = document.createElement('label');
         descriptionLabel.className = 'form-control bg-light';
         descriptionLabel.htmlFor = id;
         descriptionLabel.textContent = field.description || '';
+
         inputGroup.appendChild(inputGroupPrepend);
         inputGroup.appendChild(descriptionLabel);
         return inputGroup;
     }
-    generateInput(id, generatePreformated, field, width) {
+
+    private generateInput(id: string, generatePreformated: any, field: MessageFieldTemplate, width: string): HTMLElement {
         var inputGroup = document.createElement('div');
         inputGroup.className = 'input-group input-group-sm mb-2 mr-sm-2';
+
         var inputGroupPrepend = document.createElement('div');
         inputGroupPrepend.className = 'input-group-prepend';
+
         var inputGroupText = document.createElement('label');
         inputGroupText.className = 'input-group-text';
         inputGroupText.htmlFor = id;
         inputGroupText.id = id + '-box';
         inputGroupText.textContent = field.title || '';
+
         var input = document.createElement('input');
         input.className = 'form-control';
         input.id = id;
@@ -136,12 +176,15 @@ class MessageTemplateUI {
         input.style.width = width;
         input.addEventListener('change', generatePreformated);
         input.addEventListener('keyup', generatePreformated);
+
         inputGroupPrepend.appendChild(inputGroupText);
         inputGroup.appendChild(inputGroupPrepend);
         inputGroup.appendChild(input);
         return inputGroup;
     }
-    setupInputTypeSpecific(input, field) {
+
+    private setupInputTypeSpecific(input: HTMLInputElement, field: MessageFieldTemplate): void {
+
         switch (field.type) {
             case 'utm':
             case 'Grid':
@@ -172,6 +215,7 @@ class MessageTemplateUI {
         }
     }
 }
-function showPerformated(config) {
-    new MessageTemplateUI(document.getElementById('compose-form-fields'), document.getElementById('compose-text')).setup(config);
+
+function showPerformated(config: MessageTemplateConfig) {
+    new MessageTemplateUI(document.getElementById('compose-form-fields'), document.getElementById('compose-text') as HTMLTextAreaElement).setup(config);
 }

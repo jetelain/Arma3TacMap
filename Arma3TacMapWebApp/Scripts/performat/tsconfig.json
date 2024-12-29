@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "target": "es2017",
+    "outFile": "../../wwwroot/js/preformat.js"
+  },
+  "files": [ "MessageTemplateUI.ts" ]
+}
