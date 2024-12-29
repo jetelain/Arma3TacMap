@@ -14,12 +14,12 @@ namespace Arma3TacMapWebApp.Entities
                 href,
                 messageTemplate.Lines!.Select(l => new object?[]
                 {
-                    l.Title,
-                    l.Description,
+                    l.Title ?? string.Empty,
+                    l.Description ?? string.Empty,
                     l.Fields!.Select(f => new object?[]
                     {
-                        f.Title,
-                        f.Description,
+                        f.Title ?? string.Empty,
+                        f.Description ?? string.Empty,
                         (int)f.Type
                     }).ToArray()
                 }).ToArray()
