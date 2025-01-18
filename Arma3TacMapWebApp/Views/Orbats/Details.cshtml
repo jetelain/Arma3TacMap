@@ -68,10 +68,10 @@
             {
                 var sdic = item.GetNatoSymbol('3');
                 var symbol = await App6dSymbolGenerator.GenerateAsync(sdic, new Pmad.Milsymbol.Icons.SymbolIconOptions());
-                var png = symbol.ToPng();
+                var svg = System.Text.Encoding.UTF8.GetBytes(symbol.Svg);
             <tr>
                 <td>
-                        <img src="data:image/png;base64,@Convert.ToBase64String(png)" height="@(symbol.Height/2)" alt="@sdic" />
+                    <img src="data:image/svg+xml;base64,@Convert.ToBase64String(svg)" height="@(symbol.Height/2)" alt="@sdic" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.UniqueDesignation)
