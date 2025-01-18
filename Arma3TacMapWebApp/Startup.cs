@@ -23,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pmad.Milsymbol.AspNetCore;
 
 namespace Arma3TacMapWebApp
 {
@@ -50,7 +51,8 @@ namespace Arma3TacMapWebApp
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+                })
+                .AddMilsymbolMvcComponents();
 
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();
@@ -149,6 +151,7 @@ namespace Arma3TacMapWebApp
 
             app.UseStaticFiles();
             app.UseArma3TacMapStaticFiles();
+            app.UseMilsymbolStaticFiles();
 
             app.UseRouting();
             app.UseCors();
