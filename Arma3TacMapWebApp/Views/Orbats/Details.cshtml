@@ -1,19 +1,31 @@
 ﻿@model Arma3TacMapWebApp.Entities.Orbat
 @inject IHtmlLocalizer<SharedResource> Localizer
+@inject Pmad.Milsymbol.AspNetCore.Services.IApp6dSymbolGenerator App6dSymbolGenerator
 
 @{
     ViewData["Title"] = Model.Label;
     var canEdit = (bool?)ViewBag.CanEdit ?? false;
+    var roots = Model.Units?.Where(u => u.Parent == null);
+
 }
 <div class="container">
     <h1>@Model.Label</h1>
+
+    @if (roots != null && roots.Count() == 1)
+    {
+        var root = roots.First();
+        <pmad-orbat root-unit="@root"
+            unit-title="@(u => ((Arma3TacMapWebApp.Entities.OrbatUnit)u).UniqueDesignation)"
+            unit-link-controller="OrbatUnits" unit-link-action="Details" unit-link-route="@(u => new { id = ((Arma3TacMapWebApp.Entities.OrbatUnit)u).OrbatUnitID })" />
+    }
+
     <div>
         <dl class="row">
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Owner)
             </dt>
             <dd class="col-sm-4">
-                @Html.DisplayFor(model => model.Owner.UserLabel)
+                @Html.DisplayFor(model => model.Owner!.UserLabel)
             </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Visibility)
@@ -38,13 +50,13 @@
                     @Localizer["Symbol"]
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Units[0].UniqueDesignation)
+                    @Html.DisplayNameFor(model => model.Units![0].UniqueDesignation)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Units[0].Name)
+                    @Html.DisplayNameFor(model => model.Units![0].Name)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Units[0].Trigram)
+                    @Html.DisplayNameFor(model => model.Units![0].Trigram)
                 </th>
                 <th>
 
@@ -52,11 +64,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Units)
+            @foreach (var item in Model.Units!)
             {
+                var sdic = item.GetNatoSymbol('3');
+                var symbol = await App6dSymbolGenerator.GenerateAsync(sdic, new Pmad.Milsymbol.Icons.SymbolIconOptions());
+                var png = symbol.ToPng();
             <tr>
                 <td>
-                    <img src="@item.NatoSymbolFriendlyImageBase64" height="64" alt="@item.GetNatoSymbol('3')" />
+                        <img src="data:image/png;base64,@Convert.ToBase64String(png)" height="@(symbol.Height/2)" alt="@sdic" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.UniqueDesignation)

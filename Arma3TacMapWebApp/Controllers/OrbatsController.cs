@@ -103,8 +103,12 @@ namespace Arma3TacMapWebApp.Controllers
             return await IsEditAllowed((await _mapSvc.GetUser(User)), orbat);
         }
 
-        private async Task<bool> IsEditAllowed(User user, Orbat orbat)
+        private async Task<bool> IsEditAllowed(User? user, Orbat orbat)
         {
+            if (user == null)
+            {
+                return false;
+            }
             if (user.UserID == orbat.OwnerUserID)
             {
                 return true;

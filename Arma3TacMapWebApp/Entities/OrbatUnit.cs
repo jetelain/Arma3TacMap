@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Pmad.Milsymbol.AspNetCore.Orbat;
 
 namespace Arma3TacMapWebApp.Entities
 {
-    public class OrbatUnit
+    public class OrbatUnit : IOrbatUnit
     {
         public int OrbatUnitID { get; set; }
 
@@ -63,6 +64,16 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Trigram")]
         [MaxLength(3)]
         public string? Trigram { get; set; }
+
+        string IOrbatUnit.Sdic => GetNatoSymbol('3');
+
+        string? IOrbatUnit.CommonIdentifier => Name;
+
+        string? IOrbatUnit.HigherFormation => string.Empty;
+
+        string? IOrbatUnit.UniqueDesignation => string.Empty;
+
+        IEnumerable<IOrbatUnit>? IOrbatUnit.SubUnits => Children;
 
         internal bool IsSelfOrParent(OrbatUnit orbatUnit)
         {
