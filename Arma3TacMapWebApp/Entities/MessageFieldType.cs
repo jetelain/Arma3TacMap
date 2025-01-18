@@ -19,10 +19,16 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Frequency (MHz)")]
         Frequency,
 
-        [Display(Name = "Grid position (MRGS coordinates)")]
+        [Display(Name = "Grid position (MRGS coordinates), with map marker")]
         Grid,
 
         [Display(Name = "Checkbox")]
-        CheckBox
+        CheckBox,
+
+        [Display(Name = "Grid position (MRGS coordinates), without map marker")]
+        GridNoMarker,
+
+        [Display(Name = "Multi line text")]
+        MultiLineText
     }
 }
