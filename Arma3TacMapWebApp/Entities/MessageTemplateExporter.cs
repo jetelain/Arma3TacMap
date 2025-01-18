@@ -11,6 +11,7 @@ namespace Arma3TacMapWebApp.Entities
                 uid,
                 (int)messageTemplate.Type,
                 messageTemplate.Title,
+                ShortTitle(messageTemplate),
                 href,
                 messageTemplate.Lines!.Select(l => new object?[]
                 {
@@ -24,6 +25,23 @@ namespace Arma3TacMapWebApp.Entities
                     }).ToArray()
                 }).ToArray()
             };
+        }
+
+        private static string ShortTitle(MessageTemplate messageTemplate)
+        {
+            if (messageTemplate.Title.Length > 12)
+            {
+                if (messageTemplate.Lines != null && messageTemplate.Lines.Count > 0)
+                {
+                    var firstLine = messageTemplate.Lines[0];
+                    if (!string.IsNullOrEmpty(firstLine.Title))
+                    {
+                        return firstLine.Title;
+                    }
+                }
+                return messageTemplate.Title.Substring(0, 12);
+            }
+            return messageTemplate.Title;
         }
 
         public static MessageTemplateJson ToJson(MessageTemplate messageTemplate, string uid, string href)

@@ -6,7 +6,8 @@
     "removeComments": false,
     "sourceMap": false,
     "target": "es2017",
-    "outFile": "../../wwwroot/js/preformat.js"
+    "outFile": "../../wwwroot/js/preformat.js",
+    //"outFile": "C:\\Users\\Julien\\source\\repos\\jetelain\\cTab\\cTabIRL\\cTabWebApp\\wwwroot\\js\\preformat.js"
   },
   "files": [ "MessageTemplateUI.ts" ]
 }
