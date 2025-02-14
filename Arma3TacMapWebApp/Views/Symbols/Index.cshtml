@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@inject IHtmlLocalizer<SharedResource> Localizer
+@model SymbolsViewModel
+@{
+    ViewData["Title"] = @Localizer["Symbols"];
+}
+<div class="container">
+    <pmad-symbol-selector asp-for="Symbol" layout="Extended" all-symbols-href="/Symbols/All" />
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="commonIdentifier" class="control-label">@Localizer["Common Identifier"]</label>
+            <input type="text" id="commonIdentifier" class="form-control  form-control-sm" asp-for="CommonIdentifier" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="higherFormation" class="control-label">@Localizer["Higher Formation"]</label>
+            <input type="text" id="higherFormation" class="form-control  form-control-sm" asp-for="HigherFormation" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="additionalInformation" class="control-label">@Localizer["Additional Information"]</label>
+            <input type="text" id="additionalInformation" class="form-control  form-control-sm" asp-for="AdditionalInformation" />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="uniqueDesignation" class="control-label">@Localizer["Unique Designation"]</label>
+            <input type="text" maxlength="21" id="uniqueDesignation" class="form-control  form-control-sm" asp-for="UniqueDesignation" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="direction" class="control-label">@Localizer["Direction (mil)"]</label>
+            <input type="number" max="6400" min="0" id="direction" class="form-control  form-control-sm" asp-for="Direction" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="reinforcedReduced" class="control-label">@Localizer["Reinforced"]</label>
+            <select id="reinforcedReduced" class="form-control  form-control-sm" asp-for="ReinforcedReduced">
+                <option value=""></option>
+                <option value="(+)">(+) reinforced</option>
+                <option value="(-)">(-) reduced</option>
+                <option value="(±)">(±) reinforced and reduced</option>
+            </select>
+        </div>
+    </div>
+
+    <p class="mt-4">
+        <button class="btn btn-sm btn-outline-secondary" id="download-png"><i class="fa-solid fa-download"></i> @Localizer["Download PNG"]</button>
+        <button class="btn btn-sm btn-outline-secondary" id="download-svg"><i class="fa-solid fa-download"></i> @Localizer["Download SVG"]</button>
+    </p>
+
+</div>
+@section Scripts {
+    <script src="~/js/symbolPage.js" asp-append-version="true"></script>
+}

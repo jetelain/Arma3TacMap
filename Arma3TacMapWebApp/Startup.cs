@@ -52,7 +52,7 @@ namespace Arma3TacMapWebApp
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-                .AddMilsymbolMvcComponents();
+                .AddMilsymbolMvcComponents(DesignSystem.Bootstrap4);
 
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();

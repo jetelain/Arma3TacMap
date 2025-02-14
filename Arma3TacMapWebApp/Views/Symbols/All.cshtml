@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Pmad.Milsymbol.AspNetCore
+@model Pmad.Milsymbol.App6d.App6dSymbolDatabase
+@inject Pmad.Milsymbol.AspNetCore.Services.IApp6dSymbolGenerator SymbolGenerator
+@inject IHtmlLocalizer<SharedResource> Localizer
+@{
+    var options = new Pmad.Milsymbol.Icons.SymbolIconOptions();
+    options.Size = 25;
+    ViewData["Title"] = Localizer["All symbols"];
+}
+<div class="container">
+<h1>@Localizer["All symbols"]</h1>
+@foreach (var symbolset in Model.SymbolSets)
+{
+    <h2 class="sticky-top bg-white pb-1">@symbolset.Name</h2>
+    <code class="text-body">
+        1003<span class="text-success">@(symbolset.Code)</span>00000000000000
+    </code>
+    <h3>Symbols (@symbolset.MainIcons.Count)</h3>
+    <table class="table">
+        <colgroup>
+            <col style="width: 50px;" />
+            <col style="width: 175px;" />
+        </colgroup>
+        <tr>
+            <th>Icon</th>
+            <th>Code</th>
+            <th>Description</th>
+        </tr>
+        @foreach (var icon in symbolset.MainIcons)
+        {
+            var sidc = $"1003{symbolset.Code}0000{icon.Code}0000";
+            if (icon.IsPointRendering)
+            {
+                <tr>
+                    <td>
+                        @Html.Raw((await SymbolGenerator.GenerateAsync(sidc, options)).Svg)
+                    </td>
+                    <td>
+                        <code class="text-body">
+                                <a href="/Symbols/@sidc" class="text-body">1003@(symbolset.Code)0000<span class="text-success">@(icon.Code)</span>0000</a>
+                        </code>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(icon.EntitySubtype))
+                        {
+                            <span class="small">@icon.Entity &gt;</span>
+                            <span class="small">@icon.EntityType &gt;</span>
+                            <span>@icon.EntitySubtype</span>
+                        }
+                        else if (!string.IsNullOrEmpty(icon.EntityType))
+                        {
+                            <span class="small">@icon.Entity &gt;</span>
+                            <span>@icon.EntityType</span>
+                        }
+                        else
+                        {
+                            <span>@icon.Entity</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+}
+</div>
