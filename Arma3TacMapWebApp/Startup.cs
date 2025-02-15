@@ -10,6 +10,7 @@ using Arma3TacMapWebApp.Maps;
 using Arma3TacMapWebApp.Security;
 using Arma3TacMapWebApp.Services.GameMapStorage;
 using Arma3TacMapWebApp.Services.Screenshots;
+using Arma3TacMapWebApp.Services.Symbols;
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pmad.Milsymbol.AspNetCore;
+using Pmad.Milsymbol.AspNetCore.SymbolSelector.Bookmarks;
 
 namespace Arma3TacMapWebApp
 {
@@ -52,7 +54,7 @@ namespace Arma3TacMapWebApp
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-                .AddMilsymbolMvcComponents();
+                .AddMilsymbolMvcComponents(DesignSystem.Bootstrap4);
 
             services.AddSignalR();
             services.AddScoped<IMapService, MapService>();
@@ -127,6 +129,8 @@ namespace Arma3TacMapWebApp
                 Contact = "https://discord.gg/9JTHHKWJPn" 
             };
             services.AddSingleton(communauty);
+
+            services.AddScoped<ISymbolBookmarksService,SymbolBookmarksService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

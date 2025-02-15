@@ -26,6 +26,8 @@ namespace Arma3TacMapWebApp.Entities
 
         public DbSet<OrbatUnit> OrbatUnits { get; set; }
 
+        public DbSet<UserSymbolBookmark> SymbolBookmarks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(User));
@@ -59,6 +61,9 @@ namespace Arma3TacMapWebApp.Entities
             var field = modelBuilder.Entity<MessageFieldTemplate>();
             field.HasOne(t => t.MessageLineTemplate).WithMany(t => t.Fields).OnDelete(DeleteBehavior.Cascade);
             field.ToTable(nameof(MessageFieldTemplate));
+
+            modelBuilder.Entity<UserSymbolBookmark>().ToTable(nameof(UserSymbolBookmark));
+
         }
 
         internal void UpgradeData()

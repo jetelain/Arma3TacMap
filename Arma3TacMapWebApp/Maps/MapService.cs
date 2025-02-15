@@ -195,7 +195,7 @@ namespace Arma3TacMapWebApp.Maps
             return null;
         }
 
-        private async Task<User?> GetOrCreateUser(ClaimsPrincipal? user)
+        public async Task<User?> GetOrCreateUser(ClaimsPrincipal? user)
         {
             var steamId = GetSteamId(user);
             if (string.IsNullOrEmpty(steamId))
@@ -208,12 +208,11 @@ namespace Arma3TacMapWebApp.Maps
                 dbUser = new User()
                 {
                     SteamId = steamId,
-                    UserLabel = user.Identity.Name
+                    UserLabel = user!.Identity?.Name ?? steamId
                 };
                 await _db.AddAsync(dbUser);
                 await _db.SaveChangesAsync();
             }
-
             return dbUser;
         }
 
