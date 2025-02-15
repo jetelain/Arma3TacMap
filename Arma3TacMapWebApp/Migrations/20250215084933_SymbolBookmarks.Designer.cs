@@ -3,6 +3,7 @@ using System;
 using Arma3TacMapWebApp.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arma3TacMapWebApp.Migrations
 {
     [DbContext(typeof(Arma3TacMapContext))]
-    partial class Arma3TacMapContextModelSnapshot : ModelSnapshot
+    [Migration("20250215084933_SymbolBookmarks")]
+    partial class SymbolBookmarks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");

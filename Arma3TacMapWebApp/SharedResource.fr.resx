@@ -657,4 +657,16 @@
   <data name="Phase number" xml:space="preserve">
     <value>Temps numéro</value>
   </data>
+  <data name="Symbols" xml:space="preserve">
+    <value>Symboles</value>
+  </data>
+	<data name="All symbols" xml:space="preserve">
+    <value>Tous les symboles</value>
+  </data>
+	<data name="Download PNG" xml:space="preserve">
+    <value>Télécharger PNG</value>
+  </data>
+	<data name="Download SVG" xml:space="preserve">
+    <value>Télécharger SVG</value>
+  </data>
 </root>

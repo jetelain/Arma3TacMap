@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -16,5 +17,7 @@ namespace Arma3TacMapWebApp.Entities
         public bool IsService { get; set; }
 
         public List<UserApiKey> ApiKeys { get; set; }
+
+        public DateTime? LastSymbolBookmarksSaveUtc { get; set; }
     }
 }
