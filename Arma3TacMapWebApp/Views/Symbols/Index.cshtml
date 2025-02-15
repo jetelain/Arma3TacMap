@@ -4,6 +4,26 @@
 @model SymbolsViewModel
 @{
     ViewData["Title"] = @Localizer["Symbols"];
+    if (Model.Infos != null)
+    {
+        var id = new string?[] {
+            Model.Infos.StandardIdentity2.ToString(),
+            Model.Infos.EntitySubtype ?? Model.Infos.EntityType ?? Model.Infos.Entity,
+            Model.Infos.FirstModifier,
+            Model.Infos.SecondModifier,
+            Model.Infos.Size
+        };
+        ViewData["og:title"] = string.Join(" - ", id.Where(s => !string.IsNullOrEmpty(s) && s != "Unspecified"));
+        ViewData["og:image"] = Url.Action("png", "Symbols", new { 
+            id = Model.Symbol,
+            Model.Direction,
+            Model.ReinforcedReduced,
+            Model.CommonIdentifier,
+            Model.HigherFormation,
+            Model.UniqueDesignation,
+            Model.AdditionalInformation
+        }, "https");
+    }
 }
 <div class="container">
     <pmad-symbol-selector asp-for="Symbol" layout="Extended" all-symbols-href="/Symbols/All" />

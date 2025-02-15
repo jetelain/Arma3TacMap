@@ -10,7 +10,7 @@
     <title>@ViewData["Title"] - PLANOPS Maps</title>
     @if (!string.IsNullOrEmpty(ViewData["og:image"] as string))
     {
-        <meta property="og:title" content="@ViewData["Title"]" />
+        <meta property="og:title" content="@(ViewData["og:title"] ?? ViewData["Title"])" />
         <meta property="og:image" content="@ViewData["og:image"]" />
     }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />

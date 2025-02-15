@@ -1,4 +1,6 @@
-﻿namespace Arma3TacMapWebApp.Models
+﻿using Pmad.Milsymbol.App6d;
+
+namespace Arma3TacMapWebApp.Models
 {
     public class SymbolsViewModel
     {
@@ -9,5 +11,6 @@
         public string? UniqueDesignation { get; set; }
         public string? Direction { get; set; }
         public string? ReinforcedReduced { get; set; }
+        public App6dSymbolIdInfos? Infos { get; set; }
     }
 }
