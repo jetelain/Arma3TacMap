@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Pmad.Milsymbol.App6d;
 using Pmad.Milsymbol.AspNetCore.Orbat;
 
 namespace Arma3TacMapWebApp.Entities
@@ -22,6 +24,9 @@ namespace Arma3TacMapWebApp.Entities
 
         [Display(Name = "Unique Designation")]
         public string? UniqueDesignation { get; set; }
+
+        [Display(Name = "Symbol set")]
+        public string? NatoSymbolSet { get; set; }
 
         [Display(Name = "Symbol")]
         public string? NatoSymbolIcon { get; set; }
@@ -49,7 +54,7 @@ namespace Arma3TacMapWebApp.Entities
 
         public int Position { get; set; }
 
-        public string GetNatoSymbol(char c, char e = '0') => "100" + c + "10" + e +
+        public string GetNatoSymbol(char c, char e = '0') => "100" + c + (NatoSymbolSet ?? "10") + e +
             (NatoSymbolHQ ?? string.Empty).PadLeft(1, '0') +
             (NatoSymbolSize ?? string.Empty).PadLeft(2, '0') +
             (NatoSymbolIcon ?? string.Empty).PadLeft(6, '0') +
@@ -64,6 +69,33 @@ namespace Arma3TacMapWebApp.Entities
         [Display(Name = "Trigram")]
         [MaxLength(3)]
         public string? Trigram { get; set; }
+
+        [NotMapped]
+        public string FriendSidc
+        {
+            get { return GetNatoSymbol('3'); }
+            set
+            {
+                if (App6dSymbolId.TryParse(value, out var symbolId))
+                {
+                    NatoSymbolHQ = symbolId.HqTfFdCode;
+                    NatoSymbolSize = symbolId.Amplifier;
+                    NatoSymbolIcon = symbolId.Icon;
+                    NatoSymbolMod1 = symbolId.Modifier1;
+                    NatoSymbolMod2 = symbolId.Modifier2;
+                    NatoSymbolSet = symbolId.SymbolSet;
+                }
+                else
+                {
+                    NatoSymbolHQ = "0";
+                    NatoSymbolSize = "00";
+                    NatoSymbolIcon = "000000";
+                    NatoSymbolMod1 = "00";
+                    NatoSymbolMod2 = "00";
+                    NatoSymbolSet = "10";
+                }
+            }
+        }
 
         string IOrbatUnit.Sdic => GetNatoSymbol('3');
 
