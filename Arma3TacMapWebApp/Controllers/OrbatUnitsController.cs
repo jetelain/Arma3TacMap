@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Arma3TacMapWebApp.Entities;
 using Arma3TacMapWebApp.Maps;
 using Microsoft.AspNetCore.Authorization;
+using Pmad.Milsymbol.AspNetCore.Services;
 
 namespace Arma3TacMapWebApp.Controllers
 {
@@ -17,12 +18,14 @@ namespace Arma3TacMapWebApp.Controllers
         private readonly Arma3TacMapContext _context;
         private readonly MapService _mapSvc;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IApp6dSymbolGenerator _app6DSymbolGenerator;
 
-        public OrbatUnitsController(Arma3TacMapContext context, MapService mapSvc, IAuthorizationService authorizationService)
+        public OrbatUnitsController(Arma3TacMapContext context, MapService mapSvc, IAuthorizationService authorizationService, IApp6dSymbolGenerator app6DSymbolGenerator)
         {
             _context = context;
             _mapSvc = mapSvc;
             _authorizationService = authorizationService;
+            _app6DSymbolGenerator = app6DSymbolGenerator;
         }
 
         private async Task<bool> IsEditAllowed(Orbat orbat)
@@ -67,7 +70,7 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,NatoSymbolHostileAssumedImageBase64,Position")] OrbatUnit orbatUnit)
+        public async Task<IActionResult> Create([Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,FriendSidc,Position")] OrbatUnit orbatUnit)
         {
             orbatUnit.Orbat = await _context.Orbats.FindAsync(orbatUnit.OrbatID);
             if (orbatUnit.Orbat == null)
@@ -81,12 +84,28 @@ namespace Arma3TacMapWebApp.Controllers
             if (ModelState.IsValid)
             {
                 orbatUnit.Trigram = await GetTrigam(orbatUnit.OrbatID);
+                await PrecomputeSvgImages(orbatUnit);
                 _context.Add(orbatUnit);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(OrbatsController.Details), "Orbats", new { id = orbatUnit.OrbatID });
             }
             await PrepareDropdownList(orbatUnit);
             return View(orbatUnit);
+        }
+
+        private async Task PrecomputeSvgImages(OrbatUnit orbatUnit)
+        {
+            orbatUnit.NatoSymbolFriendlyImageBase64 = await PrecomputeSvg(orbatUnit.GetNatoSymbol('3'), orbatUnit.UniqueDesignation);
+            orbatUnit.NatoSymbolHostileImageBase64 = await PrecomputeSvg(orbatUnit.GetNatoSymbol('6'), orbatUnit.UniqueDesignation);
+            orbatUnit.NatoSymbolHostileAssumedImageBase64 = await PrecomputeSvg(orbatUnit.GetNatoSymbol('6', '1'), orbatUnit.UniqueDesignation);
+        }
+
+        private async Task<string> PrecomputeSvg(string sidc, string? uniqueDesignation)
+        {
+            var symbol = await _app6DSymbolGenerator.GenerateAsync(sidc, new Pmad.Milsymbol.Icons.SymbolIconOptions() { UniqueDesignation = uniqueDesignation });
+            var svg = System.Text.Encoding.UTF8.GetBytes(symbol.Svg);
+            var b64 = "data:image/svg+xml;base64," + Convert.ToBase64String(svg);
+            return b64;
         }
 
         private async Task<string> GetTrigam(int orbatID)
@@ -135,7 +154,7 @@ namespace Arma3TacMapWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,NatoSymbolIcon,NatoSymbolMod1,NatoSymbolMod2,NatoSymbolSize,NatoSymbolHQ,NatoSymbolFriendlyImageBase64,NatoSymbolHostileImageBase64,NatoSymbolHostileAssumedImageBase64,Position,Trigram")] OrbatUnit orbatUnit)
+        public async Task<IActionResult> Edit(int id, [Bind("OrbatUnitID,OrbatID,ParentOrbatUnitID,Name,UniqueDesignation,FriendSidc,Position,Trigram")] OrbatUnit orbatUnit)
         {
             if (id != orbatUnit.OrbatUnitID)
             {
@@ -162,6 +181,7 @@ namespace Arma3TacMapWebApp.Controllers
 
             if (ModelState.IsValid)
             {
+                await PrecomputeSvgImages(orbatUnit);
                 try
                 {
                     _context.Update(orbatUnit);
