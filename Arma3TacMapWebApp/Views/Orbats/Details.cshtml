@@ -17,7 +17,7 @@
         <div class="mb-5">
             <pmad-orbat root-unit="@root"
                 unit-title="@(u => ((Arma3TacMapWebApp.Entities.OrbatUnit)u).UniqueDesignation)"
-                unit-link-controller="OrbatUnits" unit-link-action="Details" unit-link-route="@(u => new { id = ((Arma3TacMapWebApp.Entities.OrbatUnit)u).OrbatUnitID })" />
+                unit-link-controller="OrbatUnits" unit-link-action="Edit" unit-link-route="@(u => new { id = ((Arma3TacMapWebApp.Entities.OrbatUnit)u).OrbatUnitID })" />
         </div>
     }
 
