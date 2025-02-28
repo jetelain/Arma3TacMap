@@ -14,9 +14,11 @@
     @if (roots != null && roots.Count() == 1)
     {
         var root = roots.First();
-        <pmad-orbat root-unit="@root"
-            unit-title="@(u => ((Arma3TacMapWebApp.Entities.OrbatUnit)u).UniqueDesignation)"
-            unit-link-controller="OrbatUnits" unit-link-action="Details" unit-link-route="@(u => new { id = ((Arma3TacMapWebApp.Entities.OrbatUnit)u).OrbatUnitID })" />
+        <div class="mb-5">
+            <pmad-orbat root-unit="@root"
+                unit-title="@(u => ((Arma3TacMapWebApp.Entities.OrbatUnit)u).UniqueDesignation)"
+                unit-link-controller="OrbatUnits" unit-link-action="Edit" unit-link-route="@(u => new { id = ((Arma3TacMapWebApp.Entities.OrbatUnit)u).OrbatUnitID })" />
+        </div>
     }
 
     <div>
@@ -66,12 +68,12 @@
         <tbody>
             @foreach (var item in Model.Units!)
             {
-                var sdic = item.GetNatoSymbol('3');
-                var symbol = await App6dSymbolGenerator.GenerateAsync(sdic, new Pmad.Milsymbol.Icons.SymbolIconOptions());
+                var sidc = item.GetNatoSymbol('3');
+                var symbol = await App6dSymbolGenerator.GenerateAsync(sidc, new Pmad.Milsymbol.Icons.SymbolIconOptions());
                 var svg = System.Text.Encoding.UTF8.GetBytes(symbol.Svg);
             <tr>
                 <td>
-                    <img src="data:image/svg+xml;base64,@Convert.ToBase64String(svg)" height="@(symbol.Height/2)" alt="@sdic" />
+                    <img src="data:image/svg+xml;base64,@Convert.ToBase64String(svg)" height="@(symbol.Height/2)" alt="@sidc" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.UniqueDesignation)

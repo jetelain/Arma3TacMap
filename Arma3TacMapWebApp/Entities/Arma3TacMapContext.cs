@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Arma3TacMapWebApp.Entities;
 
 namespace Arma3TacMapWebApp.Entities
 {
@@ -46,7 +45,9 @@ namespace Arma3TacMapWebApp.Entities
 
             modelBuilder.Entity<Orbat>().ToTable(nameof(Orbat));
 
-            modelBuilder.Entity<OrbatUnit>().ToTable(nameof(OrbatUnit));
+            var orbatUnit = modelBuilder.Entity<OrbatUnit>();
+            orbatUnit.Property(t => t.NatoSymbolSet).HasDefaultValue("10");
+            orbatUnit.ToTable(nameof(OrbatUnit));
 
             var userApiKey = modelBuilder.Entity<UserApiKey>();
             userApiKey.ToTable(nameof(UserApiKey));
