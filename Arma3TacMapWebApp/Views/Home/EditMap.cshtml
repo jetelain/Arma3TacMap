@@ -150,123 +150,52 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="bg-light text-center mb-1 p-1">
-                    <div id="symbolNumber" class="text-dark">
+
+                <pmad-symbol-selector id="sidc" name="" layout="Extended" />
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="additionalInformation" class="control-label">@Localizer["Additional Information"]</label>
+                        <input type="text" id="additionalInformation" class="form-control  form-control-sm" />
                     </div>
-                    <div id="symbolPreview">
+                    <div class="form-group col-md-6">
+                        <label for="higherFormation" class="control-label">Higher Formation</label>
+                        <input type="text" id="higherFormation" class="form-control  form-control-sm" />
                     </div>
                 </div>
-                <div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="id2" class="control-label">@Localizer["Standard Identity"]</label>
-                            <select id="id2" class="form-control  form-control-sm">
-                                <option value="0">@Localizer["Pending (yellow)"]</option>
-                                <option value="1">@Localizer["Unknown (yellow)"]</option>
-                                <option value="2">@Localizer["Assumed Friend (blue)"]</option>
-                                <option value="3" selected="selected">@Localizer["Friend (blue)"]</option>
-                                <option value="4">@Localizer["Neutral (green)"]</option>
-                                <option value="5">@Localizer["Suspect (red)"]</option>
-                                <option value="6">@Localizer["Hostile (red)"]</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="set" class="control-label">@Localizer["Symbol set"]</label>
-                            <select id="set" class="form-control  form-control-sm">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="status" class="control-label">@Localizer["Status"]</label>
-                            <select id="status" class="form-control  form-control-sm">
-                                <option value="0" selected="selected">@Localizer["Present"]</option>
-                                <option value="1">@Localizer["Planned/Anticiped/Supect"]</option>
-                                <option value="2">@Localizer["Present/Fully capable"]</option>
-                                <option value="3">@Localizer["Present/Damaged"]</option>
-                                <option value="4">@Localizer["Present/Destroyed"]</option>
-                                <option value="5">@Localizer["Present/Full to capacity"]</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="hq" class="control-label">HQ, TF</label>
-                            <select id="hq" class="form-control  form-control-sm">
-                                <option value="0" selected="selected">n/a</option>
-                                <option value="1">Feint/Dummy</option>
-                                <option value="2">Headquarters</option>
-                                <option value="3">Feint/Dummy Headquarters</option>
-                                <option value="4">Task Force</option>
-                                <option value="5">Feint/Dummy Task Force</option>
-                                <option value="6">Task Force Headquarters</option>
-                                <option value="7">Feint/Dummy Task Force Headquarters</option>
-                            </select>
-                        </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="uniqueDesignation" class="control-label">@Localizer["Unique Designation"]</label>
+                        <input type="text" maxlength="21" id="uniqueDesignation" class="form-control  form-control-sm" />
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="icon" class="control-label">@Localizer["Symbol"]</label>
-                            <select id="icon" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="mod1" class="control-label">@Localizer["Icon Modifier 1"]</label>
-                            <select id="mod1" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="mod2" class="control-label">@Localizer["Icon Modifier 2"]</label>
-                            <select id="mod2" class="form-control  form-control-sm" data-live-search="true">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="size" class="control-label">@Localizer["Echelon"]</label>
-                            <select id="size" class="form-control  form-control-sm">
-                            </select>
-                        </div>
+                    <div class="form-group col-md-4">
+                        <label for="direction" class="control-label">@Localizer["Direction (mil)"]</label>
+                        <input type="number" max="6400" min="0" id="direction" class="form-control  form-control-sm" />
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="additionalInformation" class="control-label">@Localizer["Additional Information"]</label>
-                            <input type="text" id="additionalInformation" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="higherFormation" class="control-label">Higher Formation</label>
-                            <input type="text" id="higherFormation" class="form-control  form-control-sm" />
-                        </div>
+                    <div class="form-group col-md-4">
+                        <label for="reinforcedReduced" class="control-label">@Localizer["Reinforced"]</label>
+                        <select id="reinforcedReduced" class="form-control  form-control-sm">
+                            <option value=""></option>
+                            <option value="(+)">(+) reinforced</option>
+                            <option value="(-)">(-) reduced</option>
+                            <option value="(±)">(±) reinforced and reduced</option>
+                        </select>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="uniqueDesignation" class="control-label">@Localizer["Unique Designation"]</label>
-                            <input type="text" maxlength="21" id="uniqueDesignation" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="direction" class="control-label">@Localizer["Direction (mil)"]</label>
-                            <input type="number" max="6400" min="0" id="direction" class="form-control  form-control-sm" />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="reinforcedReduced" class="control-label">@Localizer["Reinforced"]</label>
-                            <select id="reinforcedReduced" class="form-control  form-control-sm">
-                                <option value=""></option>
-                                <option value="(+)">(+) reinforced</option>
-                                <option value="(-)">(-) reduced</option>
-                                <option value="(±)">(±) reinforced and reduced</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="milsymbol-scale" class="control-label">@Localizer["Scale"]</label>
+                        <input type="number" id="milsymbol-scale" class="form-control" min="10" max="1000" value="100" />
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-2">
-                            <label for="milsymbol-scale" class="control-label">@Localizer["Scale"]</label>
-                            <input type="number" id="milsymbol-scale" class="form-control" min="10" max="1000" value="100" />
-                        </div>
-                        <div class="form-group col-md-5">
-                            <label for="milsymbol-layer" class="control-label">@Localizer["Layer"]</label>
-                            <select class="layers-dropdown form-control" id="milsymbol-layer">
-                                <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-5 mb-0">
-                            <p>@Localizer["Export to Metis Marker Preview"]</p>
-                            <p id="symbolPreviewMetis" class="mb-0 text-center"></p>
-                        </div>
+                    <div class="form-group col-md-5">
+                        <label for="milsymbol-layer" class="control-label">@Localizer["Layer"]</label>
+                        <select class="layers-dropdown form-control" id="milsymbol-layer">
+                            <option value="@Model.InitLiveMap.mapId.TacMapID">@Localizer["Base layer"]</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-5 mb-0">
+                        <p>@Localizer["Export to Metis Marker Preview"]</p>
+                        <p id="symbolPreviewMetis" class="mb-0 text-center"></p>
                     </div>
                 </div>
 
@@ -302,7 +231,7 @@
                             <select id="basic-type" class="form-control">
                                 @foreach (var type in Model.Game.Markers)
                                 {
-                                    <option data-content="<img src='@(type.ImagePng)' height='24' /> @(type.EnglishTitle)" value="@type.Name.ToLowerInvariant()">@(type.EnglishTitle)</option>
+                                    <option value="@type.Name.ToLowerInvariant()">@(type.EnglishTitle)</option>
                                 }
                             </select>
                         </div>
