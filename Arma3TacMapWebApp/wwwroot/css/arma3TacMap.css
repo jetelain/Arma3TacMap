@@ -100,14 +100,14 @@
     /*text-shadow: 1px 1px 2px white;*/
 }
 
-.btn-outline-secondary {
+.map .btn-outline-secondary {
     background-color: rgba(255, 255, 255, 0.5);
     text-shadow: 0px 0px 4px #fff;
 }
-    .btn-outline-secondary:hover {
+    .map .btn-outline-secondary:hover {
         text-shadow: none;
     }
-.btn-outline-primary {
+.map .btn-outline-primary {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -165,4 +165,43 @@
     font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
     font-size: 12px;
     line-height: 1.5;
+}
+ 
+/** Color dropdown */
+
+.choices__list--dropdown.choices-dropdown-grid {
+    width: 300px !important;
+}
+
+.choices-dropdown-grid div.choices__list {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 300px;
+}
+
+    .choices-dropdown-grid div.choices__list div.choices__item {
+        width: 100px;
+        text-align:center;
+    }
+    .choices-dropdown-grid div.choices__list div.choices__item.is-highlighted {
+        border: 5px #f2f2f2 solid;
+        padding: 5.2px; /* why not 5px ? effective border is 4.8px on tested browsers */
+    }
+
+/** Basic marker dropdown */
+
+.choices__item.game-icon {
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 0px;
+    padding-left: 30px;
+}
+.choices__list--dropdown .choices__item.game-icon {
+    padding-left: 40px !important;
+    background-position: 10px;
+}
+
+div.modal div.pmad-symbol-selector div.preview-box {
+    min-height: 110px;
 }

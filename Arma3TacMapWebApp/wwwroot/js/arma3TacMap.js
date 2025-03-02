@@ -9,6 +9,8 @@ var Arma3TacMap;
 
     var intl = new Intl.NumberFormat();
 
+    const choices = {};
+
     function getSymbol() {
         return PmadMilsymbolSelector.getInstance('sidc').getValue();
     }
@@ -188,8 +190,8 @@ var Arma3TacMap;
             $('#milsymbol-grid').text(Arma3Map.toGrid(e.latlng));
 
         } else if (modalMarkerData.type == 'basic') {
-            $('#basic-type').val(modalMarkerData.symbol);
-            $('#basic-color').val(modalMarkerData.config.color.toLowerCase());
+            choices['basic-type'].setChoiceByValue(modalMarkerData.symbol);
+            choices['basic-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#basic-dir').val(modalMarkerData.config.dir);
             $('#basic-label').val(modalMarkerData.config.label);
             $('#basic-scale').val((modalMarkerData.scale ?? 1) * 100);
@@ -201,12 +203,12 @@ var Arma3TacMap;
             $('#basicsymbol-grid').text(Arma3Map.toGrid(e.latlng));
 
         } else if (modalMarkerData.type == 'line') {
-            $('#line-color').val(modalMarkerData.config.color.toLowerCase());
+            choices['line-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#line').modal('show');
         } else if (modalMarkerData.type == 'measure') {
             $('#measure').modal('show');
         } else if (modalMarkerData.type == 'mission') {
-            $('#mission-edit-color').val(modalMarkerData.config.color.toLowerCase());
+            choices['mission-edit-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#mission-edit').modal('show');
 
         } else if (modalMarkerData.type == 'note') {
@@ -312,12 +314,12 @@ var Arma3TacMap;
         });
 
         PmadMilsymbolSelector.setOptions("sidc", {
-            getSymbolOptions: getSymbolConfig,
+            getSymbolOptions: function () { var options = getSymbolConfig(); options.size = 60;  return options; },
             symbolUpdatedCallback: function (sidc, optionsWithDegrees, symbol) {
 
                 // Update Metis Marker export preview
                 var symMetis = new ms.Symbol(getSymbolMetisCompatible(sidc), {
-                    size: 40,
+                    size: 30,
                     uniqueDesignation: optionsWithDegrees.uniqueDesignation
                 });
                 document.getElementById('symbolPreviewMetis').innerHTML = symMetis.asSVG();
@@ -629,7 +631,6 @@ var Arma3TacMap;
         $('#note-insert').show();
         $('#note-grid').text(Arma3Map.toGrid(latlng));
         $('#note-dialog').modal('show');
-
         $('#note-layer').val('' + getCurrentLayerId());
 
         initNoteEditor('');
@@ -890,9 +891,9 @@ var Arma3TacMap;
         $('.leaflet-container').css('cursor', currentTool == 0 ? '' : 'crosshair');
 
         if (currentTool == 4) {
-            colorPicker.show();
+            choices['color-tool'].containerOuter.element.classList.remove("d-none");
         } else {
-            colorPicker.hide();
+            choices['color-tool'].containerOuter.element.classList.add("d-none");
         }
 
         if (currentTool == 1) {
@@ -914,19 +915,10 @@ var Arma3TacMap;
             gameJson.colors.forEach(color => { basicColors[color.name.toLowerCase()] = color.hexadecimal; });
         }
         
-        var previousColor = Object.getOwnPropertyNames(basicColors)[0];
-        var colorSelect = $('<select class="btn-maptool" data-container="body" id="color-tool"></select>');
-        Object.getOwnPropertyNames(basicColors).forEach(function (color) {
-            colorSelect.append($('<option></option>').attr({
-                value: color
-            }).addClass('game-bg-' + color));
-        });
-        colorSelect.on('change', function () {
-            colorSelect.removeClass('game-bg-' + previousColor);
-            colorSelect.addClass('game-bg-' + colorSelect.val());
-            previousColor = colorSelect.val();
-        });
-        colorSelect.addClass('game-bg-' + previousColor);
+        var preExisting = document.querySelector('.game-color-select'); // Find an existing color picker
+
+        var colorSelect = $('<select class="btn-maptool game-color-select" id="color-tool"></select>');
+        colorSelect.html(preExisting.innerHTML);
         return colorSelect;
     }
 
@@ -1165,7 +1157,63 @@ var Arma3TacMap;
 
         $('.modal-edit-points').on('click', _ => editMarkerPoints(modalMarker, map, backend));
 
+
+
+        const choicesColorConfig = {
+            searchEnabled: false,
+            shouldSort: false,
+            itemSelectText: "",
+            callbackOnCreateTemplates: () => ({
+                choice: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+            }),
+            classNames: {
+                listDropdown: ['choices__list--dropdown', 'choices-dropdown-grid'],
+                containerInner: ['choices__inner', 'same-height-as-bs'],
+            }
+        };
+
+        const choicesIconConfig = {
+            shouldSort: false,
+            itemSelectText: "",
+            searchResultLimit: -1,
+            callbackOnCreateTemplates: () => ({
+                item: function (options, choice, removeItemButton) {
+                    let result = Choices.defaults.templates.item.call(this, options, choice, removeItemButton);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+                choice: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+            }),
+            classNames: {
+                item: ['choices__item', 'game-icon'],
+                containerInner: ['choices__inner', 'same-height-as-bs'],
+            },
+            fuseOptions: {
+                shouldSort: false,
+                findAllMatches: true,
+                threshold: 0,
+                ignoreLocation: true
+            }
+        };
+
+        document.querySelectorAll('select.game-color-select').forEach(function (select) {
+            choices[select.id] = new Choices(select, choicesColorConfig);
+        });
+
+        document.querySelectorAll('select.game-icon-select').forEach(function (select) {
+            choices[select.id] = new Choices(select, choicesIconConfig);
+        });
+
         selectTool(map, 0);
+
     }
 
     function getHeading(p1, p2) {

@@ -226,25 +226,25 @@
             <div class="modal-body">
                 <div>
                     <div class="form-row">
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="basic-type" class="control-label">@Localizer["Shape"]</label>
-                            <select id="basic-type" class="form-control">
-                                @foreach (var type in Model.Game.Markers)
+                            <select id="basic-type" class="form-control game-icon-select">
+                                @foreach (var type in Model.Game.Markers!)
                                 {
-                                    <option value="@type.Name.ToLowerInvariant()">@(type.EnglishTitle)</option>
+                                    <option class="game-icon-@type.Name!.ToLowerInvariant()" value="@type.Name!.ToLowerInvariant()">@(type.EnglishTitle)</option>
                                 }
                             </select>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label for="basic-color" class="control-label">@Localizer["Color"]</label>
-                            <select id="basic-color" class="form-control">
-                                @foreach (var color in Model.Game.Colors)
+                            <select id="basic-color" class="form-control game-color-select">
+                                @foreach (var color in Model.Game.Colors!)
                                 {
-                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
+                                    <option class="game-bg-@color.Name!.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-3">
                             <label for="basic-dir" class="control-label">@Localizer["Rotation (mil)"]</label>
                             <input type="number" max="6400" min="0" id="basic-dir" class="form-control" />
                         </div>
@@ -297,12 +297,12 @@
             <div class="modal-body">
                 <div>
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group col-md-3">
                             <label for="line-color" class="control-label">@Localizer["Color"]</label>
-                            <select id="line-color" class="form-control">
-                                @foreach (var color in Model.Game.Colors)
+                            <select id="line-color" class="form-control game-color-select">
+                                @foreach (var color in Model.Game.Colors!)
                                 {
-                                    <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
+                                    <option class="game-bg-@color.Name!.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                                 }
                             </select>
                         </div>
@@ -459,10 +459,10 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="mission-selector-color" class="control-label">@Localizer["Color"]</label>
-                        <select id="mission-selector-color" class="form-control">
-                            @foreach (var color in Model.Game.Colors)
+                        <select id="mission-selector-color" class="form-control game-color-select">
+                            @foreach (var color in Model.Game.Colors!)
                             {
-                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
+                                <option class="game-bg-@color.Name!.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>
@@ -540,10 +540,10 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="mission-edit-color" class="control-label">@Localizer["Color"]</label>
-                        <select id="mission-edit-color" class="form-control">
-                            @foreach (var color in Model.Game.Colors)
+                        <select id="mission-edit-color" class="form-control game-color-select">
+                            @foreach (var color in Model.Game.Colors!)
                             {
-                                <option class="game-bg-@color.Name.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
+                                <option class="game-bg-@color.Name!.ToLowerInvariant()" value="@color.Name.ToLowerInvariant()">@color.EnglishTitle</option>
                             }
                         </select>
                     </div>
