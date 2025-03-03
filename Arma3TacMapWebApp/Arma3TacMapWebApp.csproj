@@ -18,8 +18,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-    <PackageReference Include="Pmad.Milsymbol.AspNetCore" Version="0.1.50" />
-	<PackageReference Include="Pmad.Milsymbol.Png" Version="0.1.50" />
+    <PackageReference Include="Pmad.Milsymbol.AspNetCore" Version="0.1.53" />
+	<PackageReference Include="Pmad.Milsymbol.Png" Version="0.1.53" />
 	<PackageReference Include="PuppeteerSharp" Version="20.0.5" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
 	  

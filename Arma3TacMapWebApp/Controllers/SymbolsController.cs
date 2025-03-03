@@ -50,7 +50,8 @@ namespace Arma3TacMapWebApp.Controllers
                 Direction = ToDegrees(options?.Direction),
                 HigherFormation = options?.HigherFormation,
                 ReinforcedReduced = options?.ReinforcedReduced,
-                UniqueDesignation = options?.UniqueDesignation
+                UniqueDesignation = options?.UniqueDesignation,
+                OutlineWidth = 3
             });
             var stream = new MemoryStream();
             symbol.SaveToPng(stream, 2);
