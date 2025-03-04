@@ -182,12 +182,14 @@
 
     .choices-dropdown-grid div.choices__list div.choices__item {
         width: 100px;
-        text-align:center;
+        text-align: center;
+        border: 7px solid transparent;
+        padding: 3px;
     }
-    .choices-dropdown-grid div.choices__list div.choices__item.is-highlighted {
-        border: 5px #f2f2f2 solid;
-        padding: 5.2px; /* why not 5px ? effective border is 4.8px on tested browsers */
-    }
+        .choices-dropdown-grid div.choices__list div.choices__item.is-highlighted {
+            border: 7px solid #f2f2f2;
+            padding: 3px;
+        }
 
 /** Basic marker dropdown */
 
