@@ -350,13 +350,13 @@ class MessageTemplateUI {
             case 'callsign':
             case 'CallSign':
                 input.type = 'text';
-                input.value = this.lastValues['callsign'] || (this.helper && this.helper.getCallSign) ? this.helper.getCallSign() : '';
+                input.value = this.lastValues['callsign'] || ((this.helper && this.helper.getCallSign) ? this.helper.getCallSign() : '');
                 break;
             case 'frequency':
             case 'Frequency':
                 input.type = 'number';
                 input.step = '0.025';
-                input.value = this.lastValues['frequency'] || (this.helper && this.helper.getCurrentFrequency) ? this.helper.getCurrentFrequency() : '';
+                input.value = this.lastValues['frequency'] || ((this.helper && this.helper.getCurrentFrequency) ? this.helper.getCurrentFrequency() : '');
                 break;
             case 'number':
             case 'Number':
