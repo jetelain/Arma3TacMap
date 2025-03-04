@@ -3,83 +3,20 @@
 var Arma3TacMap;
 (function (Arma3TacMap) {
 
-    ms.setStandard("APP6"); // We always use APP6 edition D
+    document.addEventListener("DOMContentLoaded", function () {
+        ms.setStandard("APP6"); // We always use APP6 edition D
+    });
 
     var intl = new Intl.NumberFormat();
 
-    function applySymbolSet() {
-        var id = '0003';
-        var symbolset = $('#set').val();
+    const choices = {};
 
-        $('#size').empty();
-        $.each(echelonMobilityTowedarray(symbolset), function (name, value) {
-            var sym = new ms.Symbol(id + symbolset + '00' + value.code + '0000000000', { size: 16 });
-            var labelHtml = '<img class="mil-icon" src="' + sym.asCanvas(window.devicePixelRatio).toDataURL() + '" width="' + sym.getSize().width + '" height="' + sym.getSize().height + '"> ' + value.name;
-            $('#size').append($('<option></option>').attr({ value: value.code, 'data-content': labelHtml }).text(value.name));
-        });
-
-        var data = milstd.app6d[symbolset];
-
-        var grps = {};
-        $('#icon').empty();
-        $.each(data['main icon'], function (name, value) {
-
-            var sym = new ms.Symbol(id + symbolset + '0000' + value.code + '0000', { size: 16 });
-            var labelHtml = '<img class="mil-icon" src="' + sym.asCanvas(window.devicePixelRatio).toDataURL() + '" width="' + sym.getSize().width + '" height="' + sym.getSize().height + '"> ';
-            var labelText = '';
-
-            if (value['entity type']) {
-                if (value['entity subtype']) {
-                    labelHtml += '<span class="font-weight-light text-muted">' + value.entity + ' - ' + value['entity type'] + '</span> - <strong>' + value['entity subtype'] + '</strong>';
-                    labelText = value.entity + ' - ' + value['entity type'] + ' - ' + value['entity subtype'];
-                } else {
-                    labelHtml += '<span class="font-weight-light text-muted">' + value.entity + '</span> - <strong>' + value['entity type'] + '</strong>';
-                    labelText = value.entity + ' - ' + value['entity subtype'];
-                }
-            }
-            else {
-                labelHtml += '<strong>' + value.entity + '</strong>';
-                labelText = value.entity;
-
-                $('#icon').append($('<option></option>').attr({ 'data-divider': 'true' }));
-            }
-            $('#icon').append($('<option></option>').attr({ value: value.code, 'data-content': labelHtml }).text(labelText));
-        });
-
-        $('#mod1').empty();
-        $.each(data['modifier 1'], function (name, value) {
-            var sym = new ms.Symbol(id + symbolset + '0000000000' + value.code + '00', { size: 16 });
-            var labelHtml = '<img class="mil-icon" src="' + sym.asCanvas(window.devicePixelRatio).toDataURL() + '" width="' + sym.getSize().width + '" height="' + sym.getSize().height + '"> ' + value.modifier;
-            $('#mod1').append($('<option></option>').attr({ value: value.code, 'data-content': labelHtml }).text(value.modifier));
-        });
-
-        $('#mod2').empty();
-        $.each(data['modifier 2'], function (name, value) {
-            var sym = new ms.Symbol(id + symbolset + '000000000000' + value.code, { size: 16 });
-            var labelHtml = '<img class="mil-icon" src="' + sym.asCanvas(window.devicePixelRatio).toDataURL() + '" width="' + sym.getSize().width + '" height="' + sym.getSize().height + '"> ' + value.modifier;
-            $('#mod2').append($('<option></option>').attr({ value: value.code, 'data-content': labelHtml }).text(value.modifier));
-        });
-
-        $('#size').selectpicker('refresh');
-        $('#icon').selectpicker('refresh');
-        $('#mod1').selectpicker('refresh');
-        $('#mod2').selectpicker('refresh');
-    }
     function getSymbol() {
-        var symbol = '100';
-        symbol += $('#id2').val() || '0';
-        symbol += $('#set').val() || '00';
-        symbol += $('#status').val() || '0';
-        symbol += $('#hq').val() || '0';
-        symbol += $('#size').val() || '00';
-        symbol += $('#icon').val() || '000000';
-        symbol += $('#mod1').val() || '00';
-        symbol += $('#mod2').val() || '00';
-        return symbol;
+        return PmadMilsymbolSelector.getInstance('sidc').getValue();
     }
 
     // Keep up to date with Arma3TacMapLibrary.Maps.MapExporter
-    var metisSupported = {
+    const metisSupported = {
         entity: ["121100", "121102", "121103", "121104", "121105", "120500", "120600", "121000", "150600", "120501", "111000"],
         modifier1: ["98"],
         modifier2: ["51"],
@@ -87,108 +24,35 @@ var Arma3TacMap;
         status: ["1"]
     };
 
-    function getMetisCompatible(wanted, supported, fallback) {
-        if (supported.includes(wanted)) {
-            return wanted;
-        }
-        return fallback;
-    }
+    function getSymbolMetisCompatible(sidc) {
 
-    function getSymbolMetisCompatible() {
-        var symbol = '100';
-        symbol += $('#id2').val() || '0';
+        function getMetisCompatible(wanted, supported, fallback) {
+            if (supported.includes(wanted)) {
+                return wanted;
+            }
+            return fallback;
+        }
+
+        let symbol = '100';
+        symbol += sidc.substring(3, 4);
         symbol += '10';
-        symbol += getMetisCompatible($('#status').val() || '0', $('#id2').val() != "4" ? metisSupported.status : [], '0');
+        symbol += getMetisCompatible(sidc.substring(6, 7), sidc.substring(3, 4) != "4" ? metisSupported.status : [], '0');
         symbol += '0';
-        symbol += getMetisCompatible($('#size').val() || '00', metisSupported.size, '00');
-        symbol += getMetisCompatible($('#icon').val() || '000000', metisSupported.entity, '000000');
-        symbol += getMetisCompatible($('#mod1').val() || '00', metisSupported.modifier1, '00');
-        symbol += getMetisCompatible($('#mod2').val() || '00', metisSupported.modifier2, '00');
+        symbol += getMetisCompatible(sidc.substring(8, 10), metisSupported.size, '00');
+        symbol += getMetisCompatible(sidc.substring(10, 16), metisSupported.entity, '000000');
+        symbol += getMetisCompatible(sidc.substring(16, 18), metisSupported.modifier1, '00');
+        symbol += getMetisCompatible(sidc.substring(18, 20), metisSupported.modifier2, '00');
         return symbol;
     }
 
-    function addDegreesToConfig(config, name) {
-        var value = $('#' + name).val();
-        if (value !== '') {
-            config[name] = String(Number(value) * 360 / 6400);
-        }
-    }
-    function addToConfig(config, name) {
-        var value = $('#' + name).val();
-        if (value !== '') {
-            config[name] = value;
-        }
-    }
-
-    function getSymbolConfig() {
-
-        var config = {};
-        addToConfig(config, 'uniqueDesignation');
-        addDegreesToConfig(config, 'direction');
-        addToConfig(config, 'higherFormation');
-        addToConfig(config, 'additionalInformation');
-        addToConfig(config, 'reinforcedReduced');
-        return config;
-    }
-
     function setSymbol(symbol, config) {
-
-        $('#id2').val(symbol.substr(3, 1));
-        $('#set').val(symbol.substr(4, 2));
-        applySymbolSet();
-
-        $('#status').val(symbol.substr(6, 1));
-        $('#hq').val(symbol.substr(7, 1));
-        $('#size').val(symbol.substr(8, 2));
-        $('#icon').val(symbol.substr(10, 6));
-        $('#mod1').val(symbol.substr(16, 2));
-        $('#mod2').val(symbol.substr(18, 2));
-
         $('#uniqueDesignation').val(config.uniqueDesignation || '');
         $('#higherFormation').val(config.higherFormation || '');
         $('#additionalInformation').val(config.additionalInformation || '');
         $('#reinforcedReduced').val(config.reinforcedReduced || '');
         $('#direction').val(config.direction !== undefined ? (Number(config.direction) * 6400 / 360) : '');
-        applySymbol();
 
-        $('select').selectpicker('render');
-    }
-
-    function applySymbol() {
-        var symbol = getSymbol();
-
-        $('#symbolNumber').text(symbol);
-
-        var config = getSymbolConfig();
-
-        config.size = 70;
-
-        var sym = new ms.Symbol(symbol, config);
-
-        $('#symbolPreview').empty();
-
-        $('#symbolPreview').append($('<img></img>')
-            .attr({
-                src: sym.asCanvas(window.devicePixelRatio).toDataURL(),
-                width: sym.getSize().width,
-                height: sym.getSize().height
-
-            })
-        );
-
-        var symMetis = new ms.Symbol(getSymbolMetisCompatible(), {
-            size: 40,
-            uniqueDesignation: config.uniqueDesignation
-        });
-        $('#symbolPreviewMetis').empty();
-        $('#symbolPreviewMetis').append($('<img></img>')
-            .attr({
-                src: symMetis.asCanvas(window.devicePixelRatio).toDataURL(),
-                width: symMetis.getSize().width,
-                height: symMetis.getSize().height
-            })
-        );
-        return symbol;
+        PmadMilsymbolSelector.getInstance('sidc').setValue(symbol);
     }
 
     var basicColors = {
@@ -315,7 +179,6 @@ var Arma3TacMap;
         }
 
         $('select.layers-dropdown').val('' + marker.options.markerLayer.id);
-        $('select.layers-dropdown').selectpicker('refresh');
 
         if (modalMarkerData.type == 'mil') {
             setSymbol(modalMarkerData.symbol, modalMarkerData.config);
@@ -327,12 +190,11 @@ var Arma3TacMap;
             $('#milsymbol-grid').text(Arma3Map.toGrid(e.latlng));
 
         } else if (modalMarkerData.type == 'basic') {
-            $('#basic-type').val(modalMarkerData.symbol);
-            $('#basic-color').val(modalMarkerData.config.color.toLowerCase());
+            choices['basic-type'].setChoiceByValue(modalMarkerData.symbol);
+            choices['basic-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#basic-dir').val(modalMarkerData.config.dir);
             $('#basic-label').val(modalMarkerData.config.label);
             $('#basic-scale').val((modalMarkerData.scale ?? 1) * 100);
-            $('select').selectpicker('render');
 
             $('#basicsymbol').modal('show');
             $('#basicsymbol-delete').show();
@@ -341,14 +203,12 @@ var Arma3TacMap;
             $('#basicsymbol-grid').text(Arma3Map.toGrid(e.latlng));
 
         } else if (modalMarkerData.type == 'line') {
-            $('#line-color').val(modalMarkerData.config.color.toLowerCase());
-            $('select').selectpicker('render');
+            choices['line-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#line').modal('show');
         } else if (modalMarkerData.type == 'measure') {
             $('#measure').modal('show');
         } else if (modalMarkerData.type == 'mission') {
-            $('#mission-edit-color').val(modalMarkerData.config.color.toLowerCase());
-            $('select').selectpicker('render');
+            choices['mission-edit-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
             $('#mission-edit').modal('show');
 
         } else if (modalMarkerData.type == 'note') {
@@ -356,7 +216,6 @@ var Arma3TacMap;
             initNoteEditor(modalMarkerData.config.content);
 
             $('#note-position').val(modalMarkerData.config.position);
-            $('select').selectpicker('render');
 
             $('#note-dialog').modal('show');
             $('#note-delete').show();
@@ -375,7 +234,6 @@ var Arma3TacMap;
         $('#milsymbol-grid').text(Arma3Map.toGrid(latlng));
 
         $('#milsymbol-layer').val('' + getCurrentLayerId());
-        $('#milsymbol-layer').selectpicker('refresh');
     };
 
     function insertOrbat(latlng) {
@@ -392,10 +250,33 @@ var Arma3TacMap;
         $('#basicsymbol-grid').text(Arma3Map.toGrid(latlng));
 
         $('#basicsymbol-layer').val('' + getCurrentLayerId());
-        $('#basicsymbol-layer').selectpicker('refresh');
     };
 
     function milsymbolMarkerTool(backend) {
+
+        const fields = {
+            uniqueDesignation: document.getElementById('uniqueDesignation'),
+            direction: document.getElementById('direction'),
+            higherFormation: document.getElementById('higherFormation'),
+            additionalInformation: document.getElementById('additionalInformation'),
+            reinforcedReduced: document.getElementById('reinforcedReduced'),
+            //commonIdentifier: document.getElementById('commonIdentifier')
+        };
+
+        function getSymbolConfig () {
+            let options = {};
+            Object.getOwnPropertyNames(fields).forEach(name => {
+                let value = fields[name].value;
+                if (value !== '') {
+                    if (name == 'direction') {
+                        value = String(Number(value) * 360 / 6400);
+                    }
+                    options[name] = value;
+                }
+            });
+            return options;
+        };
+
 
         $('#milsymbol-insert').on('click', function () {
             var symbol = getSymbol();
@@ -425,18 +306,25 @@ var Arma3TacMap;
             $('#milsymbol').modal('hide');
         });
 
-        $.each(milstd.app6d, function (name, value) {
-            $('#set').append($('<option></option>').attr({ value: value.symbolset }).text(value.name));
+
+        Object.getOwnPropertyNames(fields).forEach(name => {
+            fields[name].addEventListener('change', function () {
+                PmadMilsymbolSelector.getInstance('sidc').updatePreview();
+            });
         });
-        $('#set').selectpicker("refresh");
-        $('#set').val("10");
-        applySymbolSet();
 
-        $('#set').change(applySymbolSet);
-        applySymbol();
+        PmadMilsymbolSelector.setOptions("sidc", {
+            getSymbolOptions: function () { var options = getSymbolConfig(); options.size = 60;  return options; },
+            symbolUpdatedCallback: function (sidc, optionsWithDegrees, symbol) {
 
-        $('select').change(applySymbol);
-        $('input').change(applySymbol);
+                // Update Metis Marker export preview
+                var symMetis = new ms.Symbol(getSymbolMetisCompatible(sidc), {
+                    size: 30,
+                    uniqueDesignation: optionsWithDegrees.uniqueDesignation
+                });
+                document.getElementById('symbolPreviewMetis').innerHTML = symMetis.asSVG();
+            }
+        });
 
     }
 
@@ -743,9 +631,7 @@ var Arma3TacMap;
         $('#note-insert').show();
         $('#note-grid').text(Arma3Map.toGrid(latlng));
         $('#note-dialog').modal('show');
-
         $('#note-layer').val('' + getCurrentLayerId());
-        $('#note-layer').selectpicker('refresh');
 
         initNoteEditor('');
     }
@@ -1004,7 +890,11 @@ var Arma3TacMap;
 
         $('.leaflet-container').css('cursor', currentTool == 0 ? '' : 'crosshair');
 
-        colorPicker.selectpicker(currentTool == 4 ? 'show' : 'hide');
+        if (currentTool == 4) {
+            choices['color-tool'].containerOuter.element.classList.remove("d-none");
+        } else {
+            choices['color-tool'].containerOuter.element.classList.add("d-none");
+        }
 
         if (currentTool == 1) {
             map.dragging.disable();
@@ -1025,19 +915,10 @@ var Arma3TacMap;
             gameJson.colors.forEach(color => { basicColors[color.name.toLowerCase()] = color.hexadecimal; });
         }
         
-        var previousColor = Object.getOwnPropertyNames(basicColors)[0];
-        var colorSelect = $('<select class="btn-maptool" data-container="body" id="color-tool" data-style="game-bg-' + previousColor + '"></select>');
-        Object.getOwnPropertyNames(basicColors).forEach(function (color) {
-            colorSelect.append($('<option></option>').attr({
-                value: color,
-                'data-content': "<div class='game-bg-" + color + "' style='width:20px; height:20px;'/>"
-            }).addClass('game-bg-' + color));
-        });
-        colorSelect.on('change', function () {
-            colorSelect.selectpicker('setStyle', 'game-bg-' + previousColor, 'remove');
-            colorSelect.selectpicker('setStyle', 'game-bg-' + colorSelect.val(), 'add');
-            previousColor = colorSelect.val();
-        });
+        var preExisting = document.querySelector('.game-color-select'); // Find an existing color picker
+
+        var colorSelect = $('<select class="btn-maptool game-color-select" id="color-tool"></select>');
+        colorSelect.html(preExisting.innerHTML);
         return colorSelect;
     }
 
@@ -1274,11 +1155,71 @@ var Arma3TacMap;
             }
         });
 
-        $('select').selectpicker();
-
         $('.modal-edit-points').on('click', _ => editMarkerPoints(modalMarker, map, backend));
 
+
+
+        const choicesColorConfig = {
+            searchEnabled: false,
+            shouldSort: false,
+            itemSelectText: "",
+            callbackOnCreateTemplates: () => ({
+                choice: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+                item: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    result.classList.add("item-color");
+                    return result;
+                },
+            }),
+            classNames: {
+                listDropdown: ['choices__list--dropdown', 'choices-dropdown-grid'],
+                containerInner: ['choices__inner', 'same-height-as-bs'],
+            }
+        };
+
+        const choicesIconConfig = {
+            shouldSort: false,
+            itemSelectText: "",
+            searchResultLimit: -1,
+            callbackOnCreateTemplates: () => ({
+                item: function (options, choice, removeItemButton) {
+                    let result = Choices.defaults.templates.item.call(this, options, choice, removeItemButton);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+                choice: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    return result;
+                },
+            }),
+            classNames: {
+                item: ['choices__item', 'game-icon'],
+                containerInner: ['choices__inner', 'same-height-as-bs'],
+            },
+            fuseOptions: {
+                shouldSort: false,
+                findAllMatches: true,
+                threshold: 0,
+                ignoreLocation: true
+            }
+        };
+
+        document.querySelectorAll('select.game-color-select').forEach(function (select) {
+            choices[select.id] = new Choices(select, choicesColorConfig);
+        });
+
+        document.querySelectorAll('select.game-icon-select').forEach(function (select) {
+            choices[select.id] = new Choices(select, choicesIconConfig);
+        });
+
         selectTool(map, 0);
+
     }
 
     function getHeading(p1, p2) {
@@ -1442,7 +1383,6 @@ var Arma3TacMap;
         $('select.layers-dropdown').each((index, selectElement) => {
             const selectElements = sorted.map((l) => $(selectElement).find('option[value=' + l.id + ']').detach());
             $(selectElement).append(selectElements);
-            $(selectElement).selectpicker('refresh');
         });
     }
 

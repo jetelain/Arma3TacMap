@@ -11,6 +11,7 @@ using Arma3TacMapWebApp.Services.GameMapStorage;
 using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapWebApp.Controllers
@@ -218,6 +219,14 @@ namespace Arma3TacMapWebApp.Controllers
                 foreach (var color in game.Colors)
                 {
                     sb.Append($".game-bg-{color.Name!.ToLowerInvariant()} {{ color: {color.ContrastHexadecimal} !important; background-color: {color.Hexadecimal} !important; }}");
+                    sb.AppendLine();
+                }
+            }
+            if ( game.Markers != null)
+            {
+                foreach (var marker in game.Markers)
+                {
+                    sb.Append($".game-icon-{marker.Name!.ToLowerInvariant()} {{ background-image: url('{marker.ImagePng}'); }}");
                     sb.AppendLine();
                 }
             }

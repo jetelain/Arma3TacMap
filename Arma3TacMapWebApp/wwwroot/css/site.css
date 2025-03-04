@@ -102,3 +102,32 @@ input:checked + label.orbat-radio {
 .list-group-item.active .btn {
     border-color: white;
 }
+
+/* Slight changes to ChoicesJS to be boostrap lookalike */
+main .choices .choices__inner {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+main .choices.is-focused .choices__inner {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
+    border-radius: 2.5px;
+}
+
+main .choices.is-focused {
+    overflow: unset;
+}
+
+main .choices .choices__list--dropdown {
+    border-radius: 2.5px;
+    border: 1px solid #ced4da;
+    box-shadow: 0 0 .1rem .1rem rgba(0,0,0,.1);
+}
+
+/* Allow choices height to match standard form field (not suitable for symbol selector choices due to icon) */
+.modal-body .choices[data-type*="select-one"] .choices__inner.same-height-as-bs {
+    min-height: 24.4px;
+    padding: 3.3px 12px;
+}
