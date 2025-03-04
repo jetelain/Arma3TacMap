@@ -191,8 +191,35 @@
             padding: 3px;
         }
 
-/** Basic marker dropdown */
+div.choices__item.item-color {
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: 3px;
+    box-sizing: content-box;
+    text-align: center;
+}
 
+/** Map overlay color selector (for line tool) */
+
+main .map div.choices__item.item-color {
+    color: transparent !important;
+    width: 22px;
+    height: 30px;
+    margin: -5px -8px -5px -8px;
+    box-sizing: border-box;
+}
+
+main .map .choices[data-type*="select-one"]::after {
+    right: 4px;
+}
+
+main .map .choices .choices__inner {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px #6c757d solid;
+    border-radius: 4px;
+}
+
+/** Basic marker dropdown */
 .choices__item.game-icon {
     background-size: 20px 20px;
     background-repeat: no-repeat;

@@ -1169,6 +1169,12 @@ var Arma3TacMap;
                     result.classList.add(choice.element.className);
                     return result;
                 },
+                item: function (options, choice, selectText, groupName) {
+                    let result = Choices.defaults.templates.choice.call(this, options, choice, selectText, groupName);
+                    result.classList.add(choice.element.className);
+                    result.classList.add("item-color");
+                    return result;
+                },
             }),
             classNames: {
                 listDropdown: ['choices__list--dropdown', 'choices-dropdown-grid'],
