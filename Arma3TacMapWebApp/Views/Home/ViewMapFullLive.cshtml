@@ -4,6 +4,9 @@
     Layout = "_LayoutFull";
 }
 
+<pmad-script-milsymbol />
+<pmad-script-choices />
+
 @{await Html.RenderPartialAsync("_LiveMap", Model.InitLiveMap);}
 
 @section Scripts {

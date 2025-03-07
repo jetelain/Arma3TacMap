@@ -11,7 +11,6 @@ using Arma3TacMapWebApp.Services.GameMapStorage;
 using Arma3TacMapWebApp.Services.GameMapStorage.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace Arma3TacMapWebApp.Controllers
