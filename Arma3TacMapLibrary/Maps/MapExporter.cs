@@ -162,7 +162,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
         {
             return new List<object>()
                     {
-                        id,
+                        id.ToString(),
                         data.pos[1],
                         data.pos[0],
                         ToIdentify(data.symbol[3]),
@@ -187,7 +187,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
                 points.Add(y);
             }
             return new List<object>() {
-                        id,
+                        id.ToString(),
                         points,
                         Get(data.config, "color", "ColorBlack")};
         }
@@ -197,7 +197,7 @@ publicVariable 'gtd_map_allMetisMarkers';";
             var dir = Get(data.config, "dir", "");
 
             return new List<object>() {
-                        id,
+                        id.ToString(),
                         data.pos[1],
                         data.pos[0],
                         data.symbol,
