@@ -843,7 +843,9 @@ var Arma3TacMap;
         var tileLayer = L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
                 attribution: mapInfos.attribution,
                 tileSize: mapInfos.tileSize,
-                maxNativeZoom: mapInfos.maxZoom
+                maxNativeZoom: mapInfos.maxZoom,
+                noWrap: true,
+                bounds: [[0, 0], [mapInfos.worldSize, mapInfos.worldSize]]
             })
             .on('load', function () { arma3TacMapLoaded = true })
             .addTo(map);
