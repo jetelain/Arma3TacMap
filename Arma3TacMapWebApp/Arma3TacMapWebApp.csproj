@@ -21,7 +21,7 @@
     <PackageReference Include="Pmad.Milsymbol.AspNetCore" Version="0.1.53" />
 	<PackageReference Include="Pmad.Milsymbol.Png" Version="0.1.53" />
 	<PackageReference Include="PuppeteerSharp" Version="20.0.5" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
 	  
 	  <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.6.2" Condition="'$(VsInstallRoot)'!=''">
 		  <PrivateAssets>all</PrivateAssets>
