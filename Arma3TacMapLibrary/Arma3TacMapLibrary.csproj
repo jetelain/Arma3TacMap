@@ -171,7 +171,7 @@
     <PackageReference Include="HtmlSanitizer" Version="8.2.871-beta" />
     <PackageReference Include="Jint" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.10" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
   </ItemGroup>
 
