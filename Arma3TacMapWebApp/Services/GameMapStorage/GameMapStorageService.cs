@@ -54,7 +54,7 @@ namespace Arma3TacMapWebApp.Services.GameMapStorage
                         postProcess(value);
                     }
                     using var entry = memoryCache.CreateEntry(uri);
-                    entry.SlidingExpiration = TimeSpan.FromHours(1);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(4);
                     entry.Value = value;
                 }
             }
