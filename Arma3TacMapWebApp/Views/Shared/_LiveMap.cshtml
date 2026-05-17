@@ -1,5 +1,7 @@
 ﻿@model Arma3TacMapWebApp.Models.LiveMapModel
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> Localizer
+@using Arma3TacMapWebApp.Services.GameMapStorage.Json
+@using Arma3TacMapWebApp.Views
 
 <ul class="pagination pagination-sm justify-content-center ml-4 mr-4" id="phase-selector" style="display:none;">
     <li class="page-item disabled"><span class="page-link text-dark">@Localizer["Phase"]</span></li>
@@ -35,8 +37,37 @@
         }
         <div class="list-group" id="layers-list">
             <div class="list-group-item list-group-item-action d-flex justify-content-between" id="layers-background">
-                <div>
+                <div class="flex-fill">
                     @Localizer["Base map"]
+                    @{
+                        var defaultLayer = Model.GameMap.Layers?.FirstOrDefault(l => l.IsDefault) ?? Model.GameMap.Layers?.FirstOrDefault();
+                        var compatibleLayers = defaultLayer != null
+                            ? (Model.GameMap.Layers ?? Enumerable.Empty<GameMapLayerJson>())
+                                .Where(l => l.TileSize == defaultLayer.TileSize && l.FactorX == defaultLayer.FactorX && l.FactorY == defaultLayer.FactorY)
+                                .ToList()
+                            : new List<GameMapLayerJson>();
+                    }
+                    @if (compatibleLayers.Count > 1)
+                    {
+                        <select id="bg-layer-selector" class="form-control form-control-sm mt-1">
+                            @foreach (var bgLayer in compatibleLayers)
+                            {
+                                var pattern = bgLayer.Pattern ?? string.Empty;
+                                if (pattern.StartsWith("/") && !string.IsNullOrEmpty(Model.GmsBaseUri))
+                                {
+                                    pattern = Model.GmsBaseUri.TrimEnd('/') + pattern;
+                                }
+                                @if (bgLayer.IsDefault)
+                                {
+                                    <option value="@pattern" data-native-zoom="@bgLayer.MaxZoom" selected>@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
+                                }
+                                else
+                                {
+                                    <option value="@pattern" data-native-zoom="@bgLayer.MaxZoom">@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
+                                }
+                            }
+                        </select>
+                    }
                 </div>
                 <div>
                     <span class="mr-1" id="bg-opacity">100 %</span>

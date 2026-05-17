@@ -882,6 +882,27 @@ var Arma3TacMap;
         $('#bg-opacity-minus').on('click', function () { changeOpacity(tileLayer, -0.1); });
         $('#bg-opacity-plus').on('click', function () { changeOpacity(tileLayer, +0.1); });
 
+        // Background layer switcher (options rendered server-side)
+        var bgLayerSelector = $('#bg-layer-selector');
+        if (bgLayerSelector.length && bgLayerSelector.find('option').length > 1) {
+            bgLayerSelector.on('change', function () {
+                var selectedPattern = $(this).val();
+                var selectedNativeZoom = Number($(this).find('option:selected').attr('data-native-zoom'));
+                var currentOpacity = tileLayer.options.opacity ?? 1;
+                tileLayer.remove();
+                tileLayer = L.tileLayer(selectedPattern, {
+                    attribution: mapInfos.attribution,
+                    tileSize: mapInfos.tileSize,
+                    maxNativeZoom: selectedNativeZoom,
+                    noWrap: true,
+                    bounds: [[0, 0], [mapInfos.worldSize, mapInfos.worldSize]],
+                    opacity: currentOpacity
+                }).addTo(map);
+                $('#bg-opacity-minus').off('click').on('click', function () { changeOpacity(tileLayer, -0.1); });
+                $('#bg-opacity-plus').off('click').on('click', function () { changeOpacity(tileLayer, +0.1); });
+            });
+        }
+
         return map;
     }
 
