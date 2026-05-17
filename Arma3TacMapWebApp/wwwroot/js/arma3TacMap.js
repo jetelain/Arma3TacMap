@@ -1294,10 +1294,10 @@ var Arma3TacMap;
             var allLocked = Object.getOwnPropertyNames(layers).every(id => layers[id].isLocked);
             if (allLocked) {
                 lockAllButton.setClass('btn-primary');
-                lockAllButton._container.querySelector('i.fas').className = 'fas fa-lock';
+                lockAllButton.querySelector('i.fas').className = 'fas fa-lock';
             } else {
                 lockAllButton.setClass('btn-outline-secondary');
-                lockAllButton._container.querySelector('i.fas').className = 'fas fa-lock-open';
+                lockAllButton.querySelector('i.fas').className = 'fas fa-lock-open';
             }
         }
     }
