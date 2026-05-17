@@ -91,6 +91,7 @@ var Arma3TacMap;
     var colorPicker;
     var lockAllButton;
     var noteEditor = null;
+    var currentMap = null;
 
     var pointEditMarkers = [];
 
@@ -187,7 +188,7 @@ var Arma3TacMap;
             $('#milsymbol-delete').show();
             $('#milsymbol-update').show();
             $('#milsymbol-insert').hide();
-            $('#milsymbol-grid').text(Arma3Map.toGrid(e.latlng));
+            $('#milsymbol-grid').text(GameMapUtils.toGridCoordinates(e.latlng, 4, currentMap));
 
         } else if (modalMarkerData.type == 'basic') {
             choices['basic-type'].setChoiceByValue(modalMarkerData.symbol);
@@ -200,7 +201,7 @@ var Arma3TacMap;
             $('#basicsymbol-delete').show();
             $('#basicsymbol-update').show();
             $('#basicsymbol-insert').hide();
-            $('#basicsymbol-grid').text(Arma3Map.toGrid(e.latlng));
+            $('#basicsymbol-grid').text(GameMapUtils.toGridCoordinates(e.latlng, 4, currentMap));
 
         } else if (modalMarkerData.type == 'line') {
             choices['line-color'].setChoiceByValue(modalMarkerData.config.color.toLowerCase());
@@ -221,7 +222,7 @@ var Arma3TacMap;
             $('#note-delete').show();
             $('#note-update').show();
             $('#note-insert').hide();
-            $('#note-grid').text(Arma3Map.toGrid(e.latlng));
+            $('#note-grid').text(GameMapUtils.toGridCoordinates(e.latlng, 4, currentMap));
         }
     };
     function insertMilSymbol(latlng) {
@@ -231,15 +232,15 @@ var Arma3TacMap;
         $('#milsymbol-delete').hide();
         $('#milsymbol-update').hide();
         $('#milsymbol-insert').show();
-        $('#milsymbol-grid').text(Arma3Map.toGrid(latlng));
+        $('#milsymbol-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
 
-        $('#milsymbol-layer').val('' + getCurrentLayerId());
+        $('#milsymbol-layer').val
     };
 
     function insertOrbat(latlng) {
         clickPosition = latlng;
         $('#orbat').modal('show');
-        $('#orbat-grid').text(Arma3Map.toGrid(latlng));
+        $('#orbat-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
     };
     function insertBasicSymbol(latlng) {
         clickPosition = latlng;
@@ -247,9 +248,9 @@ var Arma3TacMap;
         $('#basicsymbol-delete').hide();
         $('#basicsymbol-update').hide();
         $('#basicsymbol-insert').show();
-        $('#basicsymbol-grid').text(Arma3Map.toGrid(latlng));
+        $('#basicsymbol-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
 
-        $('#basicsymbol-layer').val('' + getCurrentLayerId());
+        $('#basicsymbol-layer').val
     };
 
     function milsymbolMarkerTool(backend) {
@@ -629,7 +630,7 @@ var Arma3TacMap;
         $('#note-delete').hide();
         $('#note-update').hide();
         $('#note-insert').show();
-        $('#note-grid').text(Arma3Map.toGrid(latlng));
+        $('#note-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
         $('#note-dialog').modal('show');
         $('#note-layer').val('' + getCurrentLayerId());
 
@@ -829,10 +830,11 @@ var Arma3TacMap;
     }
 
     function initMapArea(mapInfos, endpoint, center, fullScreen) {
+        var crs = mapInfos.CRS || GameMapUtils.CRS(mapInfos.factorX, mapInfos.factorY, mapInfos.tileSize);
         var map = L.map('map', {
             minZoom: mapInfos.minZoom,
             maxZoom: mapInfos.maxZoom +1 ,
-            crs: mapInfos.CRS,
+            crs: crs,
             zoomSnap: fullScreen ? 0.01 : 0.2,
             zoomControl: !fullScreen,
             zoomDelta: 0.2,
@@ -840,7 +842,19 @@ var Arma3TacMap;
             fadeAnimation: !fullScreen
         });
 
-        var tileLayer = L.tileLayer((endpoint || 'https://jetelain.github.io/Arma3Map') + mapInfos.tilePattern, {
+        map.grid = new GameMapUtils.MapGrid({
+            sizeInMeters: mapInfos.worldSize,
+            originX: mapInfos.originX || 0,
+            originY: mapInfos.originY || 0,
+            defaultPrecision: 4
+        });
+
+        var tilePattern = mapInfos.tilePattern;
+        if (tilePattern && tilePattern.startsWith('/') && endpoint) {
+            tilePattern = endpoint + tilePattern;
+        }
+
+        var tileLayer = L.tileLayer(tilePattern, {
                 attribution: mapInfos.attribution,
                 tileSize: mapInfos.tileSize,
                 maxNativeZoom: mapInfos.maxZoom,
@@ -858,22 +872,11 @@ var Arma3TacMap;
             map.setView(mapInfos.center, mapInfos.defaultZoom);
         }
 
-        var graticuleZooms = [];
-        if (mapInfos.maxZoom > 4) {
-            graticuleZooms.push({ start: 0, end: mapInfos.maxZoom - 4, interval: 10000 });
-            graticuleZooms.push({ start: mapInfos.maxZoom - 4, end: 10, interval: 1000 });
-        } else {
-            graticuleZooms.push({ start: 0, end: 10, interval: 1000 });
-        }
-        L.latlngGraticule(
-            {
-                color: mapInfos.isSVG ? '#0071D6' : '#444',
-                zoomInterval: graticuleZooms
-            }).addTo(map);
+        GameMapUtils.latlngGraticule({ color: mapInfos.isSVG ? '#0071D6' : '#444' }).addTo(map);
 
         if (!fullScreen) {
             L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
-            L.control.gridMousePosition().addTo(map);
+            GameMapUtils.gridMousePosition().addTo(map);
         }
 
         $('#bg-opacity-minus').on('click', function () { changeOpacity(tileLayer, -0.1); });
@@ -1047,18 +1050,18 @@ var Arma3TacMap;
     function setupEditTools(map, backend, gameJson) {
 
         tools = [
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 0); }, content: '<i class="far fa-hand-paper"></i>' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 1); }, content: '<i class="far fa-hand-pointer"></i>' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 2); }, content: '<img height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAzCAYAAADfP/VGAAACTElEQVRoge3ZsUsCcRTA8TdZaurZmJG2RtASURBI0BRELVG0BBFYi0tDkQSOQf0BTTW1FU01tQhBtNSWi8NFFNSc82soT9PTu/N+7/d+d+fwQLg70C8f7n73EwAg0hvbAxEAwN5Yjt4Sqz+WQC2VDvwkhkYwFI2ZxwrHk8aB1MQUbl7eY1HHQM7q6RVqw5lfPHGtNZaWSmPu5glHZ+aMaNn8IfsXlzkHL984uZ4zfv/44hrmSxXzWLWL5veOAqesUVM4kcSl4zMs6oiFcrVzrKKOgVFmpmn38d04bitWEJS109Q4jmL5UZmVJlex/KTMjiYhsbyszIkmYbG8qKxZ0/LJue1rhcTygrJuNZHEUlmZG02ksVRSJkITeSwVlInSJC0WhzLRmqTGkqmMQhNLLEpllJrYYlEoo9bEHkuEMlmalIjlRplMTUrFcqKMQ5Nysewo49KkbCwzZbM7+6yalI5lpgwAsC8aY9GkfKzmexP3O6aysczuTarsZCgTy+pJp8JOhhKxnDzpOJWxxup23cSljC2WiHWTbGXSY4lehctUJjUW5SpchjIpsWS901ErI4/F8U5HpYwsFvcOAYUyklgq7BBQKBMai1sTtTJhsf5p0gbZdwgolLmOpaomCmWuYnlBk0hlXcXymiZRyhzH8rImt8psx/KLJjfKbMXyo6ZulHWM5XdN7Wb79tlUWdtYQdJkV9nGxV1rrFB0wDhpbGEF86UKFsrVQM7W9QNmprPN/zTVY/XGcl5rsXQA+AKAt7/PvanPBwB8AoD+A4WfYoYlQx+dAAAAAElFTkSuQmCC" />' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 3); }, content: '●' }).addTo(map), // maybe ⬤ ?
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 4); }, content: '╱' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 5); }, content: '<i class="fas fa-ruler"></i>' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 6); }, content: '<i class="fas fa-plus-circle"></i>' }).addTo(map),
-            L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', click: function () { selectTool(map, 7); }, content: '<i class="fas fa-sticky-note"></i>' }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<i class="far fa-hand-paper"></i>' }).on('click', function () { selectTool(map, 0); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<i class="far fa-hand-pointer"></i>' }).on('click', function () { selectTool(map, 1); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<img height="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAAAzCAYAAADfP/VGAAACTElEQVRoge3ZsUsCcRTA8TdZaurZmJG2RtASURBI0BRELVG0BBFYi0tDkQSOQf0BTTW1FU01tQhBtNSWi8NFFNSc82soT9PTu/N+7/d+d+fwQLg70C8f7n73EwAg0hvbAxEAwN5Yjt4Sqz+WQC2VDvwkhkYwFI2ZxwrHk8aB1MQUbl7eY1HHQM7q6RVqw5lfPHGtNZaWSmPu5glHZ+aMaNn8IfsXlzkHL984uZ4zfv/44hrmSxXzWLWL5veOAqesUVM4kcSl4zMs6oiFcrVzrKKOgVFmpmn38d04bitWEJS109Q4jmL5UZmVJlex/KTMjiYhsbyszIkmYbG8qKxZ0/LJue1rhcTygrJuNZHEUlmZG02ksVRSJkITeSwVlInSJC0WhzLRmqTGkqmMQhNLLEpllJrYYlEoo9bEHkuEMlmalIjlRplMTUrFcqKMQ5Nysewo49KkbCwzZbM7+6yalI5lpgwAsC8aY9GkfKzmexP3O6aysczuTarsZCgTy+pJp8JOhhKxnDzpOJWxxup23cSljC2WiHWTbGXSY4lehctUJjUW5SpchjIpsWS901ErI4/F8U5HpYwsFvcOAYUyklgq7BBQKBMai1sTtTJhsf5p0gbZdwgolLmOpaomCmWuYnlBk0hlXcXymiZRyhzH8rImt8psx/KLJjfKbMXyo6ZulHWM5XdN7Wb79tlUWdtYQdJkV9nGxV1rrFB0wDhpbGEF86UKFsrVQM7W9QNmprPN/zTVY/XGcl5rsXQA+AKAt7/PvanPBwB8AoD+A4WfYoYlQx+dAAAAAElFTkSuQmCC" />' }).on('click', function () { selectTool(map, 2); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '●' }).on('click', function () { selectTool(map, 3); }).addTo(map), // maybe ⬤ ?
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '╱' }).on('click', function () { selectTool(map, 4); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<i class="fas fa-ruler"></i>' }).on('click', function () { selectTool(map, 5); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<i class="fas fa-plus-circle"></i>' }).on('click', function () { selectTool(map, 6); }).addTo(map),
+            GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topleft', content: '<i class="fas fa-sticky-note"></i>' }).on('click', function () { selectTool(map, 7); }).addTo(map),
         ];
 
         colorPicker = createColorPicker(gameJson);
-        L.control.overlayDiv({ content: colorPicker.get(0), position: 'topleft' }).addTo(map);
+        GameMapUtils.overlayDiv({ content: colorPicker.get(0), position: 'topleft' }).addTo(map);
 
         milsymbolMarkerTool(backend);
         basicsymbolMarkerTool(backend);
@@ -1245,7 +1248,7 @@ var Arma3TacMap;
     }
 
     function setupSearch(map, mapInfos, markers) {
-        L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#search').modal('show'); search(map, mapInfos, markers); }, content: '<i class="fas fa-search"></i>' }).addTo(map);
+        GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', content: '<i class="fas fa-search"></i>' }).on('click', function () { $('#search').modal('show'); search(map, mapInfos, markers); }).addTo(map);
         $('#search-term').on('keyup', function () { search(map, mapInfos, markers); });
     }
 
@@ -1291,10 +1294,10 @@ var Arma3TacMap;
             var allLocked = Object.getOwnPropertyNames(layers).every(id => layers[id].isLocked);
             if (allLocked) {
                 lockAllButton.setClass('btn-primary');
-                lockAllButton.j().find('i.fas').attr('class', 'fas fa-lock');
+                lockAllButton._container.querySelector('i.fas').className = 'fas fa-lock';
             } else {
                 lockAllButton.setClass('btn-outline-secondary');
-                lockAllButton.j().find('i.fas').attr('class', 'fas fa-lock-open');
+                lockAllButton._container.querySelector('i.fas').className = 'fas fa-lock-open';
             }
         }
     }
@@ -1318,7 +1321,7 @@ var Arma3TacMap;
             layer.group.remove();
         } else {
             i.attr('class', 'fas fa-eye');
-            map.addLayer(layer.group);
+            currentMap.addLayer(layer.group);
         }
         layer.group.eachLayer(function (marker) {
             updateMarkerState(layer, marker);
@@ -1559,21 +1562,21 @@ var Arma3TacMap;
 
     function setupLayerToggle(map) {
         var isLayersToolboxVisible = false;
-        var layersBtn = L.control.overlayButton({
-            baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
-                isLayersToolboxVisible = !isLayersToolboxVisible;
-                if (isLayersToolboxVisible) {
-                    $('#layers-col').attr('class', 'col tacmap-sidebar pl-2');
-                    layersBtn.setClass('btn-primary');
-                    history.replaceState({}, '', '#showLayers');
-                }
-                else {
-                    $('#layers-col').attr('class', 'd-none');
-                    layersBtn.setClass('btn-outline-secondary');
-                    history.replaceState({}, '', '#');
-                }
-            }, content: '<i class="fas fa-layer-group"></i>'
-        }).addTo(map);
+        var layersBtn = GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', content: '<i class="fas fa-layer-group"></i>' });
+        layersBtn.on('click', function () {
+            isLayersToolboxVisible = !isLayersToolboxVisible;
+            if (isLayersToolboxVisible) {
+                $('#layers-col').attr('class', 'col tacmap-sidebar pl-2');
+                layersBtn.setClass('btn-primary');
+                history.replaceState({}, '', '#showLayers');
+            }
+            else {
+                $('#layers-col').attr('class', 'd-none');
+                layersBtn.setClass('btn-outline-secondary');
+                history.replaceState({}, '', '#');
+            }
+        });
+        layersBtn.addTo(map);
 
         if (location.hash.indexOf('showLayers') != -1) {
             isLayersToolboxVisible = true;
@@ -1583,20 +1586,20 @@ var Arma3TacMap;
     }
 
     function setupLockAll(map, layers) {
-        lockAllButton = L.control.overlayButton({
-            baseClassName: 'btn btn-maptool', position: 'topright', click: function () {
-                var layersList = Object.getOwnPropertyNames(layers).map(id => layers[id]);
-                var allWasLocked = layersList.every(l => l.isLocked);
-                layersList.forEach(l => { l.isLocked = !allWasLocked; });
-                updateAllLayersState(layers);
-                updateLockAllState(layers);
-                if (!allWasLocked) {
-                    $('.layers-item-lock i.fas').attr('class', 'fas fa-lock');
-                } else {
-                    $('.layers-item-lock i.fas').attr('class', 'fas fa-lock-open');
-                }
-            }, content: '<i class="fas fa-lock-open"></i>'
-        }).addTo(map);
+        lockAllButton = GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', content: '<i class="fas fa-lock-open"></i>' });
+        lockAllButton.on('click', function () {
+            var layersList = Object.getOwnPropertyNames(layers).map(id => layers[id]);
+            var allWasLocked = layersList.every(l => l.isLocked);
+            layersList.forEach(l => { l.isLocked = !allWasLocked; });
+            updateAllLayersState(layers);
+            updateLockAllState(layers);
+            if (!allWasLocked) {
+                $('.layers-item-lock i.fas').attr('class', 'fas fa-lock');
+            } else {
+                $('.layers-item-lock i.fas').attr('class', 'fas fa-lock-open');
+            }
+        });
+        lockAllButton.addTo(map);
     }
 
     var defaultOpacity = { 'mil': 1.0, 'basic': 1.0, 'line': 1.0, 'measure': 1.0 };
@@ -1631,23 +1634,27 @@ var Arma3TacMap;
 
 
     function getMapInfos(config) {
-        var worldName = config.worldName;
-        var view = config.view;
-
-        if (view == 'topo' && Arma3Map.TopoMaps) {
-            var topo = Arma3Map.TopoMaps[worldName];
-            if (topo) {
-                topo.CRS = MGRS_CRS(topo.crsFactor.x, topo.crsFactor.y, topo.tileSize);
-                topo.center = [topo.center.y, topo.center.x];
-                topo.defaultZoom = 1;
-                topo.attribution = topo.credits;
-                topo.cities = topo.cities || [];
-                topo.tilePattern = '/topo/' + topo.worldName + '/' + topo.tilePattern;
-                topo.isSVG = true;
-                return topo;
-            }
-        }
-        return Arma3Map.Maps[worldName || 'altis'] || Arma3Map.Maps.altis;
+        var gameMap = config.gameMap;
+        var layer = gameMap.layers.find(function (l) { return l.isDefault; }) || gameMap.layers[0];
+        var isSvg = layer.format === 'SvgOnly' || layer.format === 'SvgAndWebp';
+        var sizeInMeters = gameMap.sizeInMeters;
+        return {
+            minZoom: layer.minZoom,
+            maxZoom: layer.maxZoom,
+            defaultZoom: layer.defaultZoom,
+            tileSize: layer.tileSize,
+            factorX: layer.factorX,
+            factorY: layer.factorY,
+            tilePattern: layer.pattern,
+            attribution: gameMap.appendAttribution,
+            worldSize: sizeInMeters,
+            originX: gameMap.originX || 0,
+            originY: gameMap.originY || 0,
+            isSVG: isSvg,
+            center: [sizeInMeters / 2, sizeInMeters / 2],
+            cities: (gameMap.locations || []).filter(function (l) { return l.type === 0 || l.type === 'City'; })
+                    .map(function (l) { return { name: l.englishTitle, x: l.x, y: l.y }; })
+        };
     }
 
     Arma3TacMap.initLiveMap = function (config) {
@@ -1658,6 +1665,7 @@ var Arma3TacMap;
             var mapInfos = getMapInfos(config);
 
             var map = initMapArea(mapInfos, config.endpoint);
+            currentMap = map;
 
             setupLayerToggle(map);
 
@@ -1671,7 +1679,7 @@ var Arma3TacMap;
             backend.create(mapId, config.hub);
 
             if ($('#share').length) {
-                L.control.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', click: function () { $('#share').modal('show'); }, content: '<i class="fas fa-share-square"></i>' }).addTo(map);
+                GameMapUtils.overlayButton({ baseClassName: 'btn btn-maptool', position: 'topright', content: '<i class="fas fa-share-square"></i>' }).on('click', function () { $('#share').modal('show'); }).addTo(map);
             }
             setupSearch(map, mapInfos, markers);
 
@@ -1690,6 +1698,7 @@ var Arma3TacMap;
             var markers = {};
 
             var map = initMapArea(mapInfos, config.endpoint, config.center, config.fullScreen);
+            currentMap = map;
 
             if ($('#search').length) {
                 setupSearch(map, mapInfos, markers);
