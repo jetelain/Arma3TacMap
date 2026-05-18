@@ -234,7 +234,7 @@ var Arma3TacMap;
         $('#milsymbol-insert').show();
         $('#milsymbol-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
 
-        $('#milsymbol-layer').val
+        $('#milsymbol-layer').val('' + getCurrentLayerId());
     };
 
     function insertOrbat(latlng) {
@@ -250,7 +250,7 @@ var Arma3TacMap;
         $('#basicsymbol-insert').show();
         $('#basicsymbol-grid').text(GameMapUtils.toGridCoordinates(latlng, 4, currentMap));
 
-        $('#basicsymbol-layer').val
+        $('#basicsymbol-layer').val('' + getCurrentLayerId());
     };
 
     function milsymbolMarkerTool(backend) {
