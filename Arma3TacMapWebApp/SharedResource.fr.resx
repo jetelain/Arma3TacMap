@@ -660,13 +660,25 @@
   <data name="Symbols" xml:space="preserve">
     <value>Symboles</value>
   </data>
-	<data name="All symbols" xml:space="preserve">
+  <data name="All symbols" xml:space="preserve">
     <value>Tous les symboles</value>
   </data>
-	<data name="Download PNG" xml:space="preserve">
+  <data name="Download PNG" xml:space="preserve">
     <value>Télécharger PNG</value>
   </data>
-	<data name="Download SVG" xml:space="preserve">
+  <data name="Download SVG" xml:space="preserve">
     <value>Télécharger SVG</value>
+  </data>
+  <data name="Topographic" xml:space="preserve">
+    <value>Topographique</value>
+  </data>
+  <data name="Topographic (Atlas)" xml:space="preserve">
+    <value>Topographique (Atlas)</value>
+  </data>
+  <data name="Aerial view" xml:space="preserve">
+    <value>Vue aérienne</value>
+  </data>
+  <data name="Satellite view" xml:space="preserve">
+    <value>Vue satellite</value>
   </data>
 </root>
