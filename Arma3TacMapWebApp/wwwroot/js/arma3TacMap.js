@@ -872,7 +872,7 @@ var Arma3TacMap;
             map.setView(mapInfos.center, mapInfos.defaultZoom);
         }
 
-        GameMapUtils.latlngGraticule({ color: mapInfos.isSVG ? '#0071D6' : '#444' }).addTo(map);
+        const graticule = GameMapUtils.latlngGraticule({ color: mapInfos.isSVG ? '#0071D6' : '#444' }).addTo(map);
 
         if (!fullScreen) {
             L.control.scale({ maxWidth: 200, imperial: false }).addTo(map);
@@ -886,8 +886,9 @@ var Arma3TacMap;
         var bgLayerSelector = $('#bg-layer-selector');
         if (bgLayerSelector.length && bgLayerSelector.find('option').length > 1) {
             bgLayerSelector.on('change', function () {
+                var selectedOption = $(this).find('option:selected');
                 var selectedPattern = $(this).val();
-                var selectedNativeZoom = Number($(this).find('option:selected').attr('data-native-zoom'));
+                var selectedNativeZoom = Number(selectedOption.attr('data-native-zoom'));
                 var currentOpacity = tileLayer.options.opacity ?? 1;
                 tileLayer.remove();
                 tileLayer = L.tileLayer(selectedPattern, {
@@ -900,6 +901,13 @@ var Arma3TacMap;
                 }).addTo(map);
                 $('#bg-opacity-minus').off('click').on('click', function () { changeOpacity(tileLayer, -0.1); });
                 $('#bg-opacity-plus').off('click').on('click', function () { changeOpacity(tileLayer, +0.1); });
+
+                if (selectedOption.attr('data-layer-type') == "Aerial") {
+                    graticule.setStyle({ drawLines: true, color: '#fff8', fontColor: '#fff', labelBackground: '#0004' });
+                }
+                else {
+                    graticule.setStyle({ drawLines: false, color: '#444', fontColor: '#444', labelBackground: null });
+                }
             });
         }
 

@@ -59,11 +59,11 @@
                                 }
                                 @if (bgLayer.IsDefault)
                                 {
-                                    <option value="@pattern" data-native-zoom="@bgLayer.MaxZoom" selected>@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
+                                    <option value="@pattern" data-layer-type="@bgLayer.Type.ToString()" data-native-zoom="@bgLayer.MaxZoom" selected>@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
                                 }
                                 else
                                 {
-                                    <option value="@pattern" data-native-zoom="@bgLayer.MaxZoom">@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
+                                    <option value="@pattern" data-layer-type="@bgLayer.Type.ToString()"  data-native-zoom="@bgLayer.MaxZoom">@ViewHelper.GetLabel(Localizer, bgLayer.Type)</option>
                                 }
                             }
                         </select>
