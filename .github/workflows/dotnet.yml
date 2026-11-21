@@ -24,6 +24,8 @@ jobs:
 
     - name: Build
       run: dotnet build --no-restore --configuration Release Arma3TacMap.sln
+      env:
+        SixLaborsLicenseKey: ${{secrets.SixLaborsLicenseKey}}
 
 #    - name: Test
 #      run: dotnet test --no-build --verbosity normal --configuration Release Arma3TacMap.sln

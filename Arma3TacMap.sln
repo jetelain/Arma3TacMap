@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+# Visual Studio Version 18
+VisualStudioVersion = 18.11.12328.437 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arma3TacMapWebApp", "Arma3TacMapWebApp\Arma3TacMapWebApp.csproj", "{10C9A732-7878-4C12-932A-BFE6E468D938}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arma3TacMapLibrary", "Arma3TacMapLibrary\Arma3TacMapLibrary.csproj", "{DDAD08A4-59E2-407C-984C-02C06840253D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arma3TacMapLibraryTest", "Arma3TacMapLibraryTest\Arma3TacMapLibraryTest.csproj", "{6561FDB0-2A4C-4D40-92C8-D9B8E42CCCE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{6A5FF574-97F7-49AE-8B35-6DD9F8F33C6E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
