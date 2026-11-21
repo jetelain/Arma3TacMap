@@ -159,7 +159,7 @@ namespace Arma3TacMapWebApp.Controllers
             ViewBag.IsFullScreen = true;
             return View(new StaticMapModel(){
                 center = data.Center,
-                GmsBaseUri = _mapInfos.BaseUri.AbsolutePath,
+                GmsBaseUri = _mapInfos.BaseUri.AbsoluteUri,
                 endpoint = _mapInfos.LegacyEndpoint.AbsoluteUri,
                 markers = data.Markers.ToDictionary(m => m.Id.ToString(), m => MarkerData.Deserialize(m.MarkerData)),
                 worldName = data.WorldName,
